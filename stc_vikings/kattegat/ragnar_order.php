@@ -6719,7 +6719,55 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$message = "Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A')." <br> Quantity :".number_format($total_dispatched_now,2)." ".$item_unit;
 		$this->stc_daily_req_log($item_id, $title, $message);
 
-		return ['success' => true, 'message' => 'Balance dispatched successfully.', 'dispatched_qty' => number_format($total_dispatched_now, 2)];
+		$main_status_code = $new_status;
+		$main_req_qty = 0.0;
+		$main_product_id = $product_id;
+		$main_q = mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_super_requisition_list_items_status` AS status_code,
+				`stc_cust_super_requisition_list_items_approved_qty` AS req_qty,
+				IFNULL(`stc_cust_super_requisition_list_items_product_id`, 0) AS product_id
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			LIMIT 1
+		");
+		if($main_q && mysqli_num_rows($main_q) > 0){
+			$main_row = mysqli_fetch_assoc($main_q);
+			$main_status_code = (int)($main_row['status_code'] ?? $new_status);
+			$main_req_qty = (float)($main_row['req_qty'] ?? 0);
+			$main_product_id = (int)($main_row['product_id'] ?? $product_id);
+		}
+		$total_item_dispatched = 0.0;
+		$total_item_q = mysqli_query($this->stc_dbs, "
+			SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
+			FROM `stc_cust_super_requisition_list_items_rec`
+			WHERE `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+		");
+		if($total_item_q){
+			$total_item_row = mysqli_fetch_assoc($total_item_q);
+			$total_item_dispatched = (float)($total_item_row['total_qty'] ?? 0);
+		}
+		$main_status_text = 'Closed';
+		if($main_status_code === 1){ $main_status_text = 'Ordered'; }
+		elseif($main_status_code === 2){ $main_status_text = 'Approved'; }
+		elseif($main_status_code === 3){ $main_status_text = 'Accepted'; }
+		elseif($main_status_code === 4){ $main_status_text = 'Dispatched'; }
+		elseif($main_status_code === 5){ $main_status_text = 'Received'; }
+		elseif($main_status_code === 6){ $main_status_text = 'Rejected'; }
+		elseif($main_status_code === 7){ $main_status_text = 'Canceled'; }
+		elseif($main_status_code === 8){ $main_status_text = 'Returned'; }
+		elseif($main_status_code === 9){ $main_status_text = 'Pending'; }
+
+		return [
+			'success' => true,
+			'message' => 'Balance dispatched successfully.',
+			'dispatched_qty' => number_format($total_dispatched_now, 2),
+			'status_code' => $main_status_code,
+			'status_text' => $main_status_text,
+			'total_dispatched_qty' => number_format($total_item_dispatched, 2),
+			'req_qty' => number_format($main_req_qty, 2),
+			'product_id' => $main_product_id
+		];
 	}
 
 	/**

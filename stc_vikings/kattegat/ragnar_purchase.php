@@ -2686,8 +2686,11 @@ class ragnarPurchaseAdhoc extends tesseract{
 				if(mysqli_num_rows($sql_qry)>0){
 					foreach($sql_qry as $sql_row){
 						$pro_image=$sql_row['stc_product_image'];
-						$productog="<img src='".stc_product_image_url($pro_image)."' style='height:80px;'>";
+						$productog="<img src='".stc_product_image_url($pro_image)."' alt='' class='stc-poa-product-thumb'>";
 					}
+				}
+				if($productog === ''){
+					$productog = "<span class='stc-poa-product-thumb-placeholder' title='No image'><i class='fa fa-image' aria-hidden='true'></i></span>";
 				}
 
 				$adhocEscShop = mysqli_real_escape_string($this->stc_dbs, (string)$odinrow['stc_purchase_product_adhoc_id']);
@@ -2735,7 +2738,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 				if($stock==0){
 					$cherrypick='';
 				}
-				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$pro_prate='<input type="number" style="display:none" placeholder="Enter purchase rate" class="form-control img-idprateinput" value="'.$poadhoc_prate.'" step="0.01" oninput="calculateInlineSaleRate(this)"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$pro_percentage='<input type="number" style="display:none" placeholder="Enter profit %" class="form-control img-idpercentageinput" step="0.01" oninput="calculateInlineSaleRate(this)"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpercentagebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$pro_rate='<input type="number" style="display:none" placeholder="Calculated sale rate" class="form-control img-idrateinput" value="'.$poadhoc_rate.'" readonly><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Update</a>';
@@ -2815,17 +2817,43 @@ class ragnarPurchaseAdhoc extends tesseract{
 				// }
 				$poadhoc_edit_src_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_source'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$poadhoc_edit_dst_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_destination'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$product_name_disp = htmlspecialchars((string)$product_name, ENT_QUOTES, 'UTF-8');
+				$itemdesc_disp = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_itemdesc'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$product_id_disp = htmlspecialchars((string)($odinrow['stc_product_id'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$adhoc_id_disp = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_id'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$product_img_btn = "
+					<button type='button'
+						class='stc-poa-link-product-trigger'
+						title='Link / change product'
+						aria-label='Link or change product'
+						data-adhoc-id='".$adhoc_id_disp."'
+						data-adhoc-name='".$itemdesc_disp."'
+						data-product-id='".$product_id_disp."'
+						data-product-name='".$product_name_disp."'>
+						".$productog."
+					</button>
+				";
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno." ".$checkbox."</td>
-						<td class='text-center' style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
-							<div style='font-weight: bold; color: #34495e;'>
-								".$odinrow['stc_purchase_product_adhoc_id']."
+						<td class='stc-poa-product-cell'>
+							<div class='stc-poa-product-wrap'>
+								<div class='stc-poa-product-imgbox'>".$product_img_btn."</div>
+								<div class='stc-poa-product-meta'>
+									<div class='stc-poa-product-line'>
+										<span class='stc-poa-product-id'>".$product_id_disp."</span>
+										<span class='text-muted'> - </span>
+										<a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name_disp."</a>
+									</div>
+									<div class='stc-poa-product-line'>
+										<span class='stc-poa-adhoc-id'>".$adhoc_id_disp."</span>
+										<span class='text-muted'> - </span>
+										<a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."' data-poa-source='".$poadhoc_edit_src_esc."' data-poa-destination='".$poadhoc_edit_dst_esc."'>".$itemdesc_disp."</a>
+										".$addtoollist."
+									</div>
+								</div>
 							</div>
 						</td>
-						<td style='width: 180px;'>".$productog."</td>
-						<td class='text-center'><b>".$odinrow['stc_product_id']."</b><br><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
-						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."' data-poa-source='".$poadhoc_edit_src_esc."' data-poa-destination='".$poadhoc_edit_dst_esc."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a> ".$addtoollist."</td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($poadhoc_qty, 2)."</td>

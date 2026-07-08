@@ -546,6 +546,57 @@ include("kattegat/role_check.php");
           z-index: 4;
           background: #f8f9fa;
           box-shadow: 0 1px 0 #dee2e6;
+          vertical-align: middle;
+          overflow: visible;
+          padding: 6px 8px;
+      }
+      .stc-poa-th-inner {
+          position: relative;
+          display: inline-block;
+          max-width: 100%;
+          vertical-align: middle;
+      }
+      .stc-poa-th-inner-check {
+          display: block;
+          width: 100%;
+      }
+      .stc-poa-th-text {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+          line-height: 1.3;
+          max-height: calc(1.3em * 2);
+          word-break: break-word;
+          text-align: center;
+      }
+      .stc-poa-results-frame thead th:hover {
+          z-index: 12;
+      }
+      .stc-poa-results-frame thead th:hover .stc-poa-th-text {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          top: 0;
+          min-width: 100%;
+          width: max-content;
+          max-width: min(300px, 92vw);
+          max-height: none;
+          -webkit-line-clamp: unset;
+          display: block;
+          overflow: visible;
+          background: #f8f9fa;
+          padding: 8px 10px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+          border: 1px solid #cfd4dc;
+          border-radius: 6px;
+          z-index: 30;
+          white-space: normal;
+      }
+      .stc-poa-th-inner .stc-poa-sort-icon {
+          display: inline-block;
+          vertical-align: top;
+          margin-left: 2px;
       }
       .stc-poa-sortable {
           cursor: pointer;
@@ -558,6 +609,294 @@ include("kattegat/role_check.php");
           font-size: 11px;
           color: #aaa;
           margin-left: 2px;
+      }
+      /* Fullscreen overlays must escape header/sidebar stacking; attached to body via JS */
+      .stc-poa-view-panel.stc-poa-view-fullscreen-active,
+      .stc-poa-create-panel.stc-poa-create-fullscreen-active {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          max-width: none !important;
+          max-height: none !important;
+          z-index: 30050 !important;
+          margin: 0 !important;
+          padding: 12px 14px !important;
+          border-radius: 0 !important;
+          border: none !important;
+          overflow: hidden !important;
+          background: #fff !important;
+          display: flex !important;
+          flex-direction: column !important;
+          box-sizing: border-box !important;
+          box-shadow: none !important;
+      }
+      .stc-poa-frame-bar {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          padding: 8px 12px;
+          margin-bottom: 8px;
+          border: 1px solid #c8e6c9;
+          border-radius: 8px;
+          background: #f8fff9;
+          flex: 0 0 auto;
+          position: relative;
+          z-index: 2;
+      }
+      .stc-poa-frame-title {
+          font-weight: 600;
+          color: #2c3e50;
+          font-size: 14px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+      .stc-poa-frame-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex: 0 0 auto;
+      }
+      .stc-poa-frame-actions .btn {
+          font-size: 18px;
+          padding: 5px 10px;
+          line-height: 1;
+      }
+      .stc-poa-toolbar {
+          display: flex;
+          flex-wrap: nowrap;
+          align-items: stretch;
+          gap: 8px;
+          width: 100%;
+      }
+      .stc-poa-toolbar-actions {
+          display: inline-flex;
+          flex: 0 0 auto;
+          height: 38px;
+      }
+      .stc-poa-toolbar-actions > .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 38px;
+          padding: 0 12px;
+          font-size: 18px;
+          line-height: 1;
+          box-sizing: border-box;
+      }
+      .stc-poa-toolbar-btn {
+          height: 38px;
+          padding: 0 14px;
+          line-height: 38px;
+          box-sizing: border-box;
+          white-space: nowrap;
+      }
+      .stc-poa-toolbar-dd {
+          flex: 0 0 auto;
+      }
+      .stc-poa-toolbar-dd > .stc-poa-toolbar-btn {
+          width: auto;
+      }
+      @media (max-width: 767px) {
+          .stc-poa-toolbar {
+              flex-wrap: wrap;
+          }
+          .stc-poa-toolbar-btn {
+              flex: 1 1 auto;
+          }
+      }
+      .stc-poa-frame-filters {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 10px;
+          margin-bottom: 8px;
+          border: 1px solid #e6ebf3;
+          border-radius: 8px;
+          background: #fff;
+          flex: 0 0 auto;
+      }
+      .stc-poa-frame-filters .stc-poa-ff {
+          flex: 1 1 160px;
+          min-width: 140px;
+          margin: 0;
+      }
+      .stc-poa-frame-filters .stc-poa-ff-search {
+          flex: 1 1 220px;
+          min-width: 180px;
+      }
+      .stc-poa-frame-filters .stc-poa-ff-status {
+          flex: 0 1 150px;
+          min-width: 130px;
+      }
+      .stc-poa-frame-filters .stc-poa-ff-btn {
+          flex: 0 0 auto;
+          min-width: 48px;
+      }
+      .stc-poa-frame-filters .form-control,
+      .stc-poa-frame-filters .custom-select {
+          height: 36px;
+          margin: 0;
+      }
+      .stc-poa-frame-filters .stc-poa-searchbar > .form-control {
+          height: 36px;
+          line-height: 36px;
+      }
+      .stc-poa-frame-filters .stc-poa-searchbar > .input-group-btn > .btn.stc-poa-search-btn {
+          height: 36px;
+          line-height: 36px;
+          padding: 0 12px;
+      }
+      .stc-poa-view-fullscreen-active .stc-poa-frame-filters {
+          background: #fbfcfe;
+      }
+      .stc-poa-frame-close {
+          display: none;
+      }
+      .stc-poa-view-fullscreen-active .stc-poa-view-frame-close,
+      .stc-poa-create-fullscreen-active .stc-poa-create-frame-close {
+          display: inline-flex !important;
+          align-items: center;
+          justify-content: center;
+          min-width: 38px;
+          min-height: 34px;
+          font-size: 22px !important;
+          font-weight: bold;
+          color: #fff !important;
+          background: #dc3545 !important;
+          border-color: #dc3545 !important;
+      }
+      .stc-poa-view-fullscreen-active .stc-poa-view-frame-close:hover,
+      .stc-poa-create-fullscreen-active .stc-poa-create-frame-close:hover {
+          background: #c82333 !important;
+          border-color: #bd2130 !important;
+      }
+      .stc-poa-view-fullscreen-active .stc-view-purchase-order-form {
+          flex: 1 1 auto;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
+          overflow: hidden;
+      }
+      .stc-poa-create-table-frame {
+          overflow: auto;
+      }
+      .stc-poa-view-fullscreen-active .stc-poa-results-frame,
+      .stc-poa-create-fullscreen-active .stc-poa-create-table-frame {
+          flex: 1 1 auto;
+          max-height: none !important;
+          height: auto;
+          overflow: auto;
+      }
+      .stc-poa-view-fullscreen-active #pagination,
+      .stc-poa-create-fullscreen-active .stc-poa-create-footer {
+          flex: 0 0 auto;
+      }
+      body.stc-poa-view-fullscreen-body,
+      body.stc-poa-create-fullscreen-body {
+          overflow: hidden !important;
+      }
+      .stc-view-purchase-row-wrap.stc-poa-wrap-fullscreen .stc-view-purchase-row-width-handle {
+          display: none !important;
+      }
+      /* Bootstrap modals above POA fullscreen frame (30050); SweetAlert stays on top */
+      .modal-backdrop {
+          z-index: 30090 !important;
+      }
+      .stc-poa-product-cell {
+          min-width: 380px;
+          max-width: 520px;
+          width: 420px;
+          vertical-align: middle !important;
+      }
+      .stc-poa-product-wrap {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          text-align: left;
+      }
+      .stc-poa-product-imgbox {
+          flex: 0 0 92px;
+          width: 92px;
+          text-align: center;
+      }
+      .stc-poa-link-product-trigger {
+          display: block;
+          width: 100%;
+          padding: 0;
+          margin: 0;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          line-height: 0;
+      }
+      .stc-poa-link-product-trigger:focus {
+          outline: 2px solid rgba(63,106,216,0.45);
+          outline-offset: 2px;
+          border-radius: 8px;
+      }
+      .stc-poa-product-imgbox img,
+      .stc-poa-product-thumb {
+          width: 84px;
+          height: 84px;
+          object-fit: contain;
+          border: 1px solid #e6ebf3;
+          border-radius: 8px;
+          background: #fff;
+          display: block;
+          margin: 0 auto;
+          transition: box-shadow 0.15s ease, border-color 0.15s ease;
+      }
+      .stc-poa-link-product-trigger:hover .stc-poa-product-thumb,
+      .stc-poa-link-product-trigger:hover .stc-poa-product-thumb-placeholder {
+          border-color: #3f6ad8;
+          box-shadow: 0 2px 8px rgba(63,106,216,0.2);
+      }
+      .stc-poa-product-thumb-placeholder {
+          width: 84px;
+          height: 84px;
+          border: 1px dashed #cfd8e3;
+          border-radius: 8px;
+          background: #f8fafc;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto;
+          color: #8a9bb0;
+          font-size: 28px;
+      }
+      .stc-poa-product-meta {
+          flex: 1 1 auto;
+          min-width: 0;
+      }
+      .stc-poa-product-line {
+          line-height: 1.4;
+          margin-bottom: 6px;
+          word-break: break-word;
+      }
+      .stc-poa-product-line:last-child {
+          margin-bottom: 0;
+      }
+      .stc-poa-product-id {
+          font-weight: 700;
+          color: #2c3e50;
+      }
+      .stc-poa-adhoc-id {
+          font-weight: 700;
+          color: #34495e;
+      }
+      #stc-poa-product-picker-banner {
+          border-radius: 8px;
+      }
+      #stc-poa-product-picker-banner strong {
+          color: #1f2d3d;
       }
       .stc-table-scroll {
           display: block;
@@ -816,7 +1155,17 @@ include("kattegat/role_check.php");
                                 <div class="row">
                                     <div class="col-xl-12 col-md-12 col-sm-12">
                                         <form action="" class="stc-add-poadhoc-product-form">
-                                            <div class="card-border mb-3 card card-body border-success">
+                                            <div class="card-border mb-3 card card-body border-success stc-poa-create-panel" id="stc-poa-create-panel">
+                                                <div class="stc-poa-frame-bar">
+                                                  <span class="stc-poa-frame-title">Create Purchase Order Adhoc</span>
+                                                  <div class="stc-poa-frame-actions">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary stc-poa-create-fullscreen" title="Full screen" aria-label="Full screen"><i class="fa fa-expand" aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-success stc-poa-create-export-excel" title="Export to Excel" aria-label="Export to Excel"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary stc-poa-create-reload" title="Reload form" aria-label="Reload form"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger stc-poa-frame-close stc-poa-create-frame-close" title="Close full screen" aria-label="Close full screen"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                                  </div>
+                                                </div>
+                                                <div class="stc-poa-create-table-frame">
                                                 <table class="table table-bordered" id="itemsTable">
                                                     <thead>
                                                         <tr>
@@ -1023,11 +1372,14 @@ include("kattegat/role_check.php");
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                </div>
+                                                <div class="stc-poa-create-footer">
                                                 <div class="text-right mb-3">
                                                     <button type="button" class="btn btn-success" id="addRow">Add Another Row</button>
                                                 </div>
                                                 <div class="text-center">
                                                     <button type="submit" class="btn btn-primary stc-poadhoc-save">Save All Items</button>
+                                                </div>
                                                 </div>
                                             </div>
                                         </form>
@@ -1037,124 +1389,68 @@ include("kattegat/role_check.php");
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
-                                    <div class="card-border mb-3 card card-body border-success">
-                                      <div class="row mb-3">
-                                        <div class="col-4 col-sm-12 text-left">
-                                          <div class="btn-group" role="group" aria-label="Quick actions">
-                                            <a
-                                              class="btn btn-sm btn-outline-secondary"
-                                              data-toggle="modal"
-                                              data-target=".bd-modal-inventoryshow"
-                                              href="javascript:void(0)"
-                                              title="View Inventory"
-                                              aria-label="View Inventory"
-                                              style="font-size: 25px;"
-                                            ><i class="fa fa-cubes" aria-hidden="true"></i></a>
-                                            <a
-                                              class="btn btn-sm btn-outline-success"
-                                              data-toggle="modal"
-                                              data-target=".bd-modal-ledgershow"
-                                              href="javascript:void(0)"
-                                              title="View Ledger"
-                                              aria-label="View Ledger"
-                                              style="font-size: 25px;"
-                                            ><i class="fa fa-book" aria-hidden="true"></i></a>
-                                            <a
-                                              class="btn btn-sm btn-outline-danger"
-                                              data-toggle="modal"
-                                              data-target=".bd-modal-pendingshow"
-                                              href="javascript:void(0)"
-                                              title="View Adjustments"
-                                              aria-label="View Adjustments"
-                                              style="font-size: 25px;"
-                                            ><i class="fa fa-sliders" aria-hidden="true"></i></a>
-                                            <a
-                                              class="btn btn-sm btn-outline-primary reset-items"
-                                              href="javascript:void(0)"
-                                              title="Reset Items"
-                                              aria-label="Reset Items"
-                                              style="font-size: 25px;"
-                                            ><i class="fa fa-refresh" aria-hidden="true"></i></a>
-                                          </div>
-                                        </div>
-
-                                        <div class="col-md-3 col-sm-6 mb-2">
-                                          <button
-                                            type="button"
-                                            class="btn btn-primary btn-block"
+                                    <div class="card-border mb-1 card card-body border-success">
+                                      <div class="stc-poa-toolbar">
+                                        <div class="stc-poa-toolbar-actions btn-group" role="group" aria-label="Quick actions">
+                                          <a
+                                            class="btn btn-outline-secondary"
                                             data-toggle="modal"
-                                            data-target=".bd-modal-adhoc-advanced-search"
-                                          >
-                                            <i class="fa fa-filter" aria-hidden="true"></i> Advanced search
-                                          </button>
+                                            data-target=".bd-modal-inventoryshow"
+                                            href="javascript:void(0)"
+                                            title="View Inventory"
+                                            aria-label="View Inventory"
+                                          ><i class="fa fa-cubes" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-success"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-ledgershow"
+                                            href="javascript:void(0)"
+                                            title="View Ledger"
+                                            aria-label="View Ledger"
+                                          ><i class="fa fa-book" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-danger"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-pendingshow"
+                                            href="javascript:void(0)"
+                                            title="View Adjustments"
+                                            aria-label="View Adjustments"
+                                          ><i class="fa fa-sliders" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-primary reset-items"
+                                            href="javascript:void(0)"
+                                            title="Reset Items"
+                                            aria-label="Reset Items"
+                                          ><i class="fa fa-refresh" aria-hidden="true"></i></a>
                                         </div>
 
-                                        <div class="col-md-3 col-sm-6 mb-2">
-                                          <div class="dropdown">
-                                            <button
-                                              class="btn btn-success btn-block dropdown-toggle"
-                                              type="button"
-                                              id="stc-poa-columns-btn"
-                                              data-toggle="dropdown"
-                                              aria-haspopup="true"
-                                              aria-expanded="false"
-                                            >
-                                              <i class="fa fa-columns" aria-hidden="true"></i> Columns <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="stc-poa-columns-btn" id="stc-poa-columns-menu">
-                                              <li style="padding: 2px 0;"><strong>Show / hide columns</strong></li>
-                                              <li role="separator" class="divider"></li>
-                                              <li style="padding: 0;">
-                                                <div id="stc-poa-columns-menu-items"></div>
-                                              </li>
-                                            </ul>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="row" style="align-items: center;">
-                                        <div class="col-md-3 col-sm-12 mb-2">
-                                          <div class="input-group stc-poa-searchbar">
-                                            <input
-                                              type="text"
-                                              class="form-control stc-poa-searchbyitem"
-                                              id="stc-poa-searchbyitem"
-                                              placeholder="Search here…"
-                                            >
-                                            <span class="input-group-btn">
-                                              <button type="button" class="btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
-                                                <i class="fa fa-search" aria-hidden="true"></i>
-                                              </button>
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-12 mb-2">
-                                          <div class="stc-adv-field">
-                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type source/location name…" aria-labelledby="stc-adv-lbl-adhocname">
-                                          </div>
-                                        </div>
-                                        <div class="col-md-2 col-sm-12 mb-2">
-                                          <div class="stc-adv-field">
-                                            <input type="text" id="stc-adv-rack" class="form-control" placeholder="Type rack name…" aria-labelledby="stc-adv-lbl-adhocname">
-                                          </div>
-                                        </div>
-                                        <div class="col-md-2 col-sm-12 mb-2">
-                                          <div class="stc-adv-field">
-                                            <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
-                                              <option value="NA">Select Status</option>
-                                              <option value="1">Stock</option>
-                                              <option value="2">Dispatched</option>
-                                              <option value="3">Pending</option>
-                                              <option value="4">Approved</option>
-                                              <option value="5">Rejected</option>
-                                            </select>
-                                          </div>
-                                        </div>
-                                        <div class="col-md-2 col-sm-12 mb-2">
-                                          <div class="stc-adv-field">
-                                          <button type="button" class="form-control btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
-                                                <i class="fa fa-search" aria-hidden="true"></i>
-                                              </button>
-                                          </div>
+                                        <button
+                                          type="button"
+                                          class="btn btn-primary stc-poa-toolbar-btn"
+                                          data-toggle="modal"
+                                          data-target=".bd-modal-adhoc-advanced-search"
+                                        >
+                                          <i class="fa fa-filter" aria-hidden="true"></i> Advanced search
+                                        </button>
+
+                                        <div class="dropdown stc-poa-toolbar-dd">
+                                          <button
+                                            class="btn btn-success dropdown-toggle stc-poa-toolbar-btn"
+                                            type="button"
+                                            id="stc-poa-columns-btn"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                          >
+                                            <i class="fa fa-columns" aria-hidden="true"></i> Columns <span class="caret"></span>
+                                          </button>
+                                          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="stc-poa-columns-btn" id="stc-poa-columns-menu">
+                                            <li style="padding: 2px 0;"><strong>Show / hide columns</strong></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li style="padding: 0;">
+                                              <div id="stc-poa-columns-menu-items"></div>
+                                            </li>
+                                          </ul>
                                         </div>
                                       </div>
 
@@ -1168,39 +1464,161 @@ include("kattegat/role_check.php");
                                   </button>
                                   <div class="row stc-view-purchase-row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
-                                      <div class="card-border mb-3 card card-body border-success">
+                                      <div class="card-border mb-3 card card-body border-success stc-poa-view-panel" id="stc-poa-view-panel">
+                                        <div class="stc-poa-frame-bar">
+                                          <span class="stc-poa-frame-title">View Purchase Adhoc</span>
+                                          <div class="stc-poa-frame-actions">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary stc-poa-view-fullscreen" title="Full screen" aria-label="Full screen"><i class="fa fa-expand" aria-hidden="true"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-success stc-poa-view-export-excel" title="Export to Excel" aria-label="Export to Excel"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary stc-poa-view-reload" title="Reload results" aria-label="Reload results"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger stc-poa-frame-close stc-poa-view-frame-close" title="Close full screen" aria-label="Close full screen"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                          </div>
+                                        </div>
+                                        <div class="stc-poa-frame-filters">
+                                          <div class="stc-poa-ff stc-poa-ff-search">
+                                            <div class="input-group stc-poa-searchbar">
+                                              <input
+                                                type="text"
+                                                class="form-control stc-poa-searchbyitem"
+                                                id="stc-poa-searchbyitem"
+                                                placeholder="Search here…"
+                                              >
+                                              <span class="input-group-btn">
+                                                <button type="button" class="btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
+                                                  <i class="fa fa-search" aria-hidden="true"></i>
+                                                </button>
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <div class="stc-poa-ff">
+                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type source/location name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                          </div>
+                                          <div class="stc-poa-ff">
+                                            <input type="text" id="stc-adv-rack" class="form-control" placeholder="Type rack name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                          </div>
+                                          <div class="stc-poa-ff stc-poa-ff-status">
+                                            <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
+                                              <option value="NA">Select Status</option>
+                                              <option value="1">Stock</option>
+                                              <option value="2">Dispatched</option>
+                                              <option value="3">Pending</option>
+                                              <option value="4">Approved</option>
+                                              <option value="5">Rejected</option>
+                                            </select>
+                                          </div>
+                                          <div class="stc-poa-ff-btn">
+                                            <button type="button" class="btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
+                                              <i class="fa fa-search" aria-hidden="true"></i>
+                                            </button>
+                                          </div>
+                                        </div>
                                         <form action="" class="stc-view-purchase-order-form">
                                           <div class="stc-poa-results-frame" role="region" aria-label="Purchase adhoc results">
                                             <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
                                               <thead>
                                                 <tr>
                                                   <th>
-                                                    <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto; display: block;">
-                                                    <br>Sl No.
+                                                    <div class="stc-poa-th-inner stc-poa-th-inner-check">
+                                                      <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto 4px; display: block;">
+                                                      <span class="stc-poa-th-text">Sl No.</span>
+                                                    </div>
                                                   </th>
-                                                  <th class="stc-poa-sortable" data-col="adhoc_id">Adhoc_Id <span class="stc-poa-sort-icon">&#8595;</span></th>
-                                                  <th>Linked Product</th>
-                                                  <th class="stc-poa-sortable" data-col="product_id">Product ID<br> Product Name <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="item_name">Item Name <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="rack">Rack <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="unit">Unit <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="quantity">Quantity <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="purchase_rate">Purchase Rate</br>Profit % / Sale Rate <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th>Stock</th>
-                                                  <th>Shop</th>
-                                                  <th>Dispatch Details</th>
-                                                  <th class="stc-poa-sortable" data-col="source">From Source (Supplier/Location)<br>To Destination (Location) <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="condition">Condition <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="received_by">Received_By <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="created_date">Created_By<br>Created_Date <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="updated_date">Updated_By<br>Updated_Date <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="status">Status <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th class="stc-poa-sortable" data-col="remarks">Remarks <span class="stc-poa-sort-icon">&#8645;</span></th>
-                                                  <th>Action</th>
+                                                  <th class="stc-poa-sortable" data-col="adhoc_id">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Product Details</span>
+                                                      <span class="stc-poa-sort-icon">&#8595;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="rack">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Rack</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="unit">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Unit</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="quantity">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Quantity</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="purchase_rate">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Purchase Rate<br>Profit % / Sale Rate</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th>
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Stock</span>
+                                                    </div>
+                                                  </th>
+                                                  <th>
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Shop</span>
+                                                    </div>
+                                                  </th>
+                                                  <th>
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Dispatch Details</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="source">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">From Source (Supplier/Location)<br>To Destination (Location)</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="condition">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Condition</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="received_by">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Received_By</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="created_date">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Created_By<br>Created_Date</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="updated_date">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Updated_By<br>Updated_Date</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="status">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Status</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="remarks">
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Remarks</span>
+                                                      <span class="stc-poa-sort-icon">&#8645;</span>
+                                                    </div>
+                                                  </th>
+                                                  <th>
+                                                    <div class="stc-poa-th-inner">
+                                                      <span class="stc-poa-th-text">Action</span>
+                                                    </div>
+                                                  </th>
                                                 </tr>
                                               </thead>
                                               <tbody class="stc-call-view-poadhoc-row">
-                                                <tr><td colspan="20">Search</td></tr>
+                                                <tr><td colspan="17">Search</td></tr>
                                               </tbody>
                                             </table>
                                           </div>
@@ -1222,6 +1640,14 @@ include("kattegat/role_check.php");
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./assets/scripts/jquery.table2excel.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      /* Above Bootstrap modals (~1050) and fullscreen frame (30050) */
+      .swal2-container {
+        z-index: 40000 !important;
+      }
+    </style>
     <script>
         <?php
         if (!isset($con)) {
@@ -1262,6 +1688,59 @@ include("kattegat/role_check.php");
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+        }
+
+        function stcSwalGuessIcon(message) {
+          var m = String(message || '').toLowerCase();
+          if (/(success|saved|updated|deleted|linked|done)/.test(m)) return 'success';
+          if (/(fail|error|wrong|missing|could not|invalid|collision|expired|required|please |no rows|at least)/.test(m)) return 'warning';
+          return 'info';
+        }
+
+        function stcAlert(message, icon) {
+          message = (message === undefined || message === null) ? '' : String(message);
+          icon = icon || stcSwalGuessIcon(message);
+          if (typeof Swal !== 'undefined' && Swal && Swal.fire) {
+            var opts = {
+              icon: icon,
+              title: message,
+              confirmButtonText: 'OK',
+              heightAuto: false,
+              allowOutsideClick: true,
+              backdrop: true
+            };
+            // Success toasts auto-dismiss (no OK click needed)
+            if (icon === 'success') {
+              opts.timer = 2000;
+              opts.timerProgressBar = true;
+              opts.showConfirmButton = false;
+            }
+            return Swal.fire(opts);
+          }
+          window.alert(message);
+          return Promise.resolve();
+        }
+
+        function stcConfirm(message, opts) {
+          opts = opts || {};
+          message = (message === undefined || message === null) ? '' : String(message);
+          if (typeof Swal !== 'undefined' && Swal && Swal.fire) {
+            return Swal.fire({
+              icon: opts.icon || 'question',
+              title: opts.title || 'Confirm',
+              text: message,
+              showCancelButton: true,
+              confirmButtonText: opts.confirmText || 'Yes',
+              cancelButtonText: opts.cancelText || 'No',
+              reverseButtons: true,
+              heightAuto: false,
+              allowOutsideClick: false,
+              backdrop: true
+            }).then(function (result) {
+              return !!(result && result.isConfirmed);
+            });
+          }
+          return Promise.resolve(window.confirm(message));
         }
 
           $(document).ready(function(){
@@ -2077,6 +2556,35 @@ include("kattegat/role_check.php");
           });
 
           // Safety net: if any modal leaves a stray backdrop, clean it.
+          function stcPoaEnsureModalsInBody() {
+            $('.modal').each(function() {
+              var $modal = $(this);
+              if ($modal.parent()[0] !== document.body) {
+                $modal.appendTo('body');
+              }
+            });
+          }
+
+          function stcPoaBoostModalLayer($modal) {
+            var baseZ = 30100;
+            var openCount = $('.modal.in').length;
+            var z = baseZ + (openCount * 20);
+            $modal.css('z-index', z);
+            setTimeout(function() {
+              $('.modal-backdrop').not('.modal-stack').last()
+                .css('z-index', z - 10)
+                .addClass('modal-stack');
+            }, 0);
+          }
+
+          stcPoaEnsureModalsInBody();
+
+          $(document).on('show.bs.modal', '.modal', function() {
+            var $modal = $(this);
+            stcPoaEnsureModalsInBody();
+            stcPoaBoostModalLayer($modal);
+          });
+
           $(document).on('hidden.bs.modal', function() {
             if ($('.modal.in').length === 0) {
               $('body').removeClass('modal-open').css('padding-right', '');
@@ -2114,7 +2622,7 @@ include("kattegat/role_check.php");
             if ($itemsHost.data('built') === 1) return;
             $itemsHost.data('built', 1);
 
-            var cookieKey = 'stc_poadhoc_cols_v1';
+            var cookieKey = 'stc_poadhoc_cols_v2';
             var storedRaw = stcGetCookie(cookieKey);
             var stored = null;
             try { stored = storedRaw ? JSON.parse(storedRaw) : null; } catch (e) { stored = null; }
@@ -2137,6 +2645,8 @@ include("kattegat/role_check.php");
             // Employee-specific column restrictions (hide + remove from chooser)
             var stcEmpId = <?php echo isset($_SESSION['stc_empl_id']) ? (int)$_SESSION['stc_empl_id'] : 0; ?>;
             var stcRestrictRateCol = (stcEmpId === 19 || stcEmpId === 20);
+            // Purchase Rate column index after merged Product column (Sl No=1, Product=2, ... Rate=6)
+            var rateColIdx = 6;
 
             var $ths = $table.find('thead th');
             var html = '<ul class="stc-poa-col-ul" role="menu">';
@@ -2153,7 +2663,7 @@ include("kattegat/role_check.php");
 
               var norm = normalizeLabel(label);
               // For employees 19 & 20, completely skip the rate column in chooser and force-hide it.
-              if (stcRestrictRateCol && idx === 9) {
+              if (stcRestrictRateCol && idx === rateColIdx) {
                 setPoaColumnVisible(idx, false);
                 return;
               }
@@ -2213,6 +2723,7 @@ include("kattegat/role_check.php");
 
             var stcEmpId = <?php echo isset($_SESSION['stc_empl_id']) ? (int)$_SESSION['stc_empl_id'] : 0; ?>;
             var stcRestrictRateCol = (stcEmpId === 19 || stcEmpId === 20);
+            var rateColIdx = 6;
 
             // Prefer current UI state if chooser exists; fallback to cookie.
             var $toggles = $('#stc-poa-columns-menu-items .stc-poa-col-toggle');
@@ -2224,18 +2735,17 @@ include("kattegat/role_check.php");
 
               // Employee-specific: even though column is not in chooser, force-hide its TDs too.
               if (stcRestrictRateCol) {
-                setPoaColumnVisible(9, false);
+                setPoaColumnVisible(rateColIdx, false);
               }
               return;
             }
 
             // Employee-specific: force-hide rate column for 19 & 20.
             if (stcRestrictRateCol) {
-              // Rate column is 9th in current table layout (Purchase Rate / Profit % / Sale Rate)
-              setPoaColumnVisible(9, false);
+              setPoaColumnVisible(rateColIdx, false);
             }
 
-            var cookieKey = 'stc_poadhoc_cols_v1';
+            var cookieKey = 'stc_poadhoc_cols_v2';
             var storedRaw = stcGetCookie(cookieKey);
             var stored = null;
             try { stored = storedRaw ? JSON.parse(storedRaw) : null; } catch (e) { stored = null; }
@@ -2313,9 +2823,9 @@ include("kattegat/role_check.php");
             var $locList = $('#stc-typeahead-location');
 
             if ($rackInput.length && $rackList.length) {
-              var rackValues = stcGetColumnTextValues(6, false); // Rack column
+              var rackValues = stcGetColumnTextValues(3, false); // Rack column
               $rackInput.off('.stcTypeahead').on('focus.stcTypeahead input.stcTypeahead', function() {
-                rackValues = stcGetColumnTextValues(6, false);
+                rackValues = stcGetColumnTextValues(3, false);
                 stcRenderTypeahead($rackInput, $rackList, rackValues);
               });
               $rackList.off('.stcTypeahead').on('click.stcTypeahead', '.stc-typeahead-item', function() {
@@ -2325,9 +2835,9 @@ include("kattegat/role_check.php");
             }
 
             if ($locInput.length && $locList.length) {
-              var locValues = stcGetColumnTextValues(13, true); // Source/Destination column
+              var locValues = stcGetColumnTextValues(10, true); // Source/Destination column
               $locInput.off('.stcTypeahead').on('focus.stcTypeahead input.stcTypeahead', function() {
-                locValues = stcGetColumnTextValues(13, true);
+                locValues = stcGetColumnTextValues(10, true);
                 stcRenderTypeahead($locInput, $locList, locValues);
               });
               $locList.off('.stcTypeahead').on('click.stcTypeahead', '.stc-typeahead-item', function() {
@@ -2367,7 +2877,7 @@ include("kattegat/role_check.php");
             $(this).closest('.stc-poa-col-item').attr('aria-checked', $(this).is(':checked') ? 'true' : 'false');
 
             // Persist to cookie
-            var cookieKey = 'stc_poadhoc_cols_v1';
+            var cookieKey = 'stc_poadhoc_cols_v2';
             var storedRaw = stcGetCookie(cookieKey);
             var stored = {};
             try { stored = storedRaw ? JSON.parse(storedRaw) : {}; } catch (e) { stored = {}; }
@@ -2416,6 +2926,178 @@ include("kattegat/role_check.php");
           if(urlParams.has('product_id')){
             $('#itemsTable tbody').find('input[name="itemcode[]"]').val(urlParams.get('product_id'));
           }
+
+          var stcPoaFsPlaceholders = {};
+
+          function stcPoaMovePanelToBody($panel, key) {
+            if (!$panel.length || $panel.data('stc-fs-on-body') === 1) return;
+            var $ph = $('<div class="stc-poa-fs-placeholder" data-stc-fs-key="' + key + '" aria-hidden="true"></div>');
+            $panel.before($ph);
+            stcPoaFsPlaceholders[key] = $ph;
+            $('body').append($panel);
+            $panel.data('stc-fs-on-body', 1);
+          }
+
+          function stcPoaRestorePanelFromBody($panel, key) {
+            if (!$panel.length || $panel.data('stc-fs-on-body') !== 1) return;
+            var $ph = stcPoaFsPlaceholders[key];
+            if ($ph && $ph.length) {
+              $ph.before($panel);
+              $ph.remove();
+            }
+            delete stcPoaFsPlaceholders[key];
+            $panel.removeData('stc-fs-on-body');
+          }
+
+          function stcPoaSetCreateFullscreen(active) {
+            var $panel = $('#stc-poa-create-panel');
+            var $btn = $panel.find('.stc-poa-create-fullscreen');
+            var $icon = $btn.find('i');
+            if (active) {
+              stcPoaMovePanelToBody($panel, 'create');
+              $panel.addClass('stc-poa-create-fullscreen-active');
+              $('body').addClass('stc-poa-create-fullscreen-body');
+              $btn.attr('title', 'Exit full screen').attr('aria-label', 'Exit full screen');
+              $icon.removeClass('fa-expand').addClass('fa-compress');
+            } else {
+              $panel.removeClass('stc-poa-create-fullscreen-active');
+              $('body').removeClass('stc-poa-create-fullscreen-body');
+              stcPoaRestorePanelFromBody($panel, 'create');
+              $btn.attr('title', 'Full screen').attr('aria-label', 'Full screen');
+              $icon.removeClass('fa-compress').addClass('fa-expand');
+            }
+          }
+
+          function stcPoaSetViewFullscreen(active) {
+            var $panel = $('#stc-poa-view-panel');
+            var $wrap = $panel.closest('.stc-view-purchase-row-wrap');
+            if (!$wrap.length && stcPoaFsPlaceholders.view) {
+              $wrap = stcPoaFsPlaceholders.view.closest('.stc-view-purchase-row-wrap');
+            }
+            var $btn = $panel.find('.stc-poa-view-fullscreen');
+            var $icon = $btn.find('i');
+            if (active) {
+              stcPoaMovePanelToBody($panel, 'view');
+              $panel.addClass('stc-poa-view-fullscreen-active');
+              if ($wrap.length) $wrap.addClass('stc-poa-wrap-fullscreen');
+              $('body').addClass('stc-poa-view-fullscreen-body');
+              $btn.attr('title', 'Exit full screen').attr('aria-label', 'Exit full screen');
+              $icon.removeClass('fa-expand').addClass('fa-compress');
+            } else {
+              $panel.removeClass('stc-poa-view-fullscreen-active');
+              $('body').removeClass('stc-poa-view-fullscreen-body');
+              stcPoaRestorePanelFromBody($panel, 'view');
+              $wrap = $panel.closest('.stc-view-purchase-row-wrap');
+              if ($wrap.length) $wrap.removeClass('stc-poa-wrap-fullscreen');
+              $btn.attr('title', 'Full screen').attr('aria-label', 'Full screen');
+              $icon.removeClass('fa-compress').addClass('fa-expand');
+            }
+          }
+
+          function stcPoaExportTableExcel(tableSelector, filenamePrefix) {
+            var $src = $(tableSelector);
+            if (!$src.length || !$.fn.table2excel) return;
+            var $clone = $src.clone();
+            $clone.find('input, textarea, select').each(function() {
+              var $el = $(this);
+              var val = $el.is('select') ? $el.find('option:selected').text() : ($el.val() || '');
+              $el.replaceWith($('<span/>').text(val));
+            });
+            $clone.find('button, a, .itemname-autocomplete-list, .dropdown-options, img').each(function() {
+              var $el = $(this);
+              if ($el.is('a') && $.trim($el.text()) !== '') {
+                $el.replaceWith($('<span/>').text($.trim($el.text())));
+              } else if (!$el.is('a')) {
+                $el.remove();
+              }
+            });
+            $clone.find('th, td').each(function() {
+              if ($(this).css('display') === 'none') {
+                $(this).remove();
+              }
+            });
+            var $wrap = $('<div style="display:none;"/>').append($clone);
+            $('body').append($wrap);
+            $clone.table2excel({
+              filename: filenamePrefix + '-' + new Date().toISOString().slice(0, 10) + '.xls',
+              name: 'POA'
+            });
+            $wrap.remove();
+          }
+
+          function stcPoaReloadCreateForm() {
+            stcConfirm('Reload form? Unsaved changes will be lost.', { title: 'Reload form' }).then(function(ok) {
+              if (!ok) return;
+              var $template = $('.item-row:first').clone();
+              $template.find('input, textarea').val('');
+              $template.find('.itemname-autocomplete-list').hide().empty();
+              $template.find('select[name="unit[]"]').val('NOS');
+              $template.find('select[name="condition[]"]').val('Good');
+              $template.find('select[name="destination[]"]').val('MANGO 17 NO STORE');
+              $template.find('select[name="rack[]"]').val('NA');
+              $template.find('[name="rate[]"]').val('0');
+              $('#itemsTable tbody').empty().append($template);
+              if (urlParams.has('product_id')) {
+                $('#itemsTable tbody').find('input[name="itemcode[]"]').val(urlParams.get('product_id'));
+              }
+              if (urlParams.has('brequist_id')) {
+                $('#addRow').hide();
+              } else {
+                $('#addRow').show();
+              }
+            });
+          }
+
+          $(document).on('click', '.stc-poa-create-fullscreen', function() {
+            var isActive = $('#stc-poa-create-panel').hasClass('stc-poa-create-fullscreen-active');
+            stcPoaSetCreateFullscreen(!isActive);
+          });
+
+          $(document).on('click', '.stc-poa-view-fullscreen', function() {
+            var isActive = $('#stc-poa-view-panel').hasClass('stc-poa-view-fullscreen-active');
+            stcPoaSetViewFullscreen(!isActive);
+          });
+
+          $(document).on('click', '.stc-poa-create-frame-close', function(e) {
+            e.preventDefault();
+            stcPoaSetCreateFullscreen(false);
+          });
+
+          $(document).on('click', '.stc-poa-view-frame-close', function(e) {
+            e.preventDefault();
+            stcPoaSetViewFullscreen(false);
+          });
+
+          $(document).on('click', '.stc-poa-create-export-excel', function(e) {
+            e.preventDefault();
+            stcPoaExportTableExcel('#itemsTable', 'purchase-adhoc-create');
+          });
+
+          $(document).on('click', '.stc-poa-view-export-excel', function(e) {
+            e.preventDefault();
+            stcPoaExportTableExcel('#stc-poadhoc-results-table', 'purchase-adhoc-results');
+          });
+
+          $(document).on('click', '.stc-poa-view-reload', function(e) {
+            e.preventDefault();
+            if (typeof Pagination !== 'undefined' && Pagination.loadData) {
+              Pagination.loadData(typeof currentPage !== 'undefined' ? currentPage : 1);
+            }
+          });
+
+          $(document).on('click', '.stc-poa-create-reload', function(e) {
+            e.preventDefault();
+            stcPoaReloadCreateForm();
+          });
+
+          $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $('#stc-poa-create-panel').hasClass('stc-poa-create-fullscreen-active')) {
+              stcPoaSetCreateFullscreen(false);
+            }
+            if (e.key === 'Escape' && $('#stc-poa-view-panel').hasClass('stc-poa-view-fullscreen-active')) {
+              stcPoaSetViewFullscreen(false);
+            }
+          });
 
           // Item name autocomplete search function
           function searchItemName(inputElement) {
@@ -2506,7 +3188,7 @@ include("kattegat/role_check.php");
               if($('#itemsTable tbody tr').length > 1) {
                   $(this).closest('tr').remove();
               } else {
-                  alert("You need to have at least one item row.");
+                  stcAlert("You need to have at least one item row.");
               }
           });
           
@@ -2540,7 +3222,7 @@ include("kattegat/role_check.php");
                   } else if(index === 0) {
                       // Only show error for first row if empty
                       isValid = false;
-                      alert('Please fill all required fields in at least the first row.');
+                      stcAlert('Please fill all required fields in at least the first row.');
                       return false; // Exit the each loop
                   }
               });
@@ -2567,18 +3249,18 @@ include("kattegat/role_check.php");
                   dataType: "JSON",
                   success: function(response){
                       if(response === "success") {
-                          alert("Purchase Order Adhoc saved successfully.");
+                          stcAlert("Purchase Order Adhoc saved successfully.");
                           $(".stc-add-poadhoc-product-form")[0].reset();
                           Pagination.loadData(pagenumber);
                           if (urlParams.has('brequist_id')) {
                             window.location.href = "agent-order.php";
                           }
                       } else {
-                          alert(response || "Something went wrong please check and try again.");
+                          stcAlert(response || "Something went wrong please check and try again.");
                       }
                   },
                   error: function(xhr, status, error) {
-                      alert("Error: " + error);
+                      stcAlert("Error: " + error);
                   }
               });
           });
@@ -2618,6 +3300,11 @@ include("kattegat/role_check.php");
             });
           }
           $('body').delegate('.product-select', 'click', function (e) {
+            // Create form product picker (not view-link mode)
+            window.stcPoaLinkMode = false;
+            window.stcPoaLinkAdhocId = '';
+            $('#stc-poa-product-picker-title').text('Product Selection');
+            $('#stc-poa-product-picker-banner').hide();
             // Remove classes from all previous rows first
             $('.product-select-val').removeClass("product-select-val");
             $('.product-select-name').removeClass("product-select-name");
@@ -2634,6 +3321,12 @@ include("kattegat/role_check.php");
             e.preventDefault();
             var pd_id = $(this).attr("id");
             var name = $(this).attr("pd-name");
+
+            // View-tab: bind selected catalog product to adhoc row
+            if (window.stcPoaLinkMode && window.stcPoaLinkAdhocId) {
+              stcPoaBindProductToAdhoc(window.stcPoaLinkAdhocId, pd_id);
+              return;
+            }
             
             // Find the row that has the active product-select-val class
             var $activeInput = $('.product-select-val');
@@ -2648,11 +3341,18 @@ include("kattegat/role_check.php");
               $activeInput.removeClass("product-select-val");
               $activeTextarea.removeClass("product-select-name");
               
-              alert("Product added successfully.");
-              $(".close").click();
+              stcAlert("Product added successfully.");
+              $(".stc-agent-req-get-mer-product-show").modal('hide');
             } else {
-              alert("Please select a row first.");
+              stcAlert("Please select a row first.");
             }
+          });
+
+          $('.stc-agent-req-get-mer-product-show').on('hidden.bs.modal', function() {
+            window.stcPoaLinkMode = false;
+            window.stcPoaLinkAdhocId = '';
+            $('#stc-poa-product-picker-banner').hide();
+            $('#stc-poa-product-picker-title').text('Product Selection');
           });
           
           // add recieving modal
@@ -2676,11 +3376,11 @@ include("kattegat/role_check.php");
               success : function(response_items){
                 var response=response_items.trim();
                 if(response=="success"){
-                  alert("Purchase Order Adhoc receiving saved successfully.");
+                  stcAlert("Purchase Order Adhoc receiving saved successfully.");
                   $('#stcpoadhocreceivedby').val("");
                   Pagination.loadData(pagenumber);
                 }else{
-                  alert("Something went wrong please check and try again.");
+                  stcAlert("Something went wrong please check and try again.");
                 }
               }
             });
@@ -2688,7 +3388,8 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.remove-products', 'click', function(e){
             var adhoc_id=$(this).attr("id");
-            if(confirm("Are you sure want to delete this product?")){
+            stcConfirm("Are you sure want to delete this product?", { title: 'Delete product' }).then(function(ok){
+            if(!ok) return;
               $.ajax({
                 url     : "kattegat/ragnar_purchase.php",
                 method  : "POST",
@@ -2699,17 +3400,17 @@ include("kattegat/role_check.php");
                 success : function(response_items){
                   var response=response_items.trim();
                   if(response=="success"){
-                    alert("Purchase Order Adhoc deleted successfully.");
+                    stcAlert("Purchase Order Adhoc deleted successfully.");
                     $('#stcpoadhocreceivedby').val("");
                     Pagination.loadData(pagenumber);
                   }else if(response=="invalid"){
-                    alert("Item cannot delete, Either its already sold or some of quantity sold.");
+                    stcAlert("Item cannot delete, Either its already sold or some of quantity sold.");
                   }else{
-                    alert("Something went wrong please check and try again.");
+                    stcAlert("Something went wrong please check and try again.");
                   }
                 }
               });
-            }          
+            });
           });  
           
           $('body').delegate('.edit-itemname', 'click', function(e){
@@ -2760,16 +3461,16 @@ include("kattegat/role_check.php");
               success : function(response_items){
                 var response = String(response_items || '').replace(/^\uFEFF/, '').trim();
                 if(response==="success"){
-                  alert("Item Name Updated Successfully.");
+                  stcAlert("Item Name Updated Successfully.");
                   $('#stcpoadhoceitemname').val("");
                   $('#stcpoadhoceitemrack').val('');
                   $('#stcpoadhoceitemrack-input').val('').removeData('rack-picked-id');
                   $('#stcpoadhoceitemrack-list').hide().empty();
                   Pagination.loadData(pagenumber);
                 }else if(response==="invalid_rack"){
-                  alert("Rack could not be resolved. Pick a suggestion from the list or type an exact rack name.");
+                  stcAlert("Rack could not be resolved. Pick a suggestion from the list or type an exact rack name.");
                 }else{
-                  alert("Something went wrong please check and try again.");
+                  stcAlert("Something went wrong please check and try again.");
                 }
               }
             });  
@@ -2841,7 +3542,7 @@ include("kattegat/role_check.php");
                 success : function(response_items){
                   var response=response_items.trim();
                   if(response=="success"){
-                    alert("Item Name Updated Successfully.");
+                    stcAlert("Item Name Updated Successfully.");
                     $('#cherryAdhocId').val('');
                     $('#cherryCurrentQty').val('');
                     $('#cherryQtyToDecrease').val('');
@@ -2851,7 +3552,7 @@ include("kattegat/role_check.php");
                     $('#cherryRate').val('');
                     Pagination.loadData(pagenumber);
                   }else{
-                    alert("Something went wrong please check and try again.");
+                    stcAlert("Something went wrong please check and try again.");
                   }
                 }
               });
@@ -2867,11 +3568,43 @@ include("kattegat/role_check.php");
             $(this).parent().find('.img-inputratebtn').toggle();
           });
 
-          $('body').delegate('.img-inputbtn', 'click', function(e){
-            var adhoc_id=$(this).attr('id');
-            var img_id=$(this).parent().find('.img-idinput').val();
-            $(this).parent().find('.img-idrateinput').toggle();
-            $(this).parent().find('.img-inputratebtn').toggle();
+          $('body').delegate('.stc-poa-link-product-trigger', 'click', function(e){
+            e.preventDefault();
+            var $btn = $(this);
+            var adhocId = $btn.attr('data-adhoc-id') || '';
+            var adhocName = $btn.attr('data-adhoc-name') || '';
+            var productId = $btn.attr('data-product-id') || '';
+            window.stcPoaLinkMode = true;
+            window.stcPoaLinkAdhocId = adhocId;
+            window.stcPoaLinkAdhocName = adhocName;
+            window.stcPoaLinkCurrentProductId = productId;
+            // Clear create-form selection markers so create-tab select doesn't conflict
+            $('.product-select-val').removeClass('product-select-val');
+            $('.product-select-name').removeClass('product-select-name');
+            $('#stc-poa-product-picker-title').text('Search & Link Product');
+            $('#stc-poa-product-picker-banner').show();
+            $('#stc-poa-picker-adhoc-id').text(adhocId || '—');
+            $('#stc-poa-picker-adhoc-name').text(adhocName || '—');
+            if (productId) {
+              $('#stc-poa-picker-current-product').text(productId).closest('.stc-poa-picker-current').show();
+            } else {
+              $('#stc-poa-picker-current-product').closest('.stc-poa-picker-current').hide();
+            }
+            $('.stc-req-product-show').html('<div class="col-12 text-muted text-center p-4">Search by name or category to pick a product for this adhoc.</div>');
+            $('.stc-agent-req-get-mer-product-show').modal('show');
+          });
+
+          function stcPoaBindProductToAdhoc(adhoc_id, img_id, done) {
+            if (!adhoc_id) {
+              stcAlert('Adhoc ID missing.');
+              if (done) done(false);
+              return;
+            }
+            if (!img_id) {
+              stcAlert('Please select a product.');
+              if (done) done(false);
+              return;
+            }
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
@@ -2881,15 +3614,32 @@ include("kattegat/role_check.php");
                 img_id:img_id
               },
               success : function(response_items){
-                var response=response_items.trim();
+                var response = String(response_items || '').trim();
                 if(response=="success"){
-                  alert("Item Name Updated Successfully.");
+                  stcAlert("Product linked successfully.");
+                  window.stcPoaLinkMode = false;
+                  window.stcPoaLinkAdhocId = '';
+                  $('.stc-agent-req-get-mer-product-show').modal('hide');
                   Pagination.loadData(pagenumber);
+                  if (done) done(true);
                 }else{
-                  alert("Something went wrong please check and try again.");
+                  stcAlert(response || "Something went wrong please check and try again.");
+                  if (done) done(false);
                 }
+              },
+              error: function(){
+                stcAlert('Failed to link product. Please try again.');
+                if (done) done(false);
               }
-            });  
+            });
+          }
+
+          $('body').delegate('.img-inputbtn', 'click', function(e){
+            var adhoc_id=$(this).attr('id');
+            var img_id=$(this).parent().find('.img-idinput').val();
+            $(this).parent().find('.img-idrateinput').toggle();
+            $(this).parent().find('.img-inputratebtn').toggle();
+            stcPoaBindProductToAdhoc(adhoc_id, img_id);
           }); 
           $('body').delegate('.img-inputpratebtn', 'click', function(e){
             var adhoc_id=$(this).attr('id');
@@ -2905,10 +3655,10 @@ include("kattegat/role_check.php");
               success : function(response_items){
                 var response=response_items.trim();
                 if(response=="success"){
-                  alert("Purchase rate Updated Successfully.");
+                  stcAlert("Purchase rate Updated Successfully.");
                   Pagination.loadData(pagenumber);
                 }else{
-                  alert("Something went wrong please check and try again.");
+                  stcAlert("Something went wrong please check and try again.");
                 }
               }
             });  
@@ -2931,10 +3681,10 @@ include("kattegat/role_check.php");
               success : function(response_items){
                 var response=response_items.trim();
                 if(response=="success"){
-                  alert("Rate Updated Successfully.");
+                  stcAlert("Rate Updated Successfully.");
                   Pagination.loadData(pagenumber);
                 }else{
-                  alert("Something went wrong please check and try again.");
+                  stcAlert("Something went wrong please check and try again.");
                 }
               }
             });  
@@ -3289,7 +4039,7 @@ include("kattegat/role_check.php");
               },
               dataType: 'json',
               success: function (response) {
-                alert("Item updated successfully.");Pagination.loadData(pagenumber);
+                stcAlert("Item updated successfully.");Pagination.loadData(pagenumber);
               }
             });
           });
@@ -3493,14 +4243,14 @@ include("kattegat/role_check.php");
               },
               success: function (res) {
                 if (res && res.success) {
-                  alert(res.message || 'Updated');
+                  stcAlert(res.message || 'Updated');
                   loadVikingsShopQtyModal(adhocId);
                   Pagination.loadData(pagenumber);
                 } else {
-                  alert((res && res.message) ? res.message : 'Update failed');
+                  stcAlert((res && res.message) ? res.message : 'Update failed');
                 }
               },
-              error: function () { alert('Update failed'); }
+              error: function () { stcAlert('Update failed'); }
             });
           });
 
@@ -3522,21 +4272,22 @@ include("kattegat/role_check.php");
               },
               success: function (res) {
                 if (res && res.success) {
-                  alert(res.message || 'Saved');
+                  stcAlert(res.message || 'Saved');
                   loadVikingsShopQtyModal(adhocId);
                   Pagination.loadData(pagenumber);
                 } else {
-                  alert((res && res.message) ? res.message : 'Save failed');
+                  stcAlert((res && res.message) ? res.message : 'Save failed');
                 }
               },
-              error: function () { alert('Save failed'); }
+              error: function () { stcAlert('Save failed'); }
             });
           });
 
           $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-delete', function () {
-            if (!window.confirm('Delete this branch row?')) { return; }
             var $tr = $(this).closest('tr');
             var adhocId = $('#vikings_shop_qty_adhoc_id').val();
+            stcConfirm('Delete this branch row?', { title: 'Delete row' }).then(function(ok) {
+            if (!ok) { return; }
             $.ajax({
               url: 'kattegat/ragnar_purchase.php',
               type: 'POST',
@@ -3548,14 +4299,15 @@ include("kattegat/role_check.php");
               },
               success: function (res) {
                 if (res && res.success) {
-                  alert(res.message || 'Deleted');
+                  stcAlert(res.message || 'Deleted');
                   loadVikingsShopQtyModal(adhocId);
                   Pagination.loadData(pagenumber);
                 } else {
-                  alert((res && res.message) ? res.message : 'Delete failed');
+                  stcAlert((res && res.message) ? res.message : 'Delete failed');
                 }
               },
-              error: function () { alert('Delete failed'); }
+              error: function () { stcAlert('Delete failed'); }
+            });
             });
           });
 
@@ -3581,7 +4333,7 @@ include("kattegat/role_check.php");
               },
               dataType: 'json',
               success: function (response) {
-                alert("Item saved successfully.");
+                stcAlert("Item saved successfully.");
                 Pagination.loadData(pagenumber);
               }
             });
@@ -3590,7 +4342,8 @@ include("kattegat/role_check.php");
 
           $('body').delegate('.remove-shop-item', 'click', function(e){
             var id=$(this).attr('id');
-            if(confirm("Are you sure want to remove item from this shop?")){
+            stcConfirm("Are you sure want to remove item from this shop?", { title: 'Remove item' }).then(function(ok){
+            if(!ok) return;
               $.ajax({
                 url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
                 type: 'POST', // or 'POST' depending on your API
@@ -3600,18 +4353,19 @@ include("kattegat/role_check.php");
                 },
                 dataType: 'json',
                 success: function (response) {
-                  alert("Item deleted successfully.");
+                  stcAlert("Item deleted successfully.");
                   Pagination.loadData(pagenumber);
                 }
               });
-            }
+            });
           });          
           
 
           $('body').delegate('.change-adhoc-status', 'click', function(e){
             var id=$(this).attr('data-id');
             var status=$(this).attr('data-status');
-            if(confirm("Are you sure want to approve status of this Item?")){
+            stcConfirm("Are you sure want to approve status of this Item?", { title: 'Approve item' }).then(function(ok){
+            if(!ok) return;
               $.ajax({
                 url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
                 type: 'POST', // or 'POST' depending on your API
@@ -3622,17 +4376,18 @@ include("kattegat/role_check.php");
                 },
                 dataType: 'json',
                 success: function (response) {
-                  alert("Item updated successfully.");
+                  stcAlert("Item updated successfully.");
                   Pagination.loadData(pagenumber);
                 }
               });
-            }
+            });
           });       
           
 
           $('body').delegate('.update-purchased-lineitems', 'click', function(e){
             var id=$(this).attr('id');
-            if(confirm("Are you sure want to change status of this Item?")){
+            stcConfirm("Are you sure want to change status of this Item?", { title: 'Change status' }).then(function(ok){
+            if(!ok) return;
               $.ajax({
                 url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
                 type: 'POST', // or 'POST' depending on your API
@@ -3642,11 +4397,11 @@ include("kattegat/role_check.php");
                 },
                 dataType: 'json',
                 success: function (response) {
-                  alert("Item updated successfully.");
+                  stcAlert("Item updated successfully.");
                   Pagination.loadData(pagenumber);
                 }
               });
-            }
+            });
           });
           var inv_type='warehouse';
           function parseInventoryResponse(response) {
@@ -3793,15 +4548,15 @@ include("kattegat/role_check.php");
                 success:function(req){
                   // console.log(req);
                   if(req=="Success"){
-                    alert("Updated successfully!! Please reload modal to see changes.");
+                    stcAlert("Updated successfully!! Please reload modal to see changes.");
                     $('.stc-adhocpendingfilter-find').trigger('click');
                   }else{
-                    alert(req);
+                    stcAlert(req);
                   }
                 }
               });
             }else{
-              alert("Please enter valid quantity.");
+              stcAlert("Please enter valid quantity.");
             }
           });
 
@@ -3911,30 +4666,31 @@ include("kattegat/role_check.php");
                     var msg = (ittAdhocQty > 1)
                       ? ittAdhocQty + " tool records saved with consecutive GTT numbers (same details). You can edit Machine SR No. per row in Tool Tracker if needed."
                       : "Record saved successfully. GTT number assigned automatically. You can edit Machine SR No. in Tool Tracker if needed.";
-                    alert(msg);
+                    stcAlert(msg);
                     Pagination.loadData(pagenumber);
                   } else if (obj_response == "duplicate") {
-                    alert("A GTT number collision occurred. Please try again.");
+                    stcAlert("A GTT number collision occurred. Please try again.");
                   } else if (obj_response == "reload") {
                     window.location.reload();
                   } else if (obj_response == "empty") {
-                    alert("Please fill complete details.");
+                    stcAlert("Please fill complete details.");
                   } else if (obj_response == "no") {
-                    alert("Something went wrong. Record not updated");
+                    stcAlert("Something went wrong. Record not updated");
                   } else if (obj_response == "complete") {
-                    alert("Tool Tracker already has the maximum rows for this ad-hoc quantity. Refresh the list.");
+                    stcAlert("Tool Tracker already has the maximum rows for this ad-hoc quantity. Refresh the list.");
                     Pagination.loadData(pagenumber);
                   }
                 }
               });
             } else {
-              alert("Please check Required fields.");
+              stcAlert("Please check Required fields.");
             }
           });
 
           // AJAX click event for updating adhoc ID
           $('body').delegate('.reset-items', 'click', function(e){
-              if(confirm("Are you sure want to reset items?")){
+              stcConfirm("Are you sure want to reset items?", { title: 'Reset items' }).then(function(ok){
+              if(!ok) return;
                 $.ajax({
                     url: "kattegat/ragnar_purchase.php",
                     method: "POST",
@@ -3947,23 +4703,23 @@ include("kattegat/role_check.php");
                     },
                     success: function(response) {
                         if(response === 'reload') {
-                            alert('Session expired. Please reload the page.');
+                            stcAlert('Session expired. Please reload the page.');
                             window.location.reload();
                         } else if(response === 'Success') {
-                            alert('Adhoc ID updated successfully');
+                            stcAlert('Adhoc ID updated successfully');
                             location.reload();
                         } else {
-                            alert('Update Failed: ' + response);
+                            stcAlert('Update Failed: ' + response);
                         }
                     },
                     error: function(xhr, status, error) {
-                        alert('AJAX Error: Failed to update adhoc ID - ' + error);
+                        stcAlert('AJAX Error: Failed to update adhoc ID - ' + error);
                     },
                     complete: function() {
                         $('.update-adhoc-id-btn').prop('disabled', false).text('Update Adhoc ID');
                     }
                 });
-              }
+              });
           });
 
           
@@ -4102,7 +4858,8 @@ include("kattegat/role_check.php");
             
             if (itemIds.length > 0) {
                 var statusText = status == 4 ? 'Approve' : 'Reject';
-                if (confirm('Are you sure you want to ' + statusText.toLowerCase() + ' ' + itemIds.length + ' selected items?')) {
+                stcConfirm('Are you sure you want to ' + statusText.toLowerCase() + ' ' + itemIds.length + ' selected items?', { title: statusText + ' items' }).then(function(ok) {
+                if (!ok) return;
                     // Show loading indicator
                     $('.fixed-status-dropdown').html('<div style="text-align: center; padding: 20px;"><i class="fa fa-spinner fa-spin"></i> Updating items...</div>');
                     
@@ -4129,9 +4886,9 @@ include("kattegat/role_check.php");
                                 if (completedCount === totalItems) {
                                     // All items processed, refresh data
                                     if (failedItems.length === 0) {
-                                        alert('All ' + totalItems + ' items updated successfully!');
+                                        stcAlert('All ' + totalItems + ' items updated successfully!');
                                     } else {
-                                        alert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
+                                        stcAlert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
                                     }
                                     
                                     // Remove the fixed dropdown
@@ -4154,9 +4911,9 @@ include("kattegat/role_check.php");
                                 // Check if all items are processed
                                 if (completedCount === totalItems) {
                                     if (failedItems.length === 0) {
-                                        alert('All ' + totalItems + ' items updated successfully!');
+                                        stcAlert('All ' + totalItems + ' items updated successfully!');
                                     } else {
-                                        alert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
+                                        stcAlert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
                                     }
                                     
                                     // Remove the fixed dropdown
@@ -4173,7 +4930,7 @@ include("kattegat/role_check.php");
                             }
                         });
                     });
-                }
+                });
             }
         });
 
@@ -4184,7 +4941,7 @@ include("kattegat/role_check.php");
             itemIds.push($(this).val());
           });
           if (itemIds.length === 0) {
-            alert('No rows selected.');
+            stcAlert('No rows selected.');
             return;
           }
           var $panel = $(this).closest('.fixed-status-dropdown');
@@ -4193,7 +4950,7 @@ include("kattegat/role_check.php");
           var updSrc = srcVal !== '' ? 1 : 0;
           var updDest = destVal !== '' ? 1 : 0;
           if (!updSrc && !updDest) {
-            alert('Choose at least one non-empty Source or Destination (leave destination blank to skip it).');
+            stcAlert('Choose at least one non-empty Source or Destination (leave destination blank to skip it).');
             return;
           }
           var what = '';
@@ -4201,10 +4958,12 @@ include("kattegat/role_check.php");
           if (updSrc && updDest) what += ' and ';
           if (updDest) what += 'destination';
           var n = itemIds.length;
-          if (!confirm('Update ' + what + ' on ' + n + ' selected row(s)?')) {
+          var $btn = $(this);
+          stcConfirm('Update ' + what + ' on ' + n + ' selected row(s)?', { title: 'Update locations' }).then(function(ok) {
+          if (!ok) {
             return;
           }
-          var $btn = $(this).prop('disabled', true).text('Saving…');
+          $btn.prop('disabled', true).text('Saving…');
           $.ajax({
             url: 'kattegat/ragnar_purchase.php',
             type: 'POST',
@@ -4220,7 +4979,7 @@ include("kattegat/role_check.php");
             success: function(r) {
               var t = $.trim(String(r || ''));
               if (t === 'success') {
-                alert('Updated ' + n + ' row(s).');
+                stcAlert('Updated ' + n + ' row(s).');
                 $('.common_selector').prop('checked', false);
                 $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', false);
                 $('.fixed-status-dropdown').remove();
@@ -4230,17 +4989,18 @@ include("kattegat/role_check.php");
                   location.reload();
                 }
               } else if (t === 'invalid') {
-                alert('Invalid request: nothing to apply.');
+                stcAlert('Invalid request: nothing to apply.');
               } else {
-                alert('Could not update. Please try again.');
+                stcAlert('Could not update. Please try again.');
               }
             },
             error: function() {
-              alert('Request failed.');
+              stcAlert('Request failed.');
             },
             complete: function() {
               $btn.prop('disabled', false).text('Apply source / destination');
             }
+          });
           });
         });
     </script>
@@ -5236,15 +5996,21 @@ include("kattegat/role_check.php");
     </form>
   </div>
 </div>
-<!-- product selection modal -->
-<div class="modal fade stc-agent-req-get-mer-product-show" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<!-- product selection / link modal -->
+<div class="modal fade stc-agent-req-get-mer-product-show" tabindex="-1" role="dialog" aria-labelledby="stcPoaProductPickerTitle" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Requisition Items Selection</h4>
+        <h4 class="modal-title" id="stc-poa-product-picker-title">Product Selection</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
+        <div id="stc-poa-product-picker-banner" class="alert alert-info" style="display:none; margin-bottom:12px;">
+          <div><strong>Adhoc ID:</strong> <span id="stc-poa-picker-adhoc-id">—</span></div>
+          <div><strong>Adhoc Name:</strong> <span id="stc-poa-picker-adhoc-name">—</span></div>
+          <div class="stc-poa-picker-current" style="display:none;"><strong>Current Product ID:</strong> <span id="stc-poa-picker-current-product">—</span></div>
+          <div class="small text-muted" style="margin-top:4px;">Search and click a product to bind it to this adhoc line.</div>
+        </div>
         <div class="row">
           <div class="col-12">
             <table class="table table-hover ">
@@ -5280,7 +6046,7 @@ include("kattegat/role_check.php");
                   </td>
                   <td>
                     <div class="card-border mb-3 card card-body border-success">
-                      <button type="submit" class="form-control btn btn-primary stcprosearchhit">Search <i class="fa fa-search"></i></button>
+                      <button type="button" class="form-control btn btn-primary stcprosearchhit">Search <i class="fa fa-search"></i></button>
                     </div>
                   </td>
                   <td>
@@ -5543,3 +6309,11 @@ include("kattegat/role_check.php");
     </div>
   </div>
 </div>
+<script>
+  (function($) {
+    if (!$) return;
+    $(function() {
+      $('.modal').appendTo('body');
+    });
+  })(window.jQuery);
+</script>

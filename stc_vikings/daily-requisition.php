@@ -567,6 +567,69 @@ include("kattegat/role_check.php");
         return '<span class="badge" style="background-color:' + bg + ';color:' + color + ';padding: 2px 6px;border-radius: 3px;">' + escapeHtml(statusText) + '</span>';
       }
 
+      function buildDrActionHtml(itemId, reqQty, dispQty) {
+        var pendingQty = reqQty - dispQty;
+        var actionParts = [];
+        if (pendingQty > 0.0001) {
+          actionParts.push(
+            '<button type="button" class="btn btn-primary btn-sm dr-balance-btn" data-item-id="' + escapeHtml(itemId) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="Edit / View Adhoc Balance"><i class="fa fa-edit"></i></button>'
+          );
+        }
+        if (dispQty > 0.0001) {
+          actionParts.push(
+            '<button type="button" class="btn btn-info btn-sm dr-dispatch-lines-open-btn" data-item-id="' + escapeHtml(itemId) + '" data-toggle="modal" data-target="#drDispatchLinesModal" title="Dispatched lines"><i class="fa fa-truck"></i></button>'
+          );
+        }
+        return actionParts.length
+          ? '<div style="display:inline-flex;flex-wrap:wrap;gap:4px;justify-content:center;">' + actionParts.join('') + '</div>'
+          : '<span class="text-muted">-</span>';
+      }
+
+      function buildDrCodeBalRackHtml(itemId, productId, pendingQty, unit, racks) {
+        var itemCode = (parseInt(productId, 10) > 0) ? String(productId) : '-';
+        var racksText = (racks && String(racks).trim() !== '') ? String(racks) : '-';
+        var pendingText = pendingQty.toFixed(2);
+        if (itemCode === '-') {
+          return '<div class="text-muted">-</div>' +
+            '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingText) + '/' + escapeHtml(unit) + '</div>' +
+            '<div style="font-size:12px;color:#555;">' + escapeHtml(racksText) + '</div>';
+        }
+        return '<div><a href="#" class="dr-balance-btn" data-item-id="' + escapeHtml(itemId) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="View Adhoc Balance"><b>' + escapeHtml(itemCode) + '</b></a></div>' +
+          '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingText) + '/' + escapeHtml(unit) + '</div>' +
+          '<div style="font-size:12px;color:#555;">' + escapeHtml(racksText) + '</div>';
+      }
+
+      function patchDailyReqMainRow(itemId, patch) {
+        patch = patch || {};
+        var $tr = $('.stc-daily-requisition-body tr[data-item-id="' + itemId + '"]');
+        if (!$tr.length) return;
+
+        var reqQty = parseNumber(patch.req_qty !== undefined ? patch.req_qty : $tr.attr('data-req-qty'));
+        var dispQty = parseNumber(patch.dispatched_qty !== undefined ? patch.dispatched_qty : $tr.attr('data-disp-qty'));
+        var unit = patch.unit !== undefined ? patch.unit : ($tr.attr('data-unit') || '');
+        var productId = patch.product_id !== undefined ? patch.product_id : ($tr.attr('data-product-id') || '0');
+        var racks = patch.racks !== undefined ? patch.racks : ($tr.attr('data-racks') || '-');
+
+        if (patch.req_qty !== undefined) {
+          $tr.attr('data-req-qty', reqQty);
+        }
+        if (patch.dispatched_qty !== undefined) {
+          $tr.attr('data-disp-qty', dispQty);
+          $tr.find('.dr-main-dispatched').text(typeof patch.dispatched_qty === 'string' ? patch.dispatched_qty : dispQty.toFixed(2));
+        }
+        if (patch.product_id !== undefined) {
+          $tr.attr('data-product-id', productId);
+        }
+
+        var pendingQty = reqQty - dispQty;
+        $tr.find('.dr-main-code-bal').html(buildDrCodeBalRackHtml(itemId, productId, pendingQty, unit, racks));
+        $tr.find('.dr-main-action').html(buildDrActionHtml(itemId, reqQty, dispQty));
+
+        if (patch.status_code !== undefined) {
+          $tr.find('.dr-main-status').html(statusBadge(patch.status_code, patch.status_text || ''));
+        }
+      }
+
       function renderPagination(totalPages, page) {
         var html = '';
         if (!totalPages || totalPages <= 1) {
@@ -640,34 +703,12 @@ include("kattegat/role_check.php");
                 var reqQty = parseNumber(item.req_qty);
                 var dispQty = parseNumber(item.dispatched_qty);
                 var pendingQty = reqQty - dispQty;
-                var actionParts = [];
-                if (pendingQty > 0.0001) {
-                  actionParts.push(
-                    '<button type="button" class="btn btn-primary btn-sm dr-balance-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="Edit / View Adhoc Balance"><i class="fa fa-edit"></i></button>'
-                  );
-                }
-                if (dispQty > 0.0001) {
-                  actionParts.push(
-                    '<button type="button" class="btn btn-info btn-sm dr-dispatch-lines-open-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#drDispatchLinesModal" title="Dispatched lines"><i class="fa fa-truck"></i></button>'
-                  );
-                }
-                var actionHtml = actionParts.length
-                  ? '<div style="display:inline-flex;flex-wrap:wrap;gap:4px;justify-content:center;">' + actionParts.join('') + '</div>'
-                  : '<span class="text-muted">-</span>';
+                var actionHtml = buildDrActionHtml(item.item_id, reqQty, dispQty);
                 var itemCode = (parseInt(item.product_id, 10) > 0) ? String(item.product_id) : '-';
                 var racks = (item.racks && String(item.racks).trim() !== '') ? String(item.racks) : '-';
-                var codeBalRackHtml =
-                  '<div><a href="#" class="dr-balance-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="View Adhoc Balance"><b>' + escapeHtml(itemCode) + '</b></a></div>' +
-                  '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingQty.toFixed(2)) + '/' + escapeHtml(item.unit) + '</div>' +
-                  '<div style="font-size:12px;color:#555;">' + escapeHtml(racks) + '</div>';
-                if (itemCode === '-') {
-                  codeBalRackHtml =
-                    '<div class="text-muted">-</div>' +
-                    '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingQty.toFixed(2)) + '/' + escapeHtml(item.unit) + '</div>' +
-                    '<div style="font-size:12px;color:#555;">' + escapeHtml(racks) + '</div>';
-                }
+                var codeBalRackHtml = buildDrCodeBalRackHtml(item.item_id, item.product_id, pendingQty, item.unit, racks);
 
-                rows += '<tr>' +
+                rows += '<tr data-item-id="' + escapeHtml(item.item_id) + '" data-req-qty="' + escapeHtml(reqQty) + '" data-disp-qty="' + escapeHtml(dispQty) + '" data-unit="' + escapeHtml(item.unit) + '" data-product-id="' + escapeHtml(item.product_id) + '" data-racks="' + escapeHtml(racks) + '">' +
                   '<td class="text-center">' + escapeHtml(slno) + '</td>' +
                   '<td class="text-center dr-col-project">' + prCell + '</td>' +
                   '<td class="dr-col-project">' + projectAndManager + '</td>' +
@@ -675,11 +716,11 @@ include("kattegat/role_check.php");
                   '<td class="dr-col-project">' + escapeHtml(item.item_desc) + '</td>' +
                   '<td class="text-center">' + escapeHtml(item.unit) + '</td>' +
                   '<td class="text-right">' + escapeHtml(item.req_qty) + '</td>' +
-                  '<td class="text-right">' + escapeHtml(item.dispatched_qty) + '</td>' +
-                  '<td class="text-center dr-col-project">' + codeBalRackHtml + '</td>' +
-                  '<td class="text-center">' + statusBadge(item.status_code, item.status_text) + '</td>' +
+                  '<td class="text-right dr-main-dispatched">' + escapeHtml(item.dispatched_qty) + '</td>' +
+                  '<td class="text-center dr-col-project dr-main-code-bal">' + codeBalRackHtml + '</td>' +
+                  '<td class="text-center dr-main-status">' + statusBadge(item.status_code, item.status_text) + '</td>' +
                   '<td class="text-center">' + escapeHtml(item.item_type) + '</td>' +
-                  '<td class="text-center">' + actionHtml + '</td>' +
+                  '<td class="text-center dr-main-action">' + actionHtml + '</td>' +
                   '<td class="text-center">' + logsBtn + '</td>' +
                   '</tr>';
               });
@@ -1538,6 +1579,13 @@ include("kattegat/role_check.php");
                 $row.find('.dr-balance-cell b').first().replaceWith('<b>' + newBal + '/' + unit + '</b>');
                 $row.find('.dr-rack-input').val(newBal);
               }
+              patchDailyReqMainRow(itemId, {
+                status_code: response.status_code,
+                status_text: response.status_text,
+                dispatched_qty: response.total_dispatched_qty,
+                req_qty: response.req_qty,
+                product_id: response.product_id
+              });
               $btn.prop('disabled', false).text('Dispatch Balance');
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Dispatch failed.');
