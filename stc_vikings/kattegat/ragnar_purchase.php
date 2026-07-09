@@ -2806,10 +2806,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$source_attr = htmlspecialchars((string)$odinrow['stc_purchase_product_adhoc_source'], ENT_QUOTES, 'UTF-8');
 				if($remaining_tools <= 0){
 					// Still allow opening modal to view existing tool rows
-					$addtoollist='<a href="javascript:void(0)" class="btn btn-light itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="0" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="View Tools Track ('.$tool_cnt.' record(s))"><i class="fa fa-tools"></i></a>';
+					$addtoollist='<a href="javascript:void(0)" class="btn btn-light itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="0" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="View Tools Track ('.$tool_cnt.' record(s))"><i class="fas fa-tools"></i></a>';
 				}else{
 					$rem_attr = (string)$remaining_tools;
-					$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="'.$rem_attr.'" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="Add to Toollist (up to '.$remaining_tools.' more)"><i class="fa fa-tools"></i></a>';
+					$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="'.$rem_attr.'" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="Add to Toollist (up to '.$remaining_tools.' more)"><i class="fas fa-tools"></i></a>';
 				}
 				$checkbox = '';
 				// if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
@@ -2817,6 +2817,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 				// }
 				$poadhoc_edit_src_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_source'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$poadhoc_edit_dst_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_destination'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$poadhoc_edit_rack_esc = htmlspecialchars((string)($odinrow['stc_rack_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$poadhoc_edit_unit_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_unit'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$poadhoc_edit_qty_esc = htmlspecialchars(number_format($poadhoc_qty, 2, '.', ''), ENT_QUOTES, 'UTF-8');
+				$poadhoc_edit_remarks_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_remarks'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$product_name_disp = htmlspecialchars((string)$product_name, ENT_QUOTES, 'UTF-8');
 				$itemdesc_disp = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_itemdesc'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$product_id_disp = htmlspecialchars((string)($odinrow['stc_product_id'] ?? ''), ENT_QUOTES, 'UTF-8');
@@ -2848,7 +2852,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 									<div class='stc-poa-product-line'>
 										<span class='stc-poa-adhoc-id'>".$adhoc_id_disp."</span>
 										<span class='text-muted'> - </span>
-										<a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."' data-poa-source='".$poadhoc_edit_src_esc."' data-poa-destination='".$poadhoc_edit_dst_esc."'>".$itemdesc_disp."</a>
+										<a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."' data-poa-source='".$poadhoc_edit_src_esc."' data-poa-destination='".$poadhoc_edit_dst_esc."' data-item-name='".$itemdesc_disp."' data-item-rack='".$poadhoc_edit_rack_esc."' data-item-unit='".$poadhoc_edit_unit_esc."' data-item-qty='".$poadhoc_edit_qty_esc."' data-item-remarks='".$poadhoc_edit_remarks_esc."'>".$itemdesc_disp."</a>
 										".$addtoollist."
 									</div>
 								</div>

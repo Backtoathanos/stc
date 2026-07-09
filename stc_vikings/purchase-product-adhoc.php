@@ -1511,13 +1511,13 @@ include("kattegat/role_check.php");
                                             </div>
                                           </div>
                                           <div class="stc-poa-ff">
-                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type source/location name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                            <input type="text" id="stc-poa-frame-source" class="form-control" placeholder="Type source/location name…" aria-labelledby="stc-adv-lbl-adhocname">
                                           </div>
                                           <div class="stc-poa-ff">
-                                            <input type="text" id="stc-adv-rack" class="form-control" placeholder="Type rack name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                            <input type="text" id="stc-poa-frame-rack" class="form-control" placeholder="Type rack name…" aria-labelledby="stc-adv-lbl-adhocname">
                                           </div>
                                           <div class="stc-poa-ff stc-poa-ff-status">
-                                            <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
+                                            <select id="stc-poa-frame-status" class="custom-select form-control" aria-labelledby="stc-adv-lbl-status">
                                               <option value="NA">Select Status</option>
                                               <option value="1">Stock</option>
                                               <option value="2">Dispatched</option>
@@ -2291,6 +2291,45 @@ include("kattegat/role_check.php");
             return out;
           }
 
+          function stcPoaFrameFilters() {
+            return $('#stc-poa-view-panel .stc-poa-frame-filters');
+          }
+
+          function stcPoaAdvSearchRoot() {
+            return $('.bd-modal-adhoc-advanced-search');
+          }
+
+          function stcPoaResolveStatusFilter() {
+            var frameStatus = $.trim(stcPoaFrameFilters().find('#stc-poa-frame-status').val() || '');
+            var advStatus = $.trim(stcPoaAdvSearchRoot().find('#stc-poa-adv-status').val() || '');
+            if (frameStatus !== '' && frameStatus !== 'NA') return frameStatus;
+            if (advStatus !== '' && advStatus !== 'NA') return advStatus;
+            return 'NA';
+          }
+
+          function stcPoaBuildSearchData(page, pageSize) {
+            var $frame = stcPoaFrameFilters();
+            var $adv = stcPoaAdvSearchRoot();
+            return {
+              stc_call_poadhoc: 1,
+              itemname: $frame.find('#stc-poa-searchbyitem').val() || '',
+              adhoc_id: $adv.find('#stc-adv-adhoc-id').val() || '',
+              product_id: $adv.find('#stc-adv-product-id').val() || '',
+              product_name: $adv.find('#stc-adv-product-name').val() || '',
+              sourcelocation: $.trim($frame.find('#stc-poa-frame-source').val() || ''),
+              adhoc_name: $.trim($adv.find('#stc-adv-adhoc-name').val() || ''),
+              sourcedestination: $adv.find('#tc-poa-searchbydourcedestination').val() || '',
+              byrack: $.trim($frame.find('#stc-poa-frame-rack').val() || '') || $.trim($adv.find('#stc-poa-by-rack').val() || ''),
+              status: stcPoaResolveStatusFilter(),
+              received_by: $adv.find('#stc-adv-received-by').val() || '',
+              remarks: $adv.find('#stc-adv-remarks').val() || '',
+              page: page,
+              pageSize: pageSize,
+              sort_col: stcPoaSortCol,
+              sort_dir: stcPoaSortDir
+            };
+          }
+
           let pagenumber=0;
           var stcPoaSortCol = 'adhoc_id';
           var stcPoaSortDir = 'DESC';
@@ -2379,27 +2418,7 @@ include("kattegat/role_check.php");
                       $.ajax({
                           url: config.apiEndpoint,
                           method: "POST",
-                          data: {
-                              stc_call_poadhoc: 1,
-                              itemname: $('#stc-poa-searchbyitem').val(),
-                              adhoc_id: $('#stc-adv-adhoc-id').val(),
-                              product_id: $('#stc-adv-product-id').val(),
-                              product_name: $('#stc-adv-product-name').val(),
-                              // This field is for source/location (NOT itemdesc)
-                              sourcelocation: stcPickInputValue('#stc-adv-adhoc-name', ''),
-                              // Keep for backward compatibility (server uses source/destination filters instead)
-                              adhoc_name: '',
-                              sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
-                              // Support both inline (top row) and advanced modal inputs
-                              byrack: ($('#stc-adv-rack').val() || $('.tc-poa-searchbyrack').val() || ''),
-                              status: (stcPickInputValue('#stc-poa-status', 'NA') || $('.stc-po-status-in').val() || 'NA'),
-                              received_by: $('#stc-adv-received-by').val(),
-                              remarks: $('#stc-adv-remarks').val(),
-                              page: page,
-                              pageSize: config.pageSize,
-                              sort_col: stcPoaSortCol,
-                              sort_dir: stcPoaSortDir
-                          },
+                          data: stcPoaBuildSearchData(page, config.pageSize),
                           dataType: "JSON",
                           success: (data) => {
                               $tableRowContainer.html(data.odin);
@@ -2562,17 +2581,19 @@ include("kattegat/role_check.php");
           });
           $('body').delegate('.stc-adhocpo-adv-clear', 'click', function(e) {
             e.preventDefault();
-            $('#stc-adv-adhoc-id').val('');
-            $('#stc-adv-product-id').val('');
-            $('#stc-adv-product-name').val('');
-            $('[id="stc-adv-adhoc-name"]').val('');
-            $('#stc-adv-rack').val('');
-            $('[id="stc-poa-status"]').val('NA');
-            $('#stc-adv-received-by').val('');
-            $('#stc-adv-remarks').val('');
-            $('#tc-poa-searchbydourcedestination').val('');
-            $('.tc-poa-searchbyrack').val('');
-            $('.stc-po-status-in').val('NA');
+            var $adv = stcPoaAdvSearchRoot();
+            $adv.find('#stc-adv-adhoc-id').val('');
+            $adv.find('#stc-adv-product-id').val('');
+            $adv.find('#stc-adv-product-name').val('');
+            $adv.find('#stc-adv-adhoc-name').val('');
+            $adv.find('#stc-poa-by-rack').val('');
+            $adv.find('#stc-poa-adv-status').val('NA');
+            $adv.find('#stc-adv-received-by').val('');
+            $adv.find('#stc-adv-remarks').val('');
+            $adv.find('#tc-poa-searchbydourcedestination').val('');
+            stcPoaFrameFilters().find('#stc-poa-frame-source').val('');
+            stcPoaFrameFilters().find('#stc-poa-frame-rack').val('');
+            stcPoaFrameFilters().find('#stc-poa-frame-status').val('NA');
           });
 
           // Safety net: if any modal leaves a stray backdrop, clean it.
@@ -3435,11 +3456,11 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.edit-itemname', 'click', function(e){
             var $link = $(this);
-            var item_name = $link.text().trim();
-            var item_rack = $link.closest('tr').find('td:eq(5)').text().trim();
-            var item_unit=$link.closest('tr').find('td:eq(6)').text().trim();
-            var item_qty=$link.closest('tr').find('td:eq(7)').text().trim();
-            var item_remarks=$link.closest('tr').find('td:eq(18)').text().trim();
+            var item_name = $.trim($link.attr('data-item-name') || $link.text());
+            var item_rack = $.trim($link.attr('data-item-rack') || '');
+            var item_unit = $.trim($link.attr('data-item-unit') || '');
+            var item_qty = $.trim($link.attr('data-item-qty') || '');
+            var item_remarks = $.trim($link.attr('data-item-remarks') || '');
             var item_id=$link.attr("id");
             $('#edit-pro-id').remove();
 
@@ -5505,7 +5526,7 @@ include("kattegat/role_check.php");
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <p class="stc-adv-field-label" id="stc-adv-lbl-status">Status</p>
               </div>
-              <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
+              <select id="stc-poa-adv-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
                 <option value="NA">Select Status</option>
                 <option value="1">Stock</option>
                 <option value="2">Dispatched</option>
