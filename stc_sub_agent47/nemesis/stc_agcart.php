@@ -1770,6 +1770,10 @@ if(isset($_POST['call_searched_requisition_report'])){
 	}
 	$supreqfromdate = '';
 	$supreqtodate = '';
+	if (!empty($_POST['supreqfromdate']) && !empty($_POST['supreqtodate'])) {
+		$supreqfromdate = date('Y-m-d', strtotime($_POST['supreqfromdate']));
+		$supreqtodate = date('Y-m-d', strtotime($_POST['supreqtodate']));
+	}
 	$supreq_project_id = isset($_POST['supreq_project_id']) ? $_POST['supreq_project_id'] : '';
 	$supreq_status = isset($_POST['supreq_status']) ? $_POST['supreq_status'] : '';
 	$supreq_page = isset($_POST['supreq_page']) ? (int) $_POST['supreq_page'] : 1;

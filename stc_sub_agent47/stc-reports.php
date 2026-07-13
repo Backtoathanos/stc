@@ -36,6 +36,15 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
         border-radius: 4px;
       }
       .stc-req-filter-toolbar .stc-req-field { margin-bottom: 10px; }
+      .stc-req-dates-row { display: flex; flex-direction: column; }
+      .stc-req-dates-row .stc-req-dates-col:not(:last-child) { margin-bottom: 8px; }
+      .stc-req-dates-row .stc-req-lbl-sub {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 3px;
+      }
       @media (min-width: 992px) {
         .stc-req-filter-toolbar .row {
           display: flex;
@@ -43,6 +52,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
           align-items: flex-end;
         }
         .stc-req-filter-toolbar .stc-req-field { margin-bottom: 0; }
+        .stc-req-filter-btns { text-align: right; }
       }
       .nav-tabs .nav-link.active { font-weight: 600; }
     </style>
@@ -72,17 +82,35 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                                         <div class="card-body">
                                             <h5 class="card-title">Requisition Report</h5>
                                             <p class="text-muted" style="font-size:13px;margin-bottom:12px;">
-                                                Select site — data loads automatically. Use status to filter further.
+                                                Select site, date range and status — then click Search.
                                             </p>
+                                            <?php
+                                              $date = date("d-m-Y");
+                                              $newDate = date('Y-m-d', strtotime($date));
+                                              $effectiveDate = date('Y-m-d', strtotime("-30 days", strtotime($date)));
+                                            ?>
                                             <div class="stc-req-filter-toolbar">
                                                 <div class="row">
-                                                    <div class="col-md-6 col-sm-6 col-xs-12 stc-req-field">
+                                                    <div class="col-md-3 col-sm-12 col-xs-12 stc-req-field">
+                                                        <span class="stc-req-lbl">Date range</span>
+                                                        <div class="stc-req-dates-row">
+                                                            <div class="stc-req-dates-col">
+                                                                <label class="stc-req-lbl-sub" for="stc-rep-beg-date">From</label>
+                                                                <input type="date" class="form-control" id="stc-rep-beg-date" value="<?php echo $effectiveDate;?>">
+                                                            </div>
+                                                            <div class="stc-req-dates-col">
+                                                                <label class="stc-req-lbl-sub" for="stc-rep-end-date">To</label>
+                                                                <input type="date" class="form-control" id="stc-rep-end-date" value="<?php echo $newDate;?>">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-sm-6 col-xs-12 stc-req-field">
                                                         <label class="stc-req-lbl" for="stc-rep-project-filter">Site / Project <span class="text-danger">*</span></label>
                                                         <select class="form-control" id="stc-rep-project-filter" required>
                                                             <option value="">Loading…</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-6 col-sm-6 col-xs-12 stc-req-field">
+                                                    <div class="col-md-3 col-sm-6 col-xs-12 stc-req-field">
                                                         <label class="stc-req-lbl" for="stc-rep-status-filter">Status</label>
                                                         <select class="form-control" id="stc-rep-status-filter">
                                                             <option value="">All statuses</option>
@@ -97,11 +125,14 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                                                             <option value="9">Pending</option>
                                                         </select>
                                                     </div>
+                                                    <div class="col-md-3 col-xs-12 stc-req-filter-btns stc-req-field">
+                                                        <button type="button" class="btn btn-primary btn-sm stc-rep-search form-control"><i class="fa fa-search"></i> Search</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="card-body stc-reports-result" style="overflow-x:auto;">
-                                            <p class="text-muted text-center">Select a site to view requisition report.</p>
+                                            <p class="text-muted text-center">Set filters and click Search.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -163,12 +194,20 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                 $('.stc-reports-result').html('<div class="alert alert-warning text-center">Please select a site / project first.</div>');
                 return;
             }
+            var fromDate = $.trim($('#stc-rep-beg-date').val());
+            var toDate = $.trim($('#stc-rep-end-date').val());
+            if(!fromDate || !toDate){
+                $('.stc-reports-result').html('<div class="alert alert-warning text-center">Please select From and To date.</div>');
+                return;
+            }
             $('.stc-reports-result').html("Loading...");
             $.ajax({
                 url     : "nemesis/stc_agcart.php",
                 method  : "POST",
                 data    : {
                     call_searched_requisition_report: 1,
+                    supreqfromdate: fromDate,
+                    supreqtodate: toDate,
                     supreq_project_id: $('#stc-rep-project-filter').val(),
                     supreq_status: $('#stc-rep-status-filter').val(),
                     supreq_page: page,
@@ -185,18 +224,9 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
             });
         }
 
-        $('#stc-rep-status-filter').on('change', function(){
-            if(canSearch()){
-                loadReportResults(1);
-            }
-        });
-
-        $('#stc-rep-project-filter').on('change', function(){
-            if(canSearch()){
-                loadReportResults(1);
-            } else {
-                $('.stc-reports-result').html('<p class="text-muted text-center">Select a site to view requisition report.</p>');
-            }
+        $('body').delegate('.stc-rep-search', 'click', function(e){
+            e.preventDefault();
+            loadReportResults(1);
         });
 
         $('body').delegate('.stc-rep-page-btn', 'click', function(e){
