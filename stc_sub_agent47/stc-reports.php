@@ -43,7 +43,6 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
           align-items: flex-end;
         }
         .stc-req-filter-toolbar .stc-req-field { margin-bottom: 0; }
-        .stc-req-filter-btns { text-align: right; }
       }
       .nav-tabs .nav-link.active { font-weight: 600; }
     </style>
@@ -73,17 +72,17 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                                         <div class="card-body">
                                             <h5 class="card-title">Requisition Report</h5>
                                             <p class="text-muted" style="font-size:13px;margin-bottom:12px;">
-                                                Select site (required), then filter by status. Date filter not needed.
+                                                Select site — data loads automatically. Use status to filter further.
                                             </p>
                                             <div class="stc-req-filter-toolbar">
                                                 <div class="row">
-                                                    <div class="col-md-5 col-sm-6 col-xs-12 stc-req-field">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 stc-req-field">
                                                         <label class="stc-req-lbl" for="stc-rep-project-filter">Site / Project <span class="text-danger">*</span></label>
                                                         <select class="form-control" id="stc-rep-project-filter" required>
                                                             <option value="">Loading…</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-5 col-sm-6 col-xs-12 stc-req-field">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 stc-req-field">
                                                         <label class="stc-req-lbl" for="stc-rep-status-filter">Status</label>
                                                         <select class="form-control" id="stc-rep-status-filter">
                                                             <option value="">All statuses</option>
@@ -98,14 +97,11 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                                                             <option value="9">Pending</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2 col-xs-12 stc-req-filter-btns">
-                                                        <button type="button" class="btn btn-primary btn-sm stc-rep-search form-control"><i class="fa fa-search"></i> Search</button>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="card-body stc-reports-result" style="overflow-x:auto;">
-                                            <p class="text-muted text-center">Select a site, then choose status and click Search.</p>
+                                            <p class="text-muted text-center">Select a site to view requisition report.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -189,11 +185,6 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
             });
         }
 
-        $('body').delegate('.stc-rep-search', 'click', function(e){
-            e.preventDefault();
-            loadReportResults(1);
-        });
-
         $('#stc-rep-status-filter').on('change', function(){
             if(canSearch()){
                 loadReportResults(1);
@@ -204,7 +195,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
             if(canSearch()){
                 loadReportResults(1);
             } else {
-                $('.stc-reports-result').html('<p class="text-muted text-center">Select a site, then choose status and click Search.</p>');
+                $('.stc-reports-result').html('<p class="text-muted text-center">Select a site to view requisition report.</p>');
             }
         });
 
