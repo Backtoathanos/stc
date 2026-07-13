@@ -15,7 +15,15 @@ class STCAuthHelper {
      * This method should be called at the beginning of every protected page
      */
     public static function checkAuth() {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+            session_start();
+        }
         
         // Check if session exists
         if (isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"] > 0)) {
@@ -95,6 +103,12 @@ class STCAuthHelper {
      */
     public static function resumeSessionForApi() {
         if (session_status() === PHP_SESSION_NONE) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
             session_start();
         }
         if (isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"] > 0)) {

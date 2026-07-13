@@ -85,7 +85,7 @@ class transformers extends tesseract{
 		return $odin=$order_table;
 	}
 
-	public function stc_call_cust_for_agent($for_filter=false){
+	public function stc_call_cust_for_agent($for_filter=false, $require_pick=false){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
 				`stc_cust_project_id`, 
@@ -103,7 +103,11 @@ class transformers extends tesseract{
 		$optimusprime='';
 		$do_action=mysqli_num_rows($optimusprimequery);
 		if($for_filter){
-			$optimusprime='<option value="">All projects</option>';
+			if($require_pick){
+				$optimusprime='<option value="" selected>Select Site</option>';
+			}else{
+				$optimusprime='<option value="">All projects</option>';
+			}
 			if($do_action == 0){
 				return $optimusprime;
 			}
@@ -644,6 +648,280 @@ class witcher_supervisor extends tesseract{
 			}
 			$pagination_bar.='
 						<li class="'.($page>=$total_pages?'disabled':'').'"><a href="#" class="stc-req-page-btn" data-page="'.min($total_pages,$page+1).'">Next &raquo;</a></li>
+					</ul>
+				</div>
+			';
+		}
+		return $requisition_table.$pagination_bar;
+	}
+
+	/** @return int[] */
+	private function stc_site_incharge_project_ids(): array {
+		$ids = array();
+		$super_esc = mysqli_real_escape_string($this->stc_dbs, (string) $_SESSION['stc_agent_sub_id']);
+		$rs = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_cust_pro_attend_supervise_pro_id` AS pid
+			FROM `stc_cust_pro_attend_supervise`
+			WHERE `stc_cust_pro_attend_supervise_super_id`='".$super_esc."'
+		");
+		if ($rs) {
+			while ($row = mysqli_fetch_assoc($rs)) {
+				$ids[] = (int) $row['pid'];
+			}
+			mysqli_free_result($rs);
+		}
+		return $ids;
+	}
+
+	private function stc_req_status_badge($status): string {
+		$map = array(
+			1 => array('#3498db', 'Ordered'),
+			2 => array('#2ecc71', 'Approved'),
+			3 => array('#27ae60', 'Accepted'),
+			4 => array('#f39c12', 'Dispatched'),
+			5 => array('#16a085', 'Received'),
+			6 => array('#e74c3c', 'Rejected'),
+			7 => array('#95a5a6', 'Canceled'),
+			8 => array('#9b59b6', 'Returned'),
+			9 => array('rgb(255, 47, 47)', 'Pending'),
+		);
+		$s = (int) $status;
+		if (!isset($map[$s])) {
+			return '<span style="background-color:#34495e;color:white;padding:2px 6px;border-radius:3px;">Closed</span>';
+		}
+		return '<span style="background-color:'.$map[$s][0].';color:white;padding:2px 6px;border-radius:3px;">'.$map[$s][1].'</span>';
+	}
+
+	public function stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $project_id = '', $status_filter = '', $page = 1, $per_page = 25) {
+		$allowed_projects = $this->stc_site_incharge_project_ids();
+		if ($allowed_projects === array()) {
+			return '
+				<table class="mb-0 table table-hover table-bordered">
+					<thead><tr><th class="text-center">No sites assigned to your account.</th></tr></thead>
+					<tbody><tr><td class="text-center">Contact admin to assign projects.</td></tr></tbody>
+				</table>';
+		}
+
+		if ($project_id === '' || $project_id === 'NA' || !ctype_digit((string) $project_id)) {
+			return '<div class="alert alert-warning text-center">Please select a site / project.</div>';
+		}
+		$pid = (int) $project_id;
+		if (!in_array($pid, $allowed_projects, true)) {
+			return '<div class="alert alert-danger text-center">Invalid project selected.</div>';
+		}
+		$project_sql = " AND L.`stc_cust_super_requisition_list_project_id`='".$pid."' ";
+
+		$status_sql = '';
+		if ($status_filter !== '' && ctype_digit((string) $status_filter)) {
+			$sf = (int) $status_filter;
+			if ($sf >= 1 && $sf <= 9) {
+				$status_sql = " AND I.`stc_cust_super_requisition_list_items_status`='".$sf."' ";
+			}
+		}
+
+		$date_sql = '';
+		if ($supreqfromdate !== '' && $supreqtodate !== '') {
+			$date_sql = " AND DATE(`stc_cust_super_requisition_list_date`) BETWEEN '"
+				.mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."' AND '"
+				.mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."' ";
+		}
+
+		$from_where = "
+			FROM `stc_cust_super_requisition_list_items` I
+			LEFT JOIN `stc_cust_super_requisition_list` L
+			ON L.`stc_cust_super_requisition_list_id`= I.`stc_cust_super_requisition_list_items_req_id`
+			LEFT JOIN `stc_cust_project` P
+			ON P.`stc_cust_project_id`= L.`stc_cust_super_requisition_list_project_id`
+			LEFT JOIN `stc_cust_pro_supervisor` S
+			ON S.`stc_cust_pro_supervisor_id`= L.`stc_cust_super_requisition_list_super_id`
+			WHERE 1=1
+			".$project_sql.$status_sql.$date_sql."
+		";
+
+		$cnt_res = mysqli_query($this->stc_dbs, 'SELECT COUNT(*) AS cnt '.$from_where);
+		$cnt_row = $cnt_res ? mysqli_fetch_assoc($cnt_res) : array('cnt' => 0);
+		$total_rows = (int) $cnt_row['cnt'];
+		$per_page = (int) $per_page;
+		if ($per_page < 10) { $per_page = 10; }
+		if ($per_page > 100) { $per_page = 100; }
+		$page = (int) $page;
+		if ($page < 1) { $page = 1; }
+		$total_pages = $total_rows > 0 ? (int) ceil($total_rows / $per_page) : 1;
+		if ($page > $total_pages) { $page = $total_pages; }
+		$offset = ($page - 1) * $per_page;
+
+		$requisition_table = '
+			<table class="mb-0 table table-hover table-bordered">
+				<thead>
+				    <th class="text-center">Req No.</th>
+				    <th class="text-center">Req Date</th>
+				    <th class="text-center">Site</th>
+				    <th class="text-center">Requested By</th>
+				    <th class="text-center">Material Desc</th>
+				    <th class="text-center">Unit</th>
+				    <th class="text-center">Order Qty</th>
+				    <th class="text-center">Approved Qty</th>
+				    <th class="text-center">Dispatched Qty</th>
+				    <th class="text-center">Received Qty</th>
+				    <th class="text-center">Balance Qty</th>
+				    <th class="text-center">Consumed Qty</th>
+				    <th class="text-center">Stock Qty</th>
+				    <th class="text-center">Status</th>
+				    <th class="text-center">Priority</th>
+				    <th class="text-center">Type</th>
+				    <th class="text-center">Log</th>
+				</thead>
+				<tbody>
+		';
+
+		$requisitioni_qry = mysqli_query($this->stc_dbs, "
+			SELECT
+				L.`stc_cust_super_requisition_list_id` as list_id,
+				L.`stc_cust_super_requisition_list_date`,
+				`stc_cust_project_title`,
+				COALESCE(S.`stc_cust_pro_supervisor_fullname`, '—') AS supervisor_name,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_list_items_approved_qty`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_items_type`,
+				`stc_cust_super_requisition_items_priority`,
+				`stc_cust_super_requisition_list_items_status`,
+				I.`stc_cust_super_requisition_list_id` as list_item_id
+			".$from_where."
+			ORDER BY `stc_cust_super_requisition_items_priority` DESC, TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC
+			LIMIT ".(int) $offset.', '.(int) $per_page.'
+		');
+		$rows_on_page = ($requisitioni_qry ? mysqli_num_rows($requisitioni_qry) : 0);
+
+		if ($rows_on_page > 0) {
+			foreach ($requisitioni_qry as $requisitioni_row) {
+				$reqstaus = $this->stc_req_status_badge($requisitioni_row['stc_cust_super_requisition_list_items_status']);
+				$priority = $requisitioni_row['stc_cust_super_requisition_items_priority'] == 2 ? 'Urgent' : 'Normal';
+
+				$dispatchedgqty = 0;
+				$getdispatchedtransformers = mysqli_query($this->stc_dbs, "
+					SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitioni_row['list_item_id']."'
+				");
+				foreach ($getdispatchedtransformers as $decqtyrow) {
+					$dispatchedgqty += $decqtyrow['dispatched_qty'];
+				}
+
+				$recievingqty = 0;
+				$getrecivedtransformers = mysqli_query($this->stc_dbs, "
+					SELECT SUM(`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`) AS received_qty
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor`
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitioni_row['list_item_id']."'
+				");
+				foreach ($getrecivedtransformers as $recqtyrow) {
+					$recievingqty += $recqtyrow['received_qty'];
+				}
+
+				$consrecievingqty = 0;
+				$getconsrecivedtransformers = mysqli_query($this->stc_dbs, "
+					SELECT SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					FROM `stc_cust_super_list_items_consumption_items`
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitioni_row['list_item_id']."'
+				");
+				foreach ($getconsrecivedtransformers as $consrecqtyrow) {
+					$consrecievingqty += $consrecqtyrow['consumable_qty'];
+				}
+
+				$sumbalanceqty = $requisitioni_row['stc_cust_super_requisition_items_finalqty'] - $recievingqty;
+				$stockqty = $recievingqty - $consrecievingqty;
+				$bgcolor = $requisitioni_row['stc_cust_super_requisition_items_priority'] == '2' ? 'style="background:#ffa5a5;color:black"' : '';
+
+				$log = '
+					<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg"
+						title="View Log" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">View Log</a>
+				';
+				$item_id = $requisitioni_row['list_item_id'];
+				$query = mysqli_query($this->stc_dbs, "
+					SELECT `title`, `message`, `created_by`, `created_date`
+					FROM `stc_cust_super_requisition_list_items_log`
+					WHERE `item_id`='".$item_id."'
+					ORDER BY `id` DESC
+				");
+				if (mysqli_num_rows($query) > 0) {
+					foreach ($query as $row) {
+						$log .= '
+							<div style="display:none;border:1px solid #e0e0e0;border-radius:8px;padding:12px 16px;margin:12px 0;background:#fff;">
+								<div style="display:flex;justify-content:space-between;align-items:center;">
+									<span style="font-weight:600;color:#212121;font-size:16px;">'.$row['title'].'</span>
+									<span style="font-size:12px;color:#757575;">'.date('d-m-Y h:i A', strtotime($row['created_date'])).'</span>
+								</div>
+								<div style="margin-top:4px;font-size:14px;color:#424242;">'.$row['message'].'</div>
+							</div>
+						';
+					}
+				}
+
+				$requisition_table .= '
+					<tr '.$bgcolor.'>
+						<td class="text-center">'.$requisitioni_row['list_id'].'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($requisitioni_row['stc_cust_super_requisition_list_date'])).'</td>
+						<td>'.$requisitioni_row['stc_cust_project_title'].'</td>
+						<td>'.$requisitioni_row['supervisor_name'].'</td>
+						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_title'].'</td>
+						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_unit'].'</td>
+						<td class="text-right">'.number_format($requisitioni_row['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+						<td class="text-right">'.number_format($requisitioni_row['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+						<td class="text-right">'.number_format($dispatchedgqty, 2).'</td>
+						<td class="text-right">'.number_format($recievingqty, 2).'</td>
+						<td class="text-right">'.number_format($sumbalanceqty, 2).'</td>
+						<td class="text-right">'.number_format($consrecievingqty, 2).'</td>
+						<td class="text-right">'.number_format($stockqty, 2).'</td>
+						<td class="text-center">'.$reqstaus.'</td>
+						<td>'.$priority.'</td>
+						<td>'.$requisitioni_row['stc_cust_super_requisition_items_type'].'</td>
+						<td class="text-center">'.$log.'</td>
+					</tr>
+				';
+			}
+		} else {
+			$requisition_table .= '
+				<tr><td colspan="17" class="text-center">No record found.</td></tr>
+			';
+		}
+
+		$requisition_table .= '</tbody></table>';
+
+		$pagination_bar = '';
+		if ($total_rows > 0) {
+			$show_from = $offset + 1;
+			$show_to = $offset + $rows_on_page;
+			$p_win = array();
+			if ($total_pages <= 7) {
+				for ($i = 1; $i <= $total_pages; $i++) { $p_win[] = $i; }
+			} else {
+				$p_win[] = 1;
+				$start = max(2, $page - 2);
+				$end = min($total_pages - 1, $page + 2);
+				if ($start > 2) { $p_win[] = 0; }
+				for ($i = $start; $i <= $end; $i++) { $p_win[] = $i; }
+				if ($end < $total_pages - 1) { $p_win[] = 0; }
+				$p_win[] = $total_pages;
+			}
+			$pagination_bar .= '
+				<div class="stc-req-pagination-wrap clearfix" style="margin-top:12px;">
+					<div class="pull-left text-muted" style="padding-top:6px;">
+						Showing '.$show_from.'–'.$show_to.' of '.$total_rows.' (page '.$page.' of '.$total_pages.')
+					</div>
+					<ul class="pagination pagination-sm pull-right" style="margin:0;">
+						<li class="'.($page <= 1 ? 'disabled' : '').'"><a href="#" class="stc-rep-page-btn" data-page="'.max(1, $page - 1).'">&laquo; Prev</a></li>
+			';
+			foreach ($p_win as $pn) {
+				if ($pn === 0) {
+					$pagination_bar .= '<li class="disabled"><a href="#">…</a></li>';
+				} else {
+					$pagination_bar .= '<li class="'.($pn == $page ? 'active' : '').'"><a href="#" class="stc-rep-page-btn" data-page="'.$pn.'">'.$pn.'</a></li>';
+				}
+			}
+			$pagination_bar .= '
+						<li class="'.($page >= $total_pages ? 'disabled' : '').'"><a href="#" class="stc-rep-page-btn" data-page="'.min($total_pages, $page + 1).'">Next &raquo;</a></li>
 					</ul>
 				</div>
 			';
@@ -1220,7 +1498,8 @@ if(isset($_POST['load_cust_req_filter'])){
 		echo '<option value="">All projects</option>';
 	}else{
 		$bumblebee=new transformers();
-		echo $bumblebee->stc_call_cust_for_agent(true);
+		$require_pick = !empty($_POST['require_pick']);
+		echo $bumblebee->stc_call_cust_for_agent(true, $require_pick);
 	}
 }
 
@@ -1482,6 +1761,21 @@ if(isset($_POST['call_searched_requisition'])){
 	$objsearchreq=new witcher_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page);
 	echo $opobjsearchreq;
+}
+
+if(isset($_POST['call_searched_requisition_report'])){
+	if(empty($_SESSION['stc_agent_sub_id']) || ($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge'){
+		echo '<div class="alert alert-danger">Access denied. Site Incharge only.</div>';
+		exit;
+	}
+	$supreqfromdate = '';
+	$supreqtodate = '';
+	$supreq_project_id = isset($_POST['supreq_project_id']) ? $_POST['supreq_project_id'] : '';
+	$supreq_status = isset($_POST['supreq_status']) ? $_POST['supreq_status'] : '';
+	$supreq_page = isset($_POST['supreq_page']) ? (int) $_POST['supreq_page'] : 1;
+	$supreq_per_page = isset($_POST['supreq_per_page']) ? (int) $_POST['supreq_per_page'] : 25;
+	$objsearchreq = new witcher_supervisor();
+	echo $objsearchreq->stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page);
 }
 
 if(isset($_POST['get_requisition_pert'])){

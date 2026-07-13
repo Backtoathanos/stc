@@ -125,6 +125,16 @@
                             </li>
                         ';
                     }
+                    if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
+                        echo '
+                            <li>
+                                <a href="stc-reports.php?page=reports" class="reports">
+                                    <i class="metismenu-icon pe-7s-graph2"></i>
+                                    Reports
+                                </a>
+                            </li>
+                        ';
+                    }
                 ?>
             </ul>
         </div>
