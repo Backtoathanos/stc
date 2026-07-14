@@ -2083,7 +2083,7 @@ if(isset($_POST['stc-safety-tbm-id'])){
 		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
 			&& function_exists('stc_r2_upload_safety_image_from_path')
 			&& is_uploaded_file($stcsafetytmpname)) {
-			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'tbm', (int) $tbm_id, '');
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'tbm', (int) $tbm_id, '', (string) $stcsafetyimages);
 			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
 				$db = $objsearchreq->stc_dbs;
 				$fn = mysqli_real_escape_string($db, $stcsafetyimages);
@@ -2320,7 +2320,7 @@ if(isset($_POST['stc-safety-nearmiss-id'])){
 		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
 			&& function_exists('stc_r2_upload_safety_image_from_path')
 			&& is_uploaded_file($stcsafetytmpname)) {
-			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'nearmiss', (int) $nearmiss_id, '');
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'nearmiss', (int) $nearmiss_id, '', (string) $stcsafetyimages);
 			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
 				$db = $objsearchreq->stc_dbs;
 				$fn = mysqli_real_escape_string($db, $stcsafetyimages);
@@ -2712,7 +2712,7 @@ if(isset($_POST['stc-capabefore-no'])){
 		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
 			&& function_exists('stc_r2_upload_safety_image_from_path')
 			&& is_uploaded_file($stcsafetytmpname)) {
-			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'before');
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'before', (string) $stcsafetyimages);
 			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
 				$db = $objsearchreq->stc_dbs;
 				$url = mysqli_real_escape_string($db, $r2['public_url']);
@@ -2743,7 +2743,7 @@ if(isset($_POST['stc-capaafter-no'])){
 		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
 			&& function_exists('stc_r2_upload_safety_image_from_path')
 			&& is_uploaded_file($stcsafetytmpname)) {
-			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'after');
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'after', (string) $stcsafetyimages);
 			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
 				$db = $objsearchreq->stc_dbs;
 				$url = mysqli_real_escape_string($db, $r2['public_url']);
@@ -3062,7 +3062,7 @@ class witcher_dso extends tesseract{
         return $q ? 'success' : 'error';
     }
 
-    public function stc_upload_dso_image_r2($dso_id, $tmpPath, $tag){
+    public function stc_upload_dso_image_r2($dso_id, $tmpPath, $tag, $originalFilename = ''){
         require_once __DIR__ . '/../../MCU/product_r2_upload.php';
         if(!is_uploaded_file($tmpPath)){
             return ['ok' => false, 'error' => 'Invalid upload file.'];
@@ -3070,7 +3070,7 @@ class witcher_dso extends tesseract{
         if(!function_exists('stc_r2_product_upload_configured') || !stc_r2_product_upload_configured()){
             return ['ok' => false, 'error' => 'Cloudflare R2 is not configured.'];
         }
-        $r2 = stc_r2_upload_safety_image_from_path($tmpPath, 'dso', (int)$dso_id, $tag);
+        $r2 = stc_r2_upload_safety_image_from_path($tmpPath, 'dso', (int)$dso_id, $tag, (string) $originalFilename);
         if(empty($r2['ok']) || empty($r2['public_url'])){
             return ['ok' => false, 'error' => $r2['error'] ?? 'Cloudflare upload failed.'];
         }
@@ -3117,16 +3117,18 @@ if(isset($_POST['stc_safety_updatedso'])){
 if(isset($_POST['stc-dsobefore-no'])){
     $dso_id = (int)$_POST['stc-dsobefore-no'];
     $stcsafetytmpname = $_FILES['before-image']['tmp_name'] ?? '';
+    $stcsafetyimages = $_FILES['before-image']['name'] ?? '';
     $obj = new witcher_dso();
-    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'before');
+    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'before', (string) $stcsafetyimages);
     echo !empty($result['ok']) ? 'success' : ('error: '.($result['error'] ?? 'Upload failed'));
 }
 
 if(isset($_POST['stc-dsoafter-no'])){
     $dso_id = (int)$_POST['stc-dsoafter-no'];
     $stcsafetytmpname = $_FILES['after-image']['tmp_name'] ?? '';
+    $stcsafetyimages = $_FILES['after-image']['name'] ?? '';
     $obj = new witcher_dso();
-    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'after');
+    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'after', (string) $stcsafetyimages);
     echo !empty($result['ok']) ? 'success' : ('error: '.($result['error'] ?? 'Upload failed'));
 }
 ?>

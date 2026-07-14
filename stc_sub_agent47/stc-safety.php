@@ -514,6 +514,63 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script>
+    // HEIC from iPhone often uploaded as .jpg on R2 (tmp has no extension). Convert for upload + view.
+    function stcIsHeicFile(file) {
+        if (!file) return false;
+        var n = (file.name || '').toLowerCase();
+        var t = (file.type || '').toLowerCase();
+        return /\.heic$/i.test(n) || /\.heif$/i.test(n) || t.indexOf('heic') !== -1 || t.indexOf('heif') !== -1;
+    }
+    function stcPrepareFormDataHeic(form) {
+        var fd = new FormData(form);
+        var fileInput = $(form).find('input[type="file"]')[0];
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+            return Promise.resolve(fd);
+        }
+        var file = fileInput.files[0];
+        if (!stcIsHeicFile(file) || typeof heic2any === 'undefined') {
+            return Promise.resolve(fd);
+        }
+        return heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 }).then(function (result) {
+            var blob = Array.isArray(result) ? result[0] : result;
+            var base = (file.name || 'image').replace(/\.(heic|heif)$/i, '');
+            var jpgFile = new File([blob], base + '.jpg', { type: 'image/jpeg' });
+            fd.delete(fileInput.name);
+            fd.append(fileInput.name, jpgFile, jpgFile.name);
+            return fd;
+        });
+    }
+    function stcBindHeicFallback($img, src) {
+        if (!$img || !src) return;
+        $img.off('error.stcheic').on('error.stcheic', function () {
+            if ($img.data('heic-tried') || typeof heic2any === 'undefined') return;
+            $img.data('heic-tried', 1);
+            fetch(src, { mode: 'cors' })
+                .then(function (r) { return r.arrayBuffer(); })
+                .then(function (buf) {
+                    return heic2any({ blob: new Blob([buf]), toType: 'image/jpeg', quality: 0.85 });
+                })
+                .then(function (result) {
+                    var blob = Array.isArray(result) ? result[0] : result;
+                    $img.attr('src', URL.createObjectURL(blob));
+                })
+                .catch(function () {});
+        });
+        if (/\.heic($|\?)/i.test(src) || /\.heif($|\?)/i.test(src)) {
+            $img.trigger('error.stcheic');
+        }
+    }
+    function stcFixHeicImagesIn(root) {
+        $(root || document).find('img[src]').each(function () {
+            var $img = $(this);
+            if ($img.data('heic-bound')) return;
+            $img.data('heic-bound', 1);
+            stcBindHeicFallback($img, $img.attr('src'));
+        });
+    }
+    </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
@@ -627,8 +684,42 @@
             // add image for tbm
             $('body').delegate('.stc-safety-tbm-image-show-btn', 'click', function() {
                 var img_src=$(this).attr("data-src");
-                $(this).after('<img src="' + img_src + '" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">');
+                var $img = $('<img src="' + img_src + '" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">');
+                $(this).after($img);
                 $(this).hide();
+                stcBindHeicFallback($img, img_src);
+            });
+
+            $(document).ajaxComplete(function(){
+                stcFixHeicImagesIn('.stc-safety-tbm-table, .stc-safety-nearmiss-res-table, .app-main__inner');
+            });
+
+            // image upload
+            $(document).on('submit', '#safety-image-upload-form', function(e) {
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "post",
+                        data        : fd,
+                        contentType : false,
+                        cache       : false,
+                        processData : false
+                    });
+                }).then(function(data){
+                    data = String(data).trim();
+                    if(data=="success"){
+                        alert("Image added!!");
+                        call_tbm();
+                        form.reset();
+                    } else {
+                        alert(data || "Upload failed.");
+                    }
+                }).catch(function(err){
+                    alert("Image upload failed. HEIC convert error — please save photo as JPG and retry.");
+                });
+                return false;
             });
 
             function call_tbm_fields(){
@@ -954,28 +1045,6 @@
                         }
                     }
                 });
-            });
-
-            // image upload
-            $(document).on('submit', '#safety-image-upload-form', function() {
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "post",
-                    data        : new FormData(this),
-                    contentType : false,
-                    cache       : false,
-                    processData : false,
-                    success     : function(data){
-                        // console.log(data);
-                        data=data.trim();
-                        if(data=="success"){
-                            alert("Image added!!");
-                            call_tbm();
-                            $('#safety-image-upload-form')[0].reset();
-                        }
-                    }
-                });
-                return false;
             });
 
             $('body').delegate('.checklistcb', 'click', function(e) {
@@ -1697,24 +1766,30 @@
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
 
-            // image upload
-            $(document).on('submit', '#safety-nearmissimage-upload-form', function() {
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "post",
-                    data        : new FormData(this),
-                    contentType : false,
-                    cache       : false,
-                    processData : false,
-                    success     : function(data){
-                        // console.log(data);
-                        data=data.trim();
-                        if(data=="success"){
-                            alert("Image added!!");
-                            call_nearmiss();
-                            $('#safety-image-upload-form')[0].reset();
-                        }
+            // image upload (near miss) — convert HEIC → JPG before send
+            $(document).on('submit', '#safety-nearmissimage-upload-form', function(e) {
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "post",
+                        data        : fd,
+                        contentType : false,
+                        cache       : false,
+                        processData : false
+                    });
+                }).then(function(data){
+                    data = String(data).trim();
+                    if(data=="success"){
+                        alert("Image added!!");
+                        call_nearmiss();
+                        form.reset();
+                    } else {
+                        alert(data || "Upload failed.");
                     }
+                }).catch(function(){
+                    alert("Image upload failed. HEIC convert error — please save photo as JPG and retry.");
                 });
                 return false;
             });            
@@ -3055,46 +3130,48 @@
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
 
-            // image upload
-            $(document).on('submit', '#safety-capaimagebefore-upload-form', function() {
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "post",
-                    data        : new FormData(this),
-                    contentType : false,
-                    cache       : false,
-                    processData : false,
-                    success     : function(data){
-                        // console.log(data);
-                        data=data.trim();
-                        if(data=="success"){
-                            alert("Image added!!");
-                            call_nearmiss();
-                            $('#safety-capaimagebefore-upload-form')[0].reset();
-                        }
+            // image upload (CAPA before) — convert HEIC → JPG before send
+            $(document).on('submit', '#safety-capaimagebefore-upload-form', function(e) {
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url: "nemesis/stc_safety.php", method: "post",
+                        data: fd, contentType: false, cache: false, processData: false
+                    });
+                }).then(function(data){
+                    data = String(data).trim();
+                    if(data=="success"){
+                        alert("Image added!!");
+                        form.reset();
+                    } else {
+                        alert(data || "Upload failed.");
                     }
+                }).catch(function(){
+                    alert("Image upload failed. HEIC convert error — please save photo as JPG and retry.");
                 });
                 return false;
-            });      
+            });
 
-            // image upload
-            $(document).on('submit', '#safety-capaimageafter-upload-form', function() {
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "post",
-                    data        : new FormData(this),
-                    contentType : false,
-                    cache       : false,
-                    processData : false,
-                    success     : function(data){
-                        // console.log(data);
-                        data=data.trim();
-                        if(data=="success"){
-                            alert("Image added!!");
-                            call_nearmiss();
-                            $('#safety-capaimageafter-upload-form')[0].reset();
-                        }
+            // image upload (CAPA after) — convert HEIC → JPG before send
+            $(document).on('submit', '#safety-capaimageafter-upload-form', function(e) {
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url: "nemesis/stc_safety.php", method: "post",
+                        data: fd, contentType: false, cache: false, processData: false
+                    });
+                }).then(function(data){
+                    data = String(data).trim();
+                    if(data=="success"){
+                        alert("Image added!!");
+                        form.reset();
+                    } else {
+                        alert(data || "Upload failed.");
                     }
+                }).catch(function(){
+                    alert("Image upload failed. HEIC convert error — please save photo as JPG and retry.");
                 });
                 return false;
             });
@@ -3240,35 +3317,45 @@
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
 
-            $(document).on('submit', '#safety-dsoimagebefore-upload-form', function(){
-                $.ajax({
-                    url: "nemesis/stc_safety.php", method: "post",
-                    data: new FormData(this), contentType: false, cache: false, processData: false,
-                    success: function(data){
-                        data = (data || '').trim();
-                        if(data==='success'){
-                            alert('Before image uploaded to Cloudflare.');
-                            $('#safety-dsoimagebefore-upload-form')[0].reset();
-                        }else{
-                            alert(data || 'Cloudflare upload failed.');
-                        }
+            $(document).on('submit', '#safety-dsoimagebefore-upload-form', function(e){
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url: "nemesis/stc_safety.php", method: "post",
+                        data: fd, contentType: false, cache: false, processData: false
+                    });
+                }).then(function(data){
+                    data = String(data || '').trim();
+                    if(data==='success'){
+                        alert('Before image uploaded to Cloudflare.');
+                        form.reset();
+                    }else{
+                        alert(data || 'Cloudflare upload failed.');
                     }
+                }).catch(function(){
+                    alert('Upload failed. HEIC convert error — please save as JPG and retry.');
                 });
                 return false;
             });
-            $(document).on('submit', '#safety-dsoimageafter-upload-form', function(){
-                $.ajax({
-                    url: "nemesis/stc_safety.php", method: "post",
-                    data: new FormData(this), contentType: false, cache: false, processData: false,
-                    success: function(data){
-                        data = (data || '').trim();
-                        if(data==='success'){
-                            alert('After image uploaded to Cloudflare.');
-                            $('#safety-dsoimageafter-upload-form')[0].reset();
-                        }else{
-                            alert(data || 'Cloudflare upload failed.');
-                        }
+            $(document).on('submit', '#safety-dsoimageafter-upload-form', function(e){
+                e.preventDefault();
+                var form = this;
+                stcPrepareFormDataHeic(form).then(function(fd){
+                    return $.ajax({
+                        url: "nemesis/stc_safety.php", method: "post",
+                        data: fd, contentType: false, cache: false, processData: false
+                    });
+                }).then(function(data){
+                    data = String(data || '').trim();
+                    if(data==='success'){
+                        alert('After image uploaded to Cloudflare.');
+                        form.reset();
+                    }else{
+                        alert(data || 'Cloudflare upload failed.');
                     }
+                }).catch(function(){
+                    alert('Upload failed. HEIC convert error — please save as JPG and retry.');
                 });
                 return false;
             });

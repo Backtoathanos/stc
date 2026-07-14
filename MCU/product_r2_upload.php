@@ -269,33 +269,128 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
     }
 }
 
+if (!function_exists('stc_r2_detect_image_extension')) {
+    /**
+     * Resolve file extension for upload tmp paths (often have no extension).
+     */
+    function stc_r2_detect_image_extension(string $absoluteLocalPath, string $originalFilename = ''): string
+    {
+        $ext = strtolower(pathinfo($originalFilename !== '' ? $originalFilename : $absoluteLocalPath, PATHINFO_EXTENSION));
+        if ($ext === 'jpeg') {
+            $ext = 'jpg';
+        }
+        if ($ext === 'heif') {
+            $ext = 'heic';
+        }
+
+        if ($ext === '' || !preg_match('/^[a-z0-9]{1,8}$/', $ext)) {
+            $finfoExt = '';
+            if (is_readable($absoluteLocalPath) && function_exists('finfo_open')) {
+                $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+                if ($finfo) {
+                    $mime = (string) @finfo_file($finfo, $absoluteLocalPath);
+                    finfo_close($finfo);
+                    $mimeMap = [
+                        'image/jpeg' => 'jpg',
+                        'image/png' => 'png',
+                        'image/gif' => 'gif',
+                        'image/webp' => 'webp',
+                        'image/heic' => 'heic',
+                        'image/heif' => 'heic',
+                        'image/heic-sequence' => 'heic',
+                        'image/heif-sequence' => 'heic',
+                    ];
+                    if (isset($mimeMap[$mime])) {
+                        $finfoExt = $mimeMap[$mime];
+                    }
+                }
+            }
+            $ext = $finfoExt !== '' ? $finfoExt : 'jpg';
+        }
+
+        // HEIC/HEIF magic: ISO BMFF "ftyp" + brand heic/heif/mif1/msf1
+        if (is_readable($absoluteLocalPath)) {
+            $fh = @fopen($absoluteLocalPath, 'rb');
+            if ($fh) {
+                $head = (string) @fread($fh, 32);
+                fclose($fh);
+                if (strlen($head) >= 12 && substr($head, 4, 4) === 'ftyp') {
+                    $brand = strtolower(substr($head, 8, 4));
+                    if (in_array($brand, ['heic', 'heif', 'mif1', 'msf1', 'hevx', 'hevc'], true)) {
+                        $ext = 'heic';
+                    }
+                }
+            }
+        }
+
+        if (!preg_match('/^[a-z0-9]{1,8}$/', $ext)) {
+            $ext = 'jpg';
+        }
+
+        return $ext;
+    }
+}
+
+if (!function_exists('stc_r2_normalize_image_upload_path')) {
+    /**
+     * Prefer browser-friendly JPEG. Converts HEIC→JPG when Imagick is available.
+     *
+     * @return array{path:string, ext:string, cleanup?:string}
+     */
+    function stc_r2_normalize_image_upload_path(string $absoluteLocalPath, string $originalFilename = ''): array
+    {
+        $ext = stc_r2_detect_image_extension($absoluteLocalPath, $originalFilename);
+
+        if ($ext === 'heic' && extension_loaded('imagick') && class_exists('Imagick')) {
+            try {
+                $tmpJpg = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'stc_heic_' . uniqid('', true) . '.jpg';
+                $img = new Imagick($absoluteLocalPath);
+                $img->setImageFormat('jpeg');
+                $img->setImageCompressionQuality(85);
+                if ($img->writeImage($tmpJpg) && is_readable($tmpJpg)) {
+                    $img->clear();
+                    $img->destroy();
+
+                    return ['path' => $tmpJpg, 'ext' => 'jpg', 'cleanup' => $tmpJpg];
+                }
+                $img->clear();
+                $img->destroy();
+            } catch (Throwable $e) {
+                // fall through — keep HEIC with correct .heic key
+            }
+        }
+
+        return ['path' => $absoluteLocalPath, 'ext' => $ext];
+    }
+}
+
 if (!function_exists('stc_r2_upload_product_image_from_path')) {
     /**
      * Upload a local file (usually PHP upload tmp) to R2 under products/.
      *
      * @param string $absoluteLocalPath readable path
      * @param int $productId product id for object key (0 if unknown — uses "vikings" prefix only)
+     * @param string $originalFilename original client filename (for HEIC/extension detection)
      */
-    function stc_r2_upload_product_image_from_path(string $absoluteLocalPath, int $productId = 0): array
+    function stc_r2_upload_product_image_from_path(string $absoluteLocalPath, int $productId = 0, string $originalFilename = ''): array
     {
         $cfg = stc_mcu_r2_config();
         if ($cfg === null) {
             return ['ok' => false, 'error' => 'R2 is not configured (missing R2_* in environment or superadmin .env).'];
         }
 
-        $ext = strtolower(pathinfo($absoluteLocalPath, PATHINFO_EXTENSION));
-        if ($ext === '') {
-            $ext = 'jpg';
-        }
-        if (!preg_match('/^[a-z0-9]{1,8}$/', $ext)) {
-            $ext = 'jpg';
-        }
+        $norm = stc_r2_normalize_image_upload_path($absoluteLocalPath, $originalFilename);
+        $ext = $norm['ext'];
+        $uploadPath = $norm['path'];
 
         $uniq = substr(str_replace('.', '', uniqid('', true)), 0, 24);
         $prefix = $productId > 0 ? (string) $productId : 'vikings';
         $objectKey = 'products/' . $prefix . '_' . date('YmdHis') . '_' . $uniq . '.' . $ext;
 
-        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $absoluteLocalPath);
+        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath);
+        if (!empty($norm['cleanup']) && is_file($norm['cleanup'])) {
+            @unlink($norm['cleanup']);
+        }
         if (!$put['ok']) {
             return ['ok' => false, 'error' => $put['error'] ?? ('Upload failed HTTP ' . ($put['http'] ?? 0))];
         }
@@ -315,10 +410,11 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
      * @param string $folderOneOf One of: tbm, nearmiss, capa, dso
      * @param int    $entityId    Row id for key naming (0 → literal "subagent")
      * @param string $tag         Optional key segment, e.g. before | after for CAPA photos
+     * @param string $originalFilename Original client filename (required for HEIC tmp uploads)
      *
      * @return array{ok:bool, public_url?:string, object_key?:string, error?:string}
      */
-    function stc_r2_upload_safety_image_from_path(string $absoluteLocalPath, string $folderOneOf, int $entityId = 0, string $tag = ''): array
+    function stc_r2_upload_safety_image_from_path(string $absoluteLocalPath, string $folderOneOf, int $entityId = 0, string $tag = '', string $originalFilename = ''): array
     {
         $allowed = ['tbm', 'nearmiss', 'capa', 'dso'];
         if (!in_array($folderOneOf, $allowed, true)) {
@@ -330,13 +426,9 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
             return ['ok' => false, 'error' => 'R2 is not configured (missing R2_* in environment or superadmin .env).'];
         }
 
-        $ext = strtolower(pathinfo($absoluteLocalPath, PATHINFO_EXTENSION));
-        if ($ext === '') {
-            $ext = 'jpg';
-        }
-        if (!preg_match('/^[a-z0-9]{1,8}$/', $ext)) {
-            $ext = 'jpg';
-        }
+        $norm = stc_r2_normalize_image_upload_path($absoluteLocalPath, $originalFilename);
+        $ext = $norm['ext'];
+        $uploadPath = $norm['path'];
 
         $tag = preg_replace('/[^a-z0-9_-]/i', '', $tag);
         $uniq = substr(str_replace('.', '', uniqid('', true)), 0, 24);
@@ -344,13 +436,17 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
         $slug = $baseId . ($tag !== '' ? '_' . $tag : '');
         $objectKey = $folderOneOf . '/' . $slug . '_' . date('YmdHis') . '_' . $uniq . '.' . $ext;
 
-        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $absoluteLocalPath);
+        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath);
+        if (!empty($norm['cleanup']) && is_file($norm['cleanup'])) {
+            @unlink($norm['cleanup']);
+        }
         if (!$put['ok']) {
             return ['ok' => false, 'error' => $put['error'] ?? ('Upload failed HTTP ' . ($put['http'] ?? 0))];
         }
 
         $publicUrl = stc_r2_public_url_from_object_key($cfg['public_base'], $objectKey);
 
-        return ['ok' => true, 'public_url' => $publicUrl, 'object_key' => $objectKey];
+        return ['ok' => true, 'public_url' => $publicUrl, 'object_key' => $objectKey, 'ext' => $ext];
     }
 }
+
