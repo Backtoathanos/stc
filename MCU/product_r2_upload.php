@@ -134,6 +134,24 @@ if (!function_exists('stc_r2_uri_encode_object_key_path')) {
     }
 }
 
+if (!function_exists('stc_r2_content_type_for_ext')) {
+    function stc_r2_content_type_for_ext(string $ext): string
+    {
+        $ext = strtolower($ext);
+        $map = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'heic' => 'image/heic',
+            'heif' => 'image/heif',
+        ];
+
+        return $map[$ext] ?? 'application/octet-stream';
+    }
+}
+
 if (!function_exists('stc_r2_sigv4_put_object')) {
     /**
      * PUT object via SigV4 (S3-compatible).
@@ -141,7 +159,7 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
      * @param array{key:string, secret:string, region:string, bucket:string, endpoint:string, use_path_style:bool, public_base:string} $cfg
      * @return array{ok:bool, http:int, error?:string}
      */
-    function stc_r2_sigv4_put_object(array $cfg, string $objectKey, string $localPath): array
+    function stc_r2_sigv4_put_object(array $cfg, string $objectKey, string $localPath, string $contentType = 'application/octet-stream'): array
     {
         if (!is_readable($localPath)) {
             return ['ok' => false, 'http' => 0, 'error' => 'Local file not readable.'];
@@ -157,6 +175,10 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
             return ['ok' => false, 'http' => 0, 'error' => 'Invalid R2_ENDPOINT URL.'];
         }
 
+        if ($contentType === '') {
+            $contentType = 'application/octet-stream';
+        }
+
         $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
         $host = $parsed['host'];
         $payloadHash = strtolower(hash_file('sha256', $localPath));
@@ -167,10 +189,12 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
         $canonicalUri = stc_r2_uri_encode_object_key_path($cfg['bucket'], $objectKey);
         $canonicalQueryString = '';
 
-        $canonicalHeaders = 'host:' . $host . "\n"
+        // Signed headers must be alphabetical
+        $canonicalHeaders = 'content-type:' . $contentType . "\n"
+            . 'host:' . $host . "\n"
             . 'x-amz-content-sha256:' . $payloadHash . "\n"
             . 'x-amz-date:' . $amzDate . "\n";
-        $signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+        $signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-date';
 
         $canonicalRequest = "PUT\n"
             . $canonicalUri . "\n"
@@ -198,6 +222,7 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
         $url = $scheme . '://' . $host . $canonicalUri;
 
         $headers = [
+            'Content-Type: ' . $contentType,
             'Host: ' . $host,
             'x-amz-date: ' . $amzDate,
             'x-amz-content-sha256: ' . $payloadHash,
@@ -236,7 +261,6 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
 
         $streamHeaders = implode("\r\n", array_merge($headers, [
             'Content-Length: ' . $size,
-            'Content-Type: application/octet-stream',
         ]));
 
         $context = stream_context_create([
@@ -387,7 +411,7 @@ if (!function_exists('stc_r2_upload_product_image_from_path')) {
         $prefix = $productId > 0 ? (string) $productId : 'vikings';
         $objectKey = 'products/' . $prefix . '_' . date('YmdHis') . '_' . $uniq . '.' . $ext;
 
-        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath);
+        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath, stc_r2_content_type_for_ext($ext));
         if (!empty($norm['cleanup']) && is_file($norm['cleanup'])) {
             @unlink($norm['cleanup']);
         }
@@ -436,7 +460,7 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
         $slug = $baseId . ($tag !== '' ? '_' . $tag : '');
         $objectKey = $folderOneOf . '/' . $slug . '_' . date('YmdHis') . '_' . $uniq . '.' . $ext;
 
-        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath);
+        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $uploadPath, stc_r2_content_type_for_ext($ext));
         if (!empty($norm['cleanup']) && is_file($norm['cleanup'])) {
             @unlink($norm['cleanup']);
         }
