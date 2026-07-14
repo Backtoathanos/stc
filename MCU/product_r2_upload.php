@@ -293,6 +293,125 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
     }
 }
 
+if (!function_exists('stc_r2_sigv4_copy_object')) {
+    /**
+     * Server-side copy (no download). Renames/copies object to a new key.
+     *
+     * @param array{key:string, secret:string, region:string, bucket:string, endpoint:string, use_path_style:bool, public_base:string} $cfg
+     * @return array{ok:bool, http:int, error?:string}
+     */
+    function stc_r2_sigv4_copy_object(array $cfg, string $sourceKey, string $destKey, string $contentType = 'application/octet-stream'): array
+    {
+        $parsed = parse_url($cfg['endpoint']);
+        if (!is_array($parsed) || empty($parsed['host'])) {
+            return ['ok' => false, 'http' => 0, 'error' => 'Invalid R2_ENDPOINT URL.'];
+        }
+
+        if ($contentType === '') {
+            $contentType = 'application/octet-stream';
+        }
+
+        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : 'https';
+        $host = $parsed['host'];
+        $payloadHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'; // empty body
+
+        $amzDate = gmdate('Ymd\THis\Z');
+        $dateStamp = gmdate('Ymd');
+
+        $canonicalUri = stc_r2_uri_encode_object_key_path($cfg['bucket'], $destKey);
+        $canonicalQueryString = '';
+
+        // x-amz-copy-source: /bucket/key (each path segment URL-encoded)
+        $srcSegs = explode('/', str_replace('\\', '/', $sourceKey));
+        $copySource = '/' . rawurlencode($cfg['bucket']) . '/' . implode('/', array_map('rawurlencode', $srcSegs));
+
+        $canonicalHeaders = 'content-type:' . $contentType . "\n"
+            . 'host:' . $host . "\n"
+            . 'x-amz-content-sha256:' . $payloadHash . "\n"
+            . 'x-amz-copy-source:' . $copySource . "\n"
+            . 'x-amz-date:' . $amzDate . "\n"
+            . 'x-amz-metadata-directive:REPLACE' . "\n";
+        $signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-copy-source;x-amz-date;x-amz-metadata-directive';
+
+        $canonicalRequest = "PUT\n"
+            . $canonicalUri . "\n"
+            . $canonicalQueryString . "\n"
+            . $canonicalHeaders . "\n"
+            . $signedHeaders . "\n"
+            . $payloadHash;
+
+        $credentialScope = $dateStamp . '/' . $cfg['region'] . '/s3/aws4_request';
+        $stringToSign = "AWS4-HMAC-SHA256\n"
+            . $amzDate . "\n"
+            . $credentialScope . "\n"
+            . hash('sha256', $canonicalRequest);
+
+        $kSecret = 'AWS4' . $cfg['secret'];
+        $kDate = hash_hmac('sha256', $dateStamp, $kSecret, true);
+        $kRegion = hash_hmac('sha256', $cfg['region'], $kDate, true);
+        $kService = hash_hmac('sha256', 's3', $kRegion, true);
+        $kSigning = hash_hmac('sha256', 'aws4_request', $kService, true);
+        $signature = hash_hmac('sha256', $stringToSign, $kSigning);
+
+        $authorization = 'AWS4-HMAC-SHA256 Credential=' . $cfg['key'] . '/' . $credentialScope
+            . ', SignedHeaders=' . $signedHeaders . ', Signature=' . $signature;
+
+        $url = $scheme . '://' . $host . $canonicalUri;
+
+        $headers = [
+            'Content-Type: ' . $contentType,
+            'Host: ' . $host,
+            'x-amz-date: ' . $amzDate,
+            'x-amz-content-sha256: ' . $payloadHash,
+            'x-amz-copy-source: ' . $copySource,
+            'x-amz-metadata-directive: REPLACE',
+            'Authorization: ' . $authorization,
+            'Content-Length: 0',
+        ];
+
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_CUSTOMREQUEST => 'PUT',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_POSTFIELDS => '',
+                CURLOPT_TIMEOUT => 60,
+            ]);
+            curl_exec($ch);
+            $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($http >= 200 && $http < 300) {
+                return ['ok' => true, 'http' => $http];
+            }
+
+            return ['ok' => false, 'http' => $http, 'error' => 'R2 copy failed (HTTP ' . $http . ').'];
+        }
+
+        $streamHeaders = implode("\r\n", $headers);
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'PUT',
+                'header' => $streamHeaders,
+                'content' => '',
+                'ignore_errors' => true,
+                'timeout' => 60,
+            ],
+        ]);
+        @file_get_contents($url, false, $context);
+        $http = 0;
+        if (!empty($http_response_header[0]) && preg_match('#HTTP/\S+\s+(\d+)#', $http_response_header[0], $m)) {
+            $http = (int) $m[1];
+        }
+        if ($http >= 200 && $http < 300) {
+            return ['ok' => true, 'http' => $http];
+        }
+
+        return ['ok' => false, 'http' => $http, 'error' => 'R2 copy failed (HTTP ' . $http . ').'];
+    }
+}
+
 if (!function_exists('stc_r2_detect_image_extension')) {
     /**
      * Resolve file extension for upload tmp paths (often have no extension).
