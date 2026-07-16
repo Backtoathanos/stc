@@ -6276,7 +6276,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			LEFT JOIN `stc_sub_category` S ON S.`stc_sub_cat_id`=P.`stc_product_sub_cat_id`
 			LEFT JOIN `stc_brand` B ON B.`stc_brand_id`=P.`stc_product_brand_id`
 			WHERE P.`stc_product_avail`='1' ".$cat_sql.$subcat_sql.$name_sql."
-			ORDER BY P.`stc_product_id` ASC LIMIT 50
+			ORDER BY adhoc_left DESC, P.`stc_product_name` ASC LIMIT 50
 		");
 		$out = '';
 		if($q && mysqli_num_rows($q) > 0){
