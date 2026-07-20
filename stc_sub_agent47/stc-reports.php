@@ -45,6 +45,19 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
         color: #666;
         margin-bottom: 3px;
       }
+      .stc-rep-btn-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .stc-rep-btn-row .stc-rep-search { flex: 1; min-width: 0; }
+      .stc-rep-btn-row .stc-rep-export-excel {
+        flex: 0 0 42px;
+        height: 34px;
+        padding: 0;
+        line-height: 34px;
+        font-size: 18px;
+      }
       @media (min-width: 992px) {
         .stc-req-filter-toolbar .row {
           display: flex;
@@ -53,6 +66,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
         }
         .stc-req-filter-toolbar .stc-req-field { margin-bottom: 0; }
         .stc-req-filter-btns { text-align: right; }
+        .stc-rep-btn-row { justify-content: flex-end; }
       }
       .nav-tabs .nav-link.active { font-weight: 600; }
     </style>
@@ -126,7 +140,10 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                                                         </select>
                                                     </div>
                                                     <div class="col-md-3 col-xs-12 stc-req-filter-btns stc-req-field">
-                                                        <button type="button" class="btn btn-primary btn-sm stc-rep-search form-control"><i class="fa fa-search"></i> Search</button>
+                                                        <div class="stc-rep-btn-row">
+                                                            <button type="button" class="btn btn-primary btn-sm stc-rep-search form-control"><i class="fa fa-search"></i> Search</button>
+                                                            <button type="button" class="btn btn-success btn-sm stc-rep-export-excel" title="Export all searched results to Excel" disabled><i class="fa fa-file-excel-o"></i></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -166,6 +183,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script type="text/javascript" src="./assets/scripts/jquery.table2excel.js"></script>
     <script>
     $(document).ready(function(){
         function loadRepProjectFilter(){
@@ -188,8 +206,14 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
             return project !== '' && project !== 'NA';
         }
 
+        function setExportEnabled(on){
+            $('.stc-rep-export-excel').prop('disabled', !on);
+        }
+        setExportEnabled(false);
+
         function loadReportResults(page){
             page = parseInt(page, 10) || 1;
+            setExportEnabled(false);
             if(!canSearch()){
                 $('.stc-reports-result').html('<div class="alert alert-warning text-center">Please select a site / project first.</div>');
                 return;
@@ -217,6 +241,10 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
                     $('.stc-reports-result').html(
                         '<div class="mb-2"><input type="text" class="form-control stc-rep-quick-search" placeholder="Quick search in results…"></div>' + html
                     );
+                    setExportEnabled(
+                        $('#stc-rep-requisition-table').length > 0 &&
+                        $('#stc-rep-requisition-table tbody tr td[colspan]').length === 0
+                    );
                 },
                 error   : function(){
                     $('.stc-reports-result').html('<div class="alert alert-danger">Failed to load report.</div>');
@@ -240,8 +268,63 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
 
         $('body').delegate('.stc-rep-quick-search', 'keyup', function(){
             var searchText = $(this).val().toLowerCase();
-            $('.stc-reports-result > table > tbody tr').each(function(){
+            $('#stc-rep-requisition-table tbody tr').each(function(){
                 $(this).toggle($(this).text().toLowerCase().indexOf(searchText) !== -1);
+            });
+        });
+
+        $('body').delegate('.stc-rep-export-excel', 'click', function(e){
+            e.preventDefault();
+            if(!canSearch() || !$.fn.table2excel){ return; }
+            var fromDate = $.trim($('#stc-rep-beg-date').val());
+            var toDate = $.trim($('#stc-rep-end-date').val());
+            if(!fromDate || !toDate){
+                alert('Please select From and To date.');
+                return;
+            }
+            var $btn = $(this);
+            if($btn.data('busy')){ return; }
+            $btn.data('busy', 1).prop('disabled', true);
+            var prevHtml = $btn.html();
+            $btn.html('<i class="fa fa-spinner fa-spin"></i>');
+            $.ajax({
+                url     : "nemesis/stc_agcart.php",
+                method  : "POST",
+                data    : {
+                    call_searched_requisition_report_excel: 1,
+                    supreqfromdate: fromDate,
+                    supreqtodate: toDate,
+                    supreq_project_id: $('#stc-rep-project-filter').val(),
+                    supreq_status: $('#stc-rep-status-filter').val()
+                },
+                success : function(html){
+                    var $wrap = $('<div id="stc-rep-excel-tmp" style="display:none;"></div>').appendTo('body');
+                    $wrap.html(html);
+                    var $table = $wrap.find('#stc-rep-requisition-export-table');
+                    if(!$table.length || $table.find('tbody tr td[colspan]').length){
+                        alert('No results to export.');
+                        $wrap.remove();
+                        return;
+                    }
+                    var siteName = $.trim($('#stc-rep-project-filter option:selected').text()) || 'site';
+                    siteName = siteName.replace(/[^\w\-]+/g, '_').substring(0, 40);
+                    var stamp = new Date().toISOString().slice(0, 10);
+                    $table.table2excel({
+                        exclude: '.noExl',
+                        name: 'Requisition Report',
+                        filename: 'stc-requisition-report-' + siteName + '-' + stamp + '.xls',
+                        fileext: '.xls',
+                        exclude_links: true,
+                        exclude_inputs: true
+                    });
+                    $wrap.remove();
+                },
+                error   : function(){
+                    alert('Failed to export Excel. Please try again.');
+                },
+                complete: function(){
+                    $btn.data('busy', 0).prop('disabled', false).html(prevHtml);
+                }
             });
         });
 

@@ -1,0 +1,39 @@
+SELECT
+    DATE(L.`stc_cust_super_requisition_list_date`) AS req_date,
+    P.`stc_cust_project_title` AS job_name,
+    I.`stc_cust_super_requisition_list_items_title` AS item_name,
+    I.`stc_cust_super_requisition_list_items_approved_qty` AS qty,
+    I.`stc_cust_super_requisition_list_items_unit` AS unit,
+    (
+        SELECT LG.`message`
+        FROM `stc_cust_super_requisition_list_items_log` LG
+        WHERE LG.`item_id` = I.`stc_cust_super_requisition_list_id`
+          AND LG.`title` = 'Pending'
+        ORDER BY LG.`created_date` DESC, LG.`id` DESC
+        LIMIT 1
+    ) AS pending_reason
+FROM `stc_cust_super_requisition_list_items` I
+INNER JOIN `stc_cust_super_requisition_list` L
+    ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+INNER JOIN `stc_cust_project` P
+    ON P.`stc_cust_project_id` = L.`stc_cust_super_requisition_list_project_id`
+INNER JOIN `stc_requisition_combiner_req` CR
+    ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+INNER JOIN `stc_requisition_combiner` C
+    ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+LEFT JOIN (
+    SELECT
+        `stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+        SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+    FROM `stc_cust_super_requisition_list_items_rec`
+    GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
+WHERE C.`stc_requisition_combiner_date` >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+  AND C.`stc_requisition_combiner_date` < DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+  AND L.`stc_cust_super_requisition_list_status` != '1'
+  AND IFNULL(R.dispatched_qty, 0) = 0
+ORDER BY
+    DATE(C.`stc_requisition_combiner_date`) ASC,
+    L.`stc_cust_super_requisition_list_date` ASC,
+    P.`stc_cust_project_title` ASC,
+    I.`stc_cust_super_requisition_list_items_title` ASC;

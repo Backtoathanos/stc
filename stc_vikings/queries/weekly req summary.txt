@@ -1,0 +1,27 @@
+SELECT
+    DATE(C.`stc_requisition_combiner_date`) AS day_date,
+    DAYNAME(C.`stc_requisition_combiner_date`) AS day_name,
+    COUNT(I.`stc_cust_super_requisition_list_id`) AS req_arrived,
+    SUM(CASE WHEN IFNULL(R.dispatched_qty, 0) > 0 THEN 1 ELSE 0 END) AS req_dispatched,
+    SUM(CASE WHEN IFNULL(R.dispatched_qty, 0) = 0 THEN 1 ELSE 0 END) AS req_pending
+FROM `stc_cust_super_requisition_list_items` I
+INNER JOIN `stc_cust_super_requisition_list` L
+    ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+INNER JOIN `stc_requisition_combiner_req` CR
+    ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+INNER JOIN `stc_requisition_combiner` C
+    ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+LEFT JOIN (
+    SELECT
+        `stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+        SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+    FROM `stc_cust_super_requisition_list_items_rec`
+    GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
+WHERE C.`stc_requisition_combiner_date` >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+  AND C.`stc_requisition_combiner_date` < DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+  AND L.`stc_cust_super_requisition_list_status` != '1'
+GROUP BY
+    DATE(C.`stc_requisition_combiner_date`),
+    DAYNAME(C.`stc_requisition_combiner_date`)
+ORDER BY day_date ASC;

@@ -692,7 +692,7 @@ class witcher_supervisor extends tesseract{
 		return '<span style="background-color:'.$map[$s][0].';color:white;padding:2px 6px;border-radius:3px;">'.$map[$s][1].'</span>';
 	}
 
-	public function stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $project_id = '', $status_filter = '', $page = 1, $per_page = 25) {
+	public function stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $project_id = '', $status_filter = '', $page = 1, $per_page = 25, $export_all = false) {
 		$allowed_projects = $this->stc_site_incharge_project_ids();
 		if ($allowed_projects === array()) {
 			return '
@@ -750,8 +750,12 @@ class witcher_supervisor extends tesseract{
 		if ($page > $total_pages) { $page = $total_pages; }
 		$offset = ($page - 1) * $per_page;
 
+		$table_id = $export_all ? 'stc-rep-requisition-export-table' : 'stc-rep-requisition-table';
+		$log_th = $export_all ? '' : '<th class="text-center noExl">Log</th>';
+		$colspan = $export_all ? 16 : 17;
+
 		$requisition_table = '
-			<table class="mb-0 table table-hover table-bordered">
+			<table class="mb-0 table table-hover table-bordered" id="'.$table_id.'">
 				<thead>
 				    <th class="text-center">Req No.</th>
 				    <th class="text-center">Req Date</th>
@@ -769,10 +773,14 @@ class witcher_supervisor extends tesseract{
 				    <th class="text-center">Status</th>
 				    <th class="text-center">Priority</th>
 				    <th class="text-center">Type</th>
-				    <th class="text-center">Log</th>
+				    '.$log_th.'
 				</thead>
 				<tbody>
 		';
+
+		$limit_sql = $export_all
+			? ' LIMIT 10000'
+			: ' LIMIT '.(int) $offset.', '.(int) $per_page;
 
 		$requisitioni_qry = mysqli_query($this->stc_dbs, "
 			SELECT
@@ -791,8 +799,8 @@ class witcher_supervisor extends tesseract{
 				I.`stc_cust_super_requisition_list_id` as list_item_id
 			".$from_where."
 			ORDER BY `stc_cust_super_requisition_items_priority` DESC, TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC
-			LIMIT ".(int) $offset.', '.(int) $per_page.'
-		');
+			".$limit_sql."
+		");
 		$rows_on_page = ($requisitioni_qry ? mysqli_num_rows($requisitioni_qry) : 0);
 
 		if ($rows_on_page > 0) {
@@ -834,29 +842,33 @@ class witcher_supervisor extends tesseract{
 				$stockqty = $recievingqty - $consrecievingqty;
 				$bgcolor = $requisitioni_row['stc_cust_super_requisition_items_priority'] == '2' ? 'style="background:#ffa5a5;color:black"' : '';
 
-				$log = '
-					<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg"
-						title="View Log" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">View Log</a>
-				';
-				$item_id = $requisitioni_row['list_item_id'];
-				$query = mysqli_query($this->stc_dbs, "
-					SELECT `title`, `message`, `created_by`, `created_date`
-					FROM `stc_cust_super_requisition_list_items_log`
-					WHERE `item_id`='".$item_id."'
-					ORDER BY `id` DESC
-				");
-				if (mysqli_num_rows($query) > 0) {
-					foreach ($query as $row) {
-						$log .= '
-							<div style="display:none;border:1px solid #e0e0e0;border-radius:8px;padding:12px 16px;margin:12px 0;background:#fff;">
-								<div style="display:flex;justify-content:space-between;align-items:center;">
-									<span style="font-weight:600;color:#212121;font-size:16px;">'.$row['title'].'</span>
-									<span style="font-size:12px;color:#757575;">'.date('d-m-Y h:i A', strtotime($row['created_date'])).'</span>
+				$log_td = '';
+				if (!$export_all) {
+					$log = '
+						<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg"
+							title="View Log" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">View Log</a>
+					';
+					$item_id = $requisitioni_row['list_item_id'];
+					$query = mysqli_query($this->stc_dbs, "
+						SELECT `title`, `message`, `created_by`, `created_date`
+						FROM `stc_cust_super_requisition_list_items_log`
+						WHERE `item_id`='".$item_id."'
+						ORDER BY `id` DESC
+					");
+					if (mysqli_num_rows($query) > 0) {
+						foreach ($query as $row) {
+							$log .= '
+								<div style="display:none;border:1px solid #e0e0e0;border-radius:8px;padding:12px 16px;margin:12px 0;background:#fff;">
+									<div style="display:flex;justify-content:space-between;align-items:center;">
+										<span style="font-weight:600;color:#212121;font-size:16px;">'.$row['title'].'</span>
+										<span style="font-size:12px;color:#757575;">'.date('d-m-Y h:i A', strtotime($row['created_date'])).'</span>
+									</div>
+									<div style="margin-top:4px;font-size:14px;color:#424242;">'.$row['message'].'</div>
 								</div>
-								<div style="margin-top:4px;font-size:14px;color:#424242;">'.$row['message'].'</div>
-							</div>
-						';
+							';
+						}
 					}
+					$log_td = '<td class="text-center noExl">'.$log.'</td>';
 				}
 
 				$requisition_table .= '
@@ -877,17 +889,21 @@ class witcher_supervisor extends tesseract{
 						<td class="text-center">'.$reqstaus.'</td>
 						<td>'.$priority.'</td>
 						<td>'.$requisitioni_row['stc_cust_super_requisition_items_type'].'</td>
-						<td class="text-center">'.$log.'</td>
+						'.$log_td.'
 					</tr>
 				';
 			}
 		} else {
 			$requisition_table .= '
-				<tr><td colspan="17" class="text-center">No record found.</td></tr>
+				<tr><td colspan="'.$colspan.'" class="text-center">No record found.</td></tr>
 			';
 		}
 
 		$requisition_table .= '</tbody></table>';
+
+		if ($export_all) {
+			return $requisition_table;
+		}
 
 		$pagination_bar = '';
 		if ($total_rows > 0) {
@@ -1763,7 +1779,7 @@ if(isset($_POST['call_searched_requisition'])){
 	echo $opobjsearchreq;
 }
 
-if(isset($_POST['call_searched_requisition_report'])){
+if(isset($_POST['call_searched_requisition_report']) || isset($_POST['call_searched_requisition_report_excel'])){
 	if(empty($_SESSION['stc_agent_sub_id']) || ($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge'){
 		echo '<div class="alert alert-danger">Access denied. Site Incharge only.</div>';
 		exit;
@@ -1778,8 +1794,9 @@ if(isset($_POST['call_searched_requisition_report'])){
 	$supreq_status = isset($_POST['supreq_status']) ? $_POST['supreq_status'] : '';
 	$supreq_page = isset($_POST['supreq_page']) ? (int) $_POST['supreq_page'] : 1;
 	$supreq_per_page = isset($_POST['supreq_per_page']) ? (int) $_POST['supreq_per_page'] : 25;
+	$export_all = isset($_POST['call_searched_requisition_report_excel']);
 	$objsearchreq = new witcher_supervisor();
-	echo $objsearchreq->stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page);
+	echo $objsearchreq->stc_search_requisitions_site_report($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page, $export_all);
 }
 
 if(isset($_POST['get_requisition_pert'])){
