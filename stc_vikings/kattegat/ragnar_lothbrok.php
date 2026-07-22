@@ -2077,6 +2077,155 @@ class sceptor extends tesseract{
 			'rows'        => $rows,
 		];
 	}
+
+	// Return list: paginated + search + sort for Returned (status=8) requisition items
+	public function stc_return_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
+		$page     = max(1, (int)$page);
+		$per_page = max(1, min(50, (int)$per_page));
+
+		$sort_map = [
+			'req_date'  => 'DATE(`stc_cust_super_requisition_list_date`)',
+			'site_name' => '`stc_cust_project_title`',
+			'item_desc' => '`stc_cust_super_requisition_list_items_title`',
+			'duration'  => 'DATE(MAX(`created_date`))',
+		];
+		$sort_dir   = strtoupper($sort_dir) === 'ASC' ? 'ASC' : 'DESC';
+		$order_expr = isset($sort_map[$sort_col]) ? $sort_map[$sort_col] : $sort_map['req_date'];
+
+		$search_where = '';
+		if(!empty($search_site)){
+			$search_where .= " AND `stc_cust_project_title` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_site)) . "%'";
+		}
+		if(!empty($search_item)){
+			$search_where .= " AND `stc_cust_super_requisition_list_items_title` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_item)) . "%'";
+		}
+		if(!empty($search_reason)){
+			$search_where .= " AND `message` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_reason)) . "%'";
+		}
+
+		$from_where = "
+			FROM `stc_cust_super_requisition_list_items`
+			INNER JOIN `stc_cust_super_requisition_list`
+				ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project`
+				ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+			LEFT JOIN `stc_requisition_combiner_req`
+				ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+			LEFT JOIN `stc_requisition_combiner`
+				ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
+			INNER JOIN `stc_cust_super_requisition_list_items_log`
+				ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+			WHERE `stc_cust_super_requisition_list_items_status`='8'
+				AND `title`='Returned'
+				AND DATE(`stc_cust_super_requisition_list_date`) >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+				$search_where
+		";
+
+		$cntq = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) as total FROM (
+				SELECT DISTINCT `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+				$from_where
+			) as cnt_tbl
+		");
+		$cnt_row     = mysqli_fetch_assoc($cntq);
+		$total       = (int)($cnt_row['total'] ?? 0);
+		$total_pages = $total > 0 ? (int)ceil($total / $per_page) : 1;
+		if($page > $total_pages) $page = $total_pages;
+		$offset = ($page - 1) * $per_page;
+
+		$mainq = mysqli_query($this->stc_dbs, "
+			SELECT
+				MAX(`stc_requisition_combiner_id`) as stc_requisition_combiner_id,
+				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+				DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+				`stc_cust_super_requisition_list_items_req_id`,
+				`stc_cust_project_title`,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_list_items_status`,
+				DATE(MAX(`created_date`)) as stc_log_date
+			$from_where
+			GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+			ORDER BY $order_expr $sort_dir
+			LIMIT $offset, $per_page
+		");
+
+		$rows = [];
+		$slno = $offset;
+		if($mainq){
+			foreach($mainq as $r){
+				$slno++;
+				$reqlistid = $r['reqlistid'];
+				$req_id    = $r['stc_cust_super_requisition_list_items_req_id'];
+				$final_qty = (float)$r['stc_cust_super_requisition_items_finalqty'];
+
+				$days_returned   = 0;
+				$months_returned = 0;
+				$dur_bg    = '#ffffff';
+				$dur_color = '#000000';
+				if(!empty($r['stc_log_date'])){
+					$log_dt          = new DateTime($r['stc_log_date']);
+					$today           = new DateTime();
+					$days_returned   = (int)$log_dt->diff($today)->days;
+					$months_returned = (int)floor($days_returned / 30);
+					if($months_returned >= 3)     { $dur_bg = '#9b59b6'; $dur_color = '#ffffff'; }
+					elseif($months_returned >= 2) { $dur_bg = '#8e44ad'; $dur_color = '#ffffff'; }
+					elseif($months_returned >= 1) { $dur_bg = '#c39bd3'; $dur_color = '#000000'; }
+				}
+
+				$logq = mysqli_query($this->stc_dbs, "
+					SELECT `message` FROM `stc_cust_super_requisition_list_items_log`
+					WHERE `title`='Returned' AND `item_id`='".mysqli_real_escape_string($this->stc_dbs, $reqlistid)."'
+					ORDER BY `id` DESC
+				");
+				$full_message = '';
+				if($logq){
+					foreach($logq as $lr){ $full_message .= $lr['message'] . '<br>'; }
+				}
+
+				$reason_truncated = '';
+				if(!empty($full_message)){
+					$clean = strip_tags($full_message);
+					if(preg_match('/Returned by\s+(.+?)\s+on/i', $clean, $m)){
+						$reason_truncated = 'Returned by ' . trim($m[1]);
+					} else {
+						$reason_truncated = substr($clean, 0, 40);
+					}
+				}
+
+				$rows[] = [
+					'slno'             => $slno,
+					'req_date'         => $r['stc_req_date'],
+					'req_id'           => $req_id,
+					'project_title'    => $r['stc_cust_project_title'],
+					'item_title'       => $r['stc_cust_super_requisition_list_items_title'],
+					'unit'             => $r['stc_cust_super_requisition_list_items_unit'],
+					'final_qty'        => number_format($final_qty, 2),
+					'status'           => (int)$r['stc_cust_super_requisition_list_items_status'],
+					'req_list_id'      => (int)$reqlistid,
+					'combiner_id'      => (int)$r['stc_requisition_combiner_id'],
+					'days_returned'    => $days_returned,
+					'months_returned'  => $months_returned,
+					'dur_bg'           => $dur_bg,
+					'dur_color'        => $dur_color,
+					'reason_truncated' => $reason_truncated,
+					'reason_full'      => $full_message,
+				];
+			}
+		}
+
+		return [
+			'success'     => true,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+			'sort_col'    => $sort_col,
+			'sort_dir'    => $sort_dir,
+			'rows'        => $rows,
+		];
+	}
 }
 
 #<------------------------------------------------------------------------------->
@@ -2284,6 +2433,23 @@ if(isset($_POST["pending_list"])){
     $sort_dir      = isset($_POST['sort_dir'])      ? trim($_POST['sort_dir'])                   : 'DESC';
     $obj = new sceptor();
     $out = $obj->stc_pending_list($page, $per_page, $search_site, $search_item, $search_reason, $sort_col, $sort_dir);
+    header('Content-Type: application/json');
+    echo json_encode($out);
+    exit;
+}
+
+// API endpoint for AJAX paginated return list (dashboard) — supports search + sort
+if(isset($_POST["return_list"])){
+    session_start();
+    $page          = isset($_POST['page'])          ? max(1, (int)$_POST['page'])               : 1;
+    $per_page      = isset($_POST['per_page'])      ? max(1, min(50, (int)$_POST['per_page']))   : 15;
+    $search_site   = isset($_POST['search_site'])   ? trim($_POST['search_site'])                : '';
+    $search_item   = isset($_POST['search_item'])   ? trim($_POST['search_item'])                : '';
+    $search_reason = isset($_POST['search_reason']) ? trim($_POST['search_reason'])              : '';
+    $sort_col      = isset($_POST['sort_col'])      ? trim($_POST['sort_col'])                   : 'req_date';
+    $sort_dir      = isset($_POST['sort_dir'])      ? trim($_POST['sort_dir'])                   : 'DESC';
+    $obj = new sceptor();
+    $out = $obj->stc_return_list($page, $per_page, $search_site, $search_item, $search_reason, $sort_col, $sort_dir);
     header('Content-Type: application/json');
     echo json_encode($out);
     exit;

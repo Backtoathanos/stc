@@ -571,6 +571,74 @@ STCAuthHelper::checkAuth();
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-12 col-xl-12">
+                                <div class="card mb-3 border-purple shadow-sm" style="border-color:#9b59b6 !important;">
+                                    <div class="card-body p-4">
+                                        <h5 class="card-title font-weight-bold mb-4 text-dark text-center">Return List</h5>
+
+                                        <div class="row mb-3 align-items-end" id="stc-return-search-bar">
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Site Name</span>
+                                                <input type="text" id="stc-return-search-site" class="form-control form-control-sm" placeholder="Search site name...">
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Item Description</span>
+                                                <input type="text" id="stc-return-search-item" class="form-control form-control-sm" placeholder="Search item description...">
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Return Reason</span>
+                                                <input type="text" id="stc-return-search-reason" class="form-control form-control-sm" placeholder="Search return reason...">
+                                            </div>
+                                            <div class="col-md-3 mb-2 d-flex" style="gap:6px;">
+                                                <button id="stc-return-search-btn" class="btn btn-primary btn-sm" style="min-width:72px;">
+                                                    <i class="fa fa-search"></i> Search
+                                                </button>
+                                                <button id="stc-return-reset-btn" class="btn btn-outline-secondary btn-sm" style="min-width:64px;">
+                                                    Reset
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="mb-0 table table-bordered" id="stc-reports-requisition-return-view">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center" style="width:40px;">#</th>
+                                                    <th class="text-center stc-return-sortable" data-col="req_date" width="10%" style="cursor:pointer;white-space:nowrap;">
+                                                        PR Date&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span><br>
+                                                        <span style="font-size:10px;font-weight:normal;color:#777;">&amp; No</span>
+                                                    </th>
+                                                    <th class="text-center stc-return-sortable" data-col="site_name" style="width:300px;text-align:center;cursor:pointer;">
+                                                        Site Name&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center stc-return-sortable" data-col="item_desc" style="width:500px;text-align:center;word-wrap:break-word;white-space:normal;cursor:pointer;">
+                                                        Item Desc&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center" style="width:40px;">Unit</th>
+                                                    <th class="text-center" style="width:80px;"><div style="transform:rotate(-90deg);white-space:nowrap;width:20px;">Proc Apprv Qty</div></th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center stc-return-sortable" data-col="duration" style="width:200px;text-align:center;cursor:pointer;">
+                                                        Return Duration&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center" style="width:500px;">Return Reason</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="stc-reports-return-view">
+                                                <tr id="stc-return-loader">
+                                                    <td colspan="9" class="text-center" style="padding:25px; color:#888;">
+                                                        <i>Loading return list&hellip;</i>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="stc-return-pagination"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
         </div>
@@ -1083,6 +1151,169 @@ STCAuthHelper::checkAuth();
             var icon = stcPendingSortDir === 'ASC' ? '&#8593;' : '&#8595;';
             $(this).find('.stc-sort-icon').html(icon).css('color','#333');
             stcLoadPendingList(1);
+        });
+        // =====================================================================
+
+        // =====================================================================
+        // RETURN LIST — AJAX loader with pagination, search, sort
+        // =====================================================================
+        var stcReturnCurrentPage = 1;
+        var stcReturnSortCol     = 'req_date';
+        var stcReturnSortDir     = 'DESC';
+
+        function stcLoadReturnList(page){
+            stcReturnCurrentPage = page;
+            var $tbody = $('.stc-reports-return-view');
+            var $pag   = $('#stc-return-pagination');
+
+            $tbody.html('<tr><td colspan="9" class="text-center" style="padding:25px;color:#888;"><i>Loading&hellip;</i></td></tr>');
+            $pag.html('');
+
+            $.ajax({
+                url     : 'kattegat/ragnar_lothbrok.php',
+                method  : 'POST',
+                data    : {
+                    return_list   : 1,
+                    page          : page,
+                    per_page      : 15,
+                    search_site   : $('#stc-return-search-site').val().trim(),
+                    search_item   : $('#stc-return-search-item').val().trim(),
+                    search_reason : $('#stc-return-search-reason').val().trim(),
+                    sort_col      : stcReturnSortCol,
+                    sort_dir      : stcReturnSortDir
+                },
+                dataType: 'json',
+                success : function(data){
+                    if(!data || !data.success){
+                        $tbody.html('<tr><td colspan="9" class="text-center text-danger">Failed to load return list.</td></tr>');
+                        return;
+                    }
+                    if(!data.rows || data.rows.length === 0){
+                        $tbody.html('<tr><td colspan="9" class="text-center" style="padding:20px;">No returned requisition found!!!</td></tr>');
+                        return;
+                    }
+
+                    var html = '';
+                    $.each(data.rows, function(i, r){
+                        var statusHtml = '<span style="background-color:#9b59b6;color:white;padding:2px 6px;border-radius:3px;">Returned</span>';
+
+                        var durHtml = '<div style="padding:5px 10px;text-align:center;color:#aaa;">N/A</div>';
+                        if(r.days_returned >= 0 && r.dur_bg !== undefined && r.dur_bg !== ''){
+                            var mLabel = r.months_returned + ' Month' + (r.months_returned !== 1 ? 's' : '') + ' (' + r.days_returned + ' Day' + (r.days_returned !== 1 ? 's' : '') + ')';
+                            durHtml = '<div style="background-color:' + r.dur_bg + ';color:' + r.dur_color + ';padding:5px 10px;border-radius:3px;text-align:center;font-weight:bold;">' + mLabel + '</div>';
+                        }
+
+                        var uniqueId = 'return-reason-' + r.req_list_id;
+                        var reasonLink = r.combiner_id
+                            ? '<a href="stc-requisition-combiner-fsale.php?requi_id=' + r.combiner_id + '" target="__blank" class="return-reason-link">' + (r.reason_truncated || '') + '</a>'
+                            : (r.reason_truncated || '');
+                        var reasonHtml = '<div class="pending-reason-container" id="' + uniqueId + '">' +
+                            '<span class="pending-reason-short">' + reasonLink + '</span>' +
+                            '<span class="pending-reason-full" style="display:none;">' + (r.reason_full || '') + '</span>' +
+                            (r.reason_full ? ' <a href="#" class="pending-read-more" style="color:#007bff;text-decoration:underline;cursor:pointer;">...read more</a>' : '') +
+                            '</div>';
+
+                        html += '<tr data-item-id="' + r.req_list_id + '">' +
+                            '<td class="text-center" style="vertical-align:middle;">' + r.slno + '</td>' +
+                            '<td>' + (r.req_date || '') + '<br>' + (r.req_id || '') + '</td>' +
+                            '<td>' + (r.project_title || '') + '</td>' +
+                            '<td>' + (r.item_title || '') + '</td>' +
+                            '<td>' + (r.unit || '') + '</td>' +
+                            '<td align="right">' + r.final_qty + '</td>' +
+                            '<td class="text-center">' + statusHtml + '</td>' +
+                            '<td style="font-size:10px;">' + durHtml + '</td>' +
+                            '<td>' + reasonHtml + '</td>' +
+                            '</tr>';
+                    });
+                    $tbody.html(html);
+
+                    var pagHtml = '';
+                    if(data.total_pages > 1){
+                        var from = (data.page - 1) * data.per_page + 1;
+                        var to   = Math.min(data.page * data.per_page, data.total);
+                        pagHtml += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 4px;gap:8px;">';
+                        pagHtml += '<div style="font-size:12px;color:#555;">Showing <strong>' + from + '</strong> &ndash; <strong>' + to + '</strong> of <strong>' + data.total + '</strong> items</div>';
+                        pagHtml += '<nav><ul class="pagination pagination-sm mb-0" style="flex-wrap:wrap;">';
+                        if(data.page > 1){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-return-page-btn" data-page="' + (data.page - 1) + '" href="#">&laquo; Prev</a></li>';
+                        } else {
+                            pagHtml += '<li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>';
+                        }
+                        var pgRange = 2;
+                        var pgStart = Math.max(1, data.page - pgRange);
+                        var pgEnd   = Math.min(data.total_pages, data.page + pgRange);
+                        if(pgStart > 1){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-return-page-btn" data-page="1" href="#">1</a></li>';
+                            if(pgStart > 2) pagHtml += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                        }
+                        for(var pg = pgStart; pg <= pgEnd; pg++){
+                            if(pg === data.page){
+                                pagHtml += '<li class="page-item active"><span class="page-link">' + pg + '</span></li>';
+                            } else {
+                                pagHtml += '<li class="page-item"><a class="page-link stc-return-page-btn" data-page="' + pg + '" href="#">' + pg + '</a></li>';
+                            }
+                        }
+                        if(pgEnd < data.total_pages){
+                            if(pgEnd < data.total_pages - 1) pagHtml += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                            pagHtml += '<li class="page-item"><a class="page-link stc-return-page-btn" data-page="' + data.total_pages + '" href="#">' + data.total_pages + '</a></li>';
+                        }
+                        if(data.page < data.total_pages){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-return-page-btn" data-page="' + (data.page + 1) + '" href="#">Next &raquo;</a></li>';
+                        } else {
+                            pagHtml += '<li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>';
+                        }
+                        pagHtml += '</ul></nav></div>';
+                    } else if(data.total > 0){
+                        pagHtml = '<div style="font-size:12px;color:#555;padding:10px 4px;">Showing <strong>' + data.total + '</strong> item' + (data.total !== 1 ? 's' : '') + '</div>';
+                    }
+                    $pag.html(pagHtml);
+                },
+                error: function(){
+                    $tbody.html('<tr><td colspan="9" class="text-center text-danger" style="padding:20px;">Error loading return list. Please refresh the page.</td></tr>');
+                }
+            });
+        }
+
+        stcLoadReturnList(1);
+
+        $(document).on('click', '.stc-return-page-btn', function(e){
+            e.preventDefault();
+            var pg = parseInt($(this).data('page'), 10);
+            if(pg && pg !== stcReturnCurrentPage){
+                stcLoadReturnList(pg);
+                var $tbl = $('#stc-reports-requisition-return-view');
+                if($tbl.length){ $('html,body').animate({ scrollTop: $tbl.offset().top - 80 }, 300); }
+            }
+        });
+
+        $('#stc-return-search-btn').on('click', function(){
+            stcLoadReturnList(1);
+        });
+
+        $('#stc-return-reset-btn').on('click', function(){
+            $('#stc-return-search-site, #stc-return-search-item, #stc-return-search-reason').val('');
+            stcReturnSortCol = 'req_date';
+            stcReturnSortDir = 'DESC';
+            $('.stc-return-sort-icon').html('&#8645;').css('color','#aaa');
+            stcLoadReturnList(1);
+        });
+
+        $('#stc-return-search-site, #stc-return-search-item, #stc-return-search-reason').on('keypress', function(e){
+            if(e.which === 13){ stcLoadReturnList(1); }
+        });
+
+        $(document).on('click', '.stc-return-sortable', function(){
+            var col = $(this).data('col');
+            if(stcReturnSortCol === col){
+                stcReturnSortDir = stcReturnSortDir === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                stcReturnSortCol = col;
+                stcReturnSortDir = 'ASC';
+            }
+            $('.stc-return-sort-icon').html('&#8645;').css('color','#aaa');
+            var icon = stcReturnSortDir === 'ASC' ? '&#8593;' : '&#8595;';
+            $(this).find('.stc-return-sort-icon').html(icon).css('color','#333');
+            stcLoadReturnList(1);
         });
         // =====================================================================
 
