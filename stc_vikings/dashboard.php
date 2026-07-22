@@ -37,6 +37,63 @@ STCAuthHelper::checkAuth();
           animation: spin 2s linear infinite;
         }
 
+        /* Custom full-screen overlay for Accept Return (avoids clipped Bootstrap backdrop) */
+        #stcAcceptReturnOverlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 100000;
+          background: rgba(15, 23, 42, 0.55);
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          box-sizing: border-box;
+        }
+        #stcAcceptReturnOverlay.is-open {
+          display: flex;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-dialog {
+          background: #fff;
+          border-radius: 8px;
+          width: 100%;
+          max-width: 480px;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+          overflow: hidden;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 18px;
+          background: #f8f9fa;
+          border-bottom: 1px solid #dee2e6;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-header h5 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-close {
+          border: 0;
+          background: transparent;
+          font-size: 22px;
+          line-height: 1;
+          color: #666;
+          cursor: pointer;
+          padding: 0 4px;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-body {
+          padding: 16px 20px;
+        }
+        #stcAcceptReturnOverlay .stc-overlay-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
+          padding: 12px 18px;
+          background: #f8f9fa;
+          border-top: 1px solid #dee2e6;
+        }
+
         /* Safari */
         @-webkit-keyframes spin {
           0% { -webkit-transform: rotate(0deg); }
@@ -623,11 +680,12 @@ STCAuthHelper::checkAuth();
                                                         Return Duration&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
                                                     </th>
                                                     <th class="text-center" style="width:500px;">Return Reason</th>
+                                                    <th class="text-center" style="width:110px;">Action</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody class="stc-reports-return-view">
                                                 <tr id="stc-return-loader">
-                                                    <td colspan="9" class="text-center" style="padding:25px; color:#888;">
+                                                    <td colspan="10" class="text-center" style="padding:25px; color:#888;">
                                                         <i>Loading return list&hellip;</i>
                                                     </td>
                                                 </tr>
@@ -673,6 +731,33 @@ STCAuthHelper::checkAuth();
             </div>
         </div>
     </div>
+
+    <!-- Accept Return Overlay (custom full-screen; not Bootstrap modal) -->
+    <div id="stcAcceptReturnOverlay" role="dialog" aria-modal="true" aria-labelledby="stcAcceptReturnOverlayLabel">
+        <div class="stc-overlay-dialog">
+            <div class="stc-overlay-header">
+                <h5 id="stcAcceptReturnOverlayLabel">
+                    <i class="fa fa-check-circle" style="color:#27ae60;"></i> Accept Return
+                </h5>
+                <button type="button" class="stc-overlay-close stc-accept-return-cancel" aria-label="Close">&times;</button>
+            </div>
+            <div class="stc-overlay-body">
+                <input type="hidden" id="stc-accept-return-item-id" value="">
+                <p id="stc-accept-return-info" style="font-size:12px;color:#888;margin-bottom:12px;padding:6px 10px;background:#f3e5f5;border-left:3px solid #9b59b6;border-radius:3px;"></p>
+                <div style="margin-bottom:4px;">
+                    <span style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:6px;">Description / Note <span style="color:#e74c3c;">*</span></span>
+                    <textarea id="stc-accept-return-msg" class="form-control" rows="4" placeholder="Enter acceptance note / description..." style="font-size:13px;resize:vertical;width:100%;box-sizing:border-box;"></textarea>
+                    <span id="stc-accept-return-err" style="display:none;color:#e74c3c;font-size:12px;margin-top:4px;">Please enter a description.</span>
+                </div>
+            </div>
+            <div class="stc-overlay-footer">
+                <button type="button" class="btn btn-secondary btn-sm stc-accept-return-cancel">Cancel</button>
+                <button type="button" class="btn btn-success btn-sm" id="stc-accept-return-submit">
+                    <i class="fa fa-check"></i> Accept Return
+                </button>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="assets/vendor/bootstrap/js/popper.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
@@ -689,6 +774,8 @@ STCAuthHelper::checkAuth();
             var d = new Date($.now());
             var month=$('.stc-dash-month').val();
             var type=$('.stc-dash-type').val();
+            // Keep pending note modal on body; accept-return uses custom overlay
+            $('#stcPendingNoteModal, #stcAcceptReturnOverlay').appendTo('body');
             $('body').delegate('.stc-dash-month', 'change', function() {
                 month=$(this).val();
                 type=$('.stc-dash-type').val();
@@ -1166,7 +1253,7 @@ STCAuthHelper::checkAuth();
             var $tbody = $('.stc-reports-return-view');
             var $pag   = $('#stc-return-pagination');
 
-            $tbody.html('<tr><td colspan="9" class="text-center" style="padding:25px;color:#888;"><i>Loading&hellip;</i></td></tr>');
+            $tbody.html('<tr><td colspan="10" class="text-center" style="padding:25px;color:#888;"><i>Loading&hellip;</i></td></tr>');
             $pag.html('');
 
             $.ajax({
@@ -1185,11 +1272,11 @@ STCAuthHelper::checkAuth();
                 dataType: 'json',
                 success : function(data){
                     if(!data || !data.success){
-                        $tbody.html('<tr><td colspan="9" class="text-center text-danger">Failed to load return list.</td></tr>');
+                        $tbody.html('<tr><td colspan="10" class="text-center text-danger">Failed to load return list.</td></tr>');
                         return;
                     }
                     if(!data.rows || data.rows.length === 0){
-                        $tbody.html('<tr><td colspan="9" class="text-center" style="padding:20px;">No returned requisition found!!!</td></tr>');
+                        $tbody.html('<tr><td colspan="10" class="text-center" style="padding:20px;">No returned requisition found!!!</td></tr>');
                         return;
                     }
 
@@ -1213,6 +1300,14 @@ STCAuthHelper::checkAuth();
                             (r.reason_full ? ' <a href="#" class="pending-read-more" style="color:#007bff;text-decoration:underline;cursor:pointer;">...read more</a>' : '') +
                             '</div>';
 
+                        var actionHtml = '<button type="button" class="btn btn-success btn-sm stc-accept-return-btn" ' +
+                            'data-item-id="' + r.req_list_id + '" ' +
+                            'data-item-title="' + String(r.item_title || '').replace(/"/g, '&quot;') + '" ' +
+                            'data-site="' + String(r.project_title || '').replace(/"/g, '&quot;') + '" ' +
+                            'data-req="' + (r.req_id || '') + '" ' +
+                            'style="font-size:12px;padding:3px 10px;" title="Accept this return">' +
+                            '<i class="fa fa-check"></i> Accept</button>';
+
                         html += '<tr data-item-id="' + r.req_list_id + '">' +
                             '<td class="text-center" style="vertical-align:middle;">' + r.slno + '</td>' +
                             '<td>' + (r.req_date || '') + '<br>' + (r.req_id || '') + '</td>' +
@@ -1223,6 +1318,7 @@ STCAuthHelper::checkAuth();
                             '<td class="text-center">' + statusHtml + '</td>' +
                             '<td style="font-size:10px;">' + durHtml + '</td>' +
                             '<td>' + reasonHtml + '</td>' +
+                            '<td class="text-center" style="vertical-align:middle;">' + actionHtml + '</td>' +
                             '</tr>';
                     });
                     $tbody.html(html);
@@ -1269,7 +1365,7 @@ STCAuthHelper::checkAuth();
                     $pag.html(pagHtml);
                 },
                 error: function(){
-                    $tbody.html('<tr><td colspan="9" class="text-center text-danger" style="padding:20px;">Error loading return list. Please refresh the page.</td></tr>');
+                    $tbody.html('<tr><td colspan="10" class="text-center text-danger" style="padding:20px;">Error loading return list. Please refresh the page.</td></tr>');
                 }
             });
         }
@@ -1314,6 +1410,84 @@ STCAuthHelper::checkAuth();
             var icon = stcReturnSortDir === 'ASC' ? '&#8593;' : '&#8595;';
             $(this).find('.stc-return-sort-icon').html(icon).css('color','#333');
             stcLoadReturnList(1);
+        });
+
+        // Open Accept Return overlay
+        function stcCloseAcceptReturnOverlay(){
+            $('#stcAcceptReturnOverlay').removeClass('is-open');
+            $('body').css('overflow', '');
+        }
+        function stcOpenAcceptReturnOverlay(){
+            $('#stcAcceptReturnOverlay').appendTo('body').addClass('is-open');
+            $('body').css('overflow', 'hidden');
+            setTimeout(function(){ $('#stc-accept-return-msg').focus(); }, 50);
+        }
+
+        $(document).on('click', '.stc-accept-return-btn', function(e){
+            e.preventDefault();
+            var itemId = $(this).data('item-id');
+            var site   = $(this).data('site') || '';
+            var item   = $(this).data('item-title') || '';
+            var req    = $(this).data('req') || '';
+            $('#stc-accept-return-item-id').val(itemId);
+            $('#stc-accept-return-msg').val('');
+            $('#stc-accept-return-err').hide();
+            $('#stc-accept-return-info').html(
+                'PR <strong>#' + req + '</strong> &mdash; ' +
+                '<strong>' + $('<div/>').text(site).html() + '</strong><br>' +
+                $('<div/>').text(item).html()
+            );
+            stcOpenAcceptReturnOverlay();
+        });
+
+        $(document).on('click', '.stc-accept-return-cancel', function(e){
+            e.preventDefault();
+            stcCloseAcceptReturnOverlay();
+        });
+
+        // Click outside dialog closes overlay
+        $(document).on('click', '#stcAcceptReturnOverlay', function(e){
+            if(e.target === this){ stcCloseAcceptReturnOverlay(); }
+        });
+
+        // Submit Accept Return
+        $('#stc-accept-return-submit').on('click', function(){
+            var itemId = parseInt($('#stc-accept-return-item-id').val(), 10) || 0;
+            var note   = $.trim($('#stc-accept-return-msg').val());
+            if(!note){
+                $('#stc-accept-return-err').show();
+                return;
+            }
+            $('#stc-accept-return-err').hide();
+            var $btn = $(this);
+            if($btn.data('busy')){ return; }
+            $btn.data('busy', 1).prop('disabled', true);
+            var prev = $btn.html();
+            $btn.html('<i class="fa fa-spinner fa-spin"></i> Saving…');
+            $.ajax({
+                url     : 'kattegat/ragnar_lothbrok.php',
+                method  : 'POST',
+                data    : {
+                    accept_return_item: 1,
+                    item_id: itemId,
+                    description: note
+                },
+                dataType: 'json',
+                success : function(res){
+                    if(res && res.success){
+                        stcCloseAcceptReturnOverlay();
+                        stcLoadReturnList(stcReturnCurrentPage);
+                    } else {
+                        alert((res && res.message) ? res.message : 'Failed to accept return.');
+                    }
+                },
+                error   : function(){
+                    alert('Failed to accept return. Please try again.');
+                },
+                complete: function(){
+                    $btn.data('busy', 0).prop('disabled', false).html(prev);
+                }
+            });
         });
         // =====================================================================
 
@@ -1554,7 +1728,7 @@ STCAuthHelper::checkAuth();
             $('#stc-pending-note-info').text(ids.length + ' item(s) selected. The note will be logged for each selected product.');
             $('#stc-pending-note-msg').val('');
             $('#stc-pending-note-err').hide();
-            $('#stcPendingNoteModal').modal('show');
+            $('#stcPendingNoteModal').appendTo('body').modal('show');
         });
 
         // Pending note submit

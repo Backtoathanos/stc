@@ -2078,8 +2078,86 @@ class sceptor extends tesseract{
 		];
 	}
 
+	// Ensure return-accepted flag column exists (hides accepted returns from Return List)
+	private function stc_ensure_return_accepted_column(){
+		static $checked = false;
+		if($checked){ return; }
+		$checked = true;
+		$col = 'stc_cust_super_requisition_list_items_return_accepted';
+		$chk = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list_items` LIKE '".$col."'");
+		if($chk && mysqli_num_rows($chk) === 0){
+			mysqli_query($this->stc_dbs, "
+				ALTER TABLE `stc_cust_super_requisition_list_items`
+				ADD COLUMN `".$col."` TINYINT(1) NOT NULL DEFAULT 0
+				COMMENT '1 = return accepted by procurement; hide from Return List'
+			");
+		}
+	}
+
+	// Accept a returned requisition item (set flag + description log) — hides from Return List
+	public function stc_accept_return_item($item_id, $description = ''){
+		$this->stc_ensure_return_accepted_column();
+		$item_id = (int)$item_id;
+		$description = trim($description);
+		if($item_id <= 0){
+			return ['success' => false, 'message' => 'Invalid item.'];
+		}
+		if($description === ''){
+			return ['success' => false, 'message' => 'Please enter a description / note.'];
+		}
+
+		$chk = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_list_items_return_accepted`
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
+			LIMIT 1
+		");
+		if(!$chk || mysqli_num_rows($chk) === 0){
+			return ['success' => false, 'message' => 'Item not found.'];
+		}
+		$row = mysqli_fetch_assoc($chk);
+		if((int)$row['stc_cust_super_requisition_list_items_status'] !== 8){
+			return ['success' => false, 'message' => 'Item is not in Returned status.'];
+		}
+		if((int)$row['stc_cust_super_requisition_list_items_return_accepted'] === 1){
+			return ['success' => false, 'message' => 'Return already accepted.'];
+		}
+
+		$user_name = isset($_SESSION['stc_empl_name']) ? $_SESSION['stc_empl_name'] : 'System';
+		$user_id   = isset($_SESSION['stc_empl_id']) ? (int)$_SESSION['stc_empl_id'] : 0;
+		$message   = "Return accepted by ".$user_name." on ".date('d-m-Y h:i A')
+			." <br> Note: ".$description;
+
+		$upd = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items`
+			SET `stc_cust_super_requisition_list_items_return_accepted`=1
+			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
+			AND `stc_cust_super_requisition_list_items_status`='8'
+			AND `stc_cust_super_requisition_list_items_return_accepted`=0
+		");
+		if(!$upd || mysqli_affected_rows($this->stc_dbs) < 1){
+			return ['success' => false, 'message' => 'Failed to accept return.'];
+		}
+
+		mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list_items_log`(
+				`item_id`, `title`, `message`, `status`, `created_by`
+			) VALUES (
+				'".$item_id."',
+				'Return Accepted',
+				'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+				'1',
+				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
+			)
+		");
+
+		return ['success' => true, 'message' => 'Return accepted successfully.'];
+	}
+
 	// Return list: paginated + search + sort for Returned (status=8) requisition items
 	public function stc_return_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
+		$this->stc_ensure_return_accepted_column();
 		$page     = max(1, (int)$page);
 		$per_page = max(1, min(50, (int)$per_page));
 
@@ -2116,6 +2194,7 @@ class sceptor extends tesseract{
 			INNER JOIN `stc_cust_super_requisition_list_items_log`
 				ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
 			WHERE `stc_cust_super_requisition_list_items_status`='8'
+				AND `stc_cust_super_requisition_list_items_return_accepted`=0
 				AND `title`='Returned'
 				AND DATE(`stc_cust_super_requisition_list_date`) >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
 				$search_where
@@ -2450,6 +2529,18 @@ if(isset($_POST["return_list"])){
     $sort_dir      = isset($_POST['sort_dir'])      ? trim($_POST['sort_dir'])                   : 'DESC';
     $obj = new sceptor();
     $out = $obj->stc_return_list($page, $per_page, $search_site, $search_item, $search_reason, $sort_col, $sort_dir);
+    header('Content-Type: application/json');
+    echo json_encode($out);
+    exit;
+}
+
+// Accept returned requisition item (description log + hide from Return List)
+if(isset($_POST["accept_return_item"])){
+    session_start();
+    $item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+    $note    = isset($_POST['description']) ? trim($_POST['description']) : '';
+    $obj     = new sceptor();
+    $out     = $obj->stc_accept_return_item($item_id, $note);
     header('Content-Type: application/json');
     echo json_encode($out);
     exit;
