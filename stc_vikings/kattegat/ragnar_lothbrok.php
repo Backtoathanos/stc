@@ -2155,6 +2155,124 @@ class sceptor extends tesseract{
 		return ['success' => true, 'message' => 'Return accepted successfully.'];
 	}
 
+	// Bulk accept returned requisition items
+	public function stc_bulk_accept_return($item_ids, $description = ''){
+		if(empty($item_ids) || !is_array($item_ids)){
+			return ['success' => false, 'message' => 'No items selected.'];
+		}
+		$description = trim($description);
+		if($description === ''){
+			return ['success' => false, 'message' => 'Please enter a description / note.'];
+		}
+		$updated = 0;
+		$errors  = 0;
+		foreach($item_ids as $raw_id){
+			$item_id = (int)$raw_id;
+			if($item_id <= 0){ continue; }
+			$result = $this->stc_accept_return_item($item_id, $description);
+			if(!empty($result['success'])) $updated++;
+			else $errors++;
+		}
+		if($updated > 0){
+			return [
+				'success' => true,
+				'message' => 'Return accepted for '.$updated.' item(s).'.($errors > 0 ? ' ('.$errors.' failed)' : '')
+			];
+		}
+		return ['success' => false, 'message' => 'Failed to accept returns. '.$errors.' error(s).'];
+	}
+
+	// Adhoc purchase details matching a requisition item description (for Return List eye button)
+	public function stc_return_item_adhoc_details($product_id = 0){
+		$product_id = (int)$product_id;
+		if($product_id <= 0){
+			return ['success' => false, 'message' => 'Product ID is missing.', 'rows' => [], 'product_id' => 0];
+		}
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				A.`stc_purchase_product_adhoc_id` AS adhoc_id,
+				A.`stc_purchase_product_adhoc_productid` AS product_id,
+				A.`stc_purchase_product_adhoc_itemdesc` AS item_desc,
+				A.`stc_purchase_product_adhoc_qty` AS qty,
+				A.`stc_purchase_product_adhoc_unit` AS unit,
+				A.`stc_purchase_product_adhoc_prate` AS prate,
+				A.`stc_purchase_product_adhoc_rate` AS rate,
+				A.`stc_purchase_product_adhoc_source` AS source,
+				A.`stc_purchase_product_adhoc_destination` AS destination,
+				A.`stc_purchase_product_adhoc_recievedby` AS received_by,
+				A.`stc_purchase_product_adhoc_status` AS status,
+				A.`stc_purchase_product_adhoc_created_date` AS created_date,
+				COALESCE(R.`stc_rack_name`, '—') AS rack_name,
+				COALESCE(U.`stc_user_name`, '—') AS created_by,
+				COALESCE(P.`stc_product_name`, '') AS product_name
+			FROM `stc_purchase_product_adhoc` A
+			LEFT JOIN `stc_rack` R ON R.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+			LEFT JOIN `stc_user` U ON U.`stc_user_id` = A.`stc_purchase_product_adhoc_created_by`
+			LEFT JOIN `stc_product` P ON P.`stc_product_id` = A.`stc_purchase_product_adhoc_productid`
+			WHERE A.`stc_purchase_product_adhoc_productid`='".$product_id."'
+			ORDER BY A.`stc_purchase_product_adhoc_id` DESC
+			LIMIT 50
+		");
+
+		$status_map = [1 => 'Stock', 2 => 'Dispatched', 3 => 'Pending', 4 => 'Approved', 5 => 'Rejected'];
+		$rows = [];
+		$product_name = '';
+		if($q){
+			foreach($q as $r){
+				if($product_name === '' && !empty($r['product_name'])){
+					$product_name = $r['product_name'];
+				}
+				$adhoc_id = (int)$r['adhoc_id'];
+				$qty = (float)$r['qty'];
+				$delivered = 0;
+				$dq = mysqli_query($this->stc_dbs, "
+					SELECT COALESCE(SUM(`stc_cust_super_requisition_list_items_rec_recqty`),0) AS dqty
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$adhoc_id."'
+				");
+				if($dq && ($dr = mysqli_fetch_assoc($dq))){
+					$delivered = (float)$dr['dqty'];
+				}
+				$shop_qty = 0;
+				$sq = mysqli_query($this->stc_dbs, "
+					SELECT COALESCE(SUM(`qty`),0) AS sqty FROM `stc_shop` WHERE `adhoc_id`='".$adhoc_id."'
+				");
+				if($sq && ($sr = mysqli_fetch_assoc($sq))){
+					$shop_qty = (float)$sr['sqty'];
+				}
+				$stock = $qty - ($delivered + $shop_qty);
+				$status_code = (int)$r['status'];
+				$rows[] = [
+					'adhoc_id'     => $adhoc_id,
+					'product_id'   => (int)$r['product_id'],
+					'item_desc'    => $r['item_desc'],
+					'qty'          => number_format($qty, 2),
+					'unit'         => $r['unit'],
+					'prate'        => number_format((float)$r['prate'], 2),
+					'rate'         => number_format((float)$r['rate'], 2),
+					'source'       => $r['source'],
+					'destination'  => $r['destination'],
+					'received_by'  => $r['received_by'],
+					'rack_name'    => $r['rack_name'],
+					'stock'        => number_format($stock, 2),
+					'status'       => isset($status_map[$status_code]) ? $status_map[$status_code] : 'Unknown',
+					'status_code'  => $status_code,
+					'created_by'   => $r['created_by'],
+					'created_date' => !empty($r['created_date']) ? date('d-m-Y h:i A', strtotime($r['created_date'])) : '',
+				];
+			}
+		}
+
+		return [
+			'success'      => true,
+			'product_id'   => $product_id,
+			'product_name' => $product_name,
+			'total'        => count($rows),
+			'rows'         => $rows,
+		];
+	}
+
 	// Return list: paginated + search + sort for Returned (status=8) requisition items
 	public function stc_return_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
 		$this->stc_ensure_return_accepted_column();
@@ -2223,6 +2341,7 @@ class sceptor extends tesseract{
 				`stc_cust_super_requisition_list_items_unit`,
 				`stc_cust_super_requisition_items_finalqty`,
 				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_list_items_product_id`,
 				DATE(MAX(`created_date`)) as stc_log_date
 			$from_where
 			GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
@@ -2279,6 +2398,7 @@ class sceptor extends tesseract{
 					'req_id'           => $req_id,
 					'project_title'    => $r['stc_cust_project_title'],
 					'item_title'       => $r['stc_cust_super_requisition_list_items_title'],
+					'product_id'       => (int)($r['stc_cust_super_requisition_list_items_product_id'] ?? 0),
 					'unit'             => $r['stc_cust_super_requisition_list_items_unit'],
 					'final_qty'        => number_format($final_qty, 2),
 					'status'           => (int)$r['stc_cust_super_requisition_list_items_status'],
@@ -2541,6 +2661,30 @@ if(isset($_POST["accept_return_item"])){
     $note    = isset($_POST['description']) ? trim($_POST['description']) : '';
     $obj     = new sceptor();
     $out     = $obj->stc_accept_return_item($item_id, $note);
+    header('Content-Type: application/json');
+    echo json_encode($out);
+    exit;
+}
+
+// Bulk accept returned requisition items
+if(isset($_POST["bulk_accept_return"])){
+    session_start();
+    $raw_ids = isset($_POST['item_ids']) ? $_POST['item_ids'] : [];
+    $note    = isset($_POST['description']) ? trim($_POST['description']) : '';
+    if(!is_array($raw_ids)) $raw_ids = [$raw_ids];
+    $obj     = new sceptor();
+    $out     = $obj->stc_bulk_accept_return($raw_ids, $note);
+    header('Content-Type: application/json');
+    echo json_encode($out);
+    exit;
+}
+
+// Adhoc details for return-list item by product id (eye button)
+if(isset($_POST["return_item_adhoc_details"])){
+    session_start();
+    $product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+    $obj = new sceptor();
+    $out = $obj->stc_return_item_adhoc_details($product_id);
     header('Content-Type: application/json');
     echo json_encode($out);
     exit;

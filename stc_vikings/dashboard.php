@@ -94,6 +94,75 @@ STCAuthHelper::checkAuth();
           border-top: 1px solid #dee2e6;
         }
 
+        /* Adhoc details overlay (Return List eye button) */
+        #stcReturnAdhocOverlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 100000;
+          background: rgba(15, 23, 42, 0.55);
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          box-sizing: border-box;
+        }
+        #stcReturnAdhocOverlay.is-open { display: flex; }
+        #stcReturnAdhocOverlay .stc-overlay-dialog {
+          background: #fff;
+          border-radius: 8px;
+          width: 100%;
+          max-width: 980px;
+          max-height: 90vh;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+        #stcReturnAdhocOverlay .stc-overlay-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 18px;
+          background: #f8f9fa;
+          border-bottom: 1px solid #dee2e6;
+          flex-shrink: 0;
+        }
+        #stcReturnAdhocOverlay .stc-overlay-header h5 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+        }
+        #stcReturnAdhocOverlay .stc-overlay-close {
+          border: 0;
+          background: transparent;
+          font-size: 22px;
+          line-height: 1;
+          color: #666;
+          cursor: pointer;
+          padding: 0 4px;
+        }
+        #stcReturnAdhocOverlay .stc-overlay-body {
+          padding: 16px 20px;
+          overflow: auto;
+        }
+        #stcReturnAdhocOverlay .stc-overlay-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
+          padding: 12px 18px;
+          background: #f8f9fa;
+          border-top: 1px solid #dee2e6;
+          flex-shrink: 0;
+        }
+        .stc-return-adhoc-eye {
+          margin-left: 6px;
+          color: #3f6ad8;
+          cursor: pointer;
+          font-size: 14px;
+          vertical-align: middle;
+        }
+        .stc-return-adhoc-eye:hover { color: #1d4ed8; }
+
         /* Safari */
         @-webkit-keyframes spin {
           0% { -webkit-transform: rotate(0deg); }
@@ -662,7 +731,9 @@ STCAuthHelper::checkAuth();
                                             <table class="mb-0 table table-bordered" id="stc-reports-requisition-return-view">
                                                 <thead>
                                                 <tr>
-                                                    <th class="text-center" style="width:40px;">#</th>
+                                                    <th class="text-center" style="width:40px;">
+                                                        <input type="checkbox" id="stc-return-select-all" title="Select all" style="cursor:pointer;width:15px;height:15px;">
+                                                    </th>
                                                     <th class="text-center stc-return-sortable" data-col="req_date" width="10%" style="cursor:pointer;white-space:nowrap;">
                                                         PR Date&nbsp;<span class="stc-return-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span><br>
                                                         <span style="font-size:10px;font-weight:normal;color:#777;">&amp; No</span>
@@ -693,6 +764,14 @@ STCAuthHelper::checkAuth();
                                             </table>
                                         </div>
                                         <div id="stc-return-pagination"></div>
+
+                                        <!-- Bulk Action Bar (shown when return rows are checked) -->
+                                        <div id="stc-return-bulk-action-bar" style="display:none;position:sticky;bottom:0;background:#fff;border-top:2px solid #dee2e6;padding:10px 14px;z-index:100;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
+                                            <span id="stc-return-bulk-selected-count" style="font-size:13px;font-weight:600;color:#555;">0 item(s) selected</span>
+                                            <button type="button" id="stc-return-bulk-accept-btn" style="background:#27ae60;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-left:8px;">
+                                                <i class="fa fa-check"></i> Accept Selected
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -743,6 +822,7 @@ STCAuthHelper::checkAuth();
             </div>
             <div class="stc-overlay-body">
                 <input type="hidden" id="stc-accept-return-item-id" value="">
+                <input type="hidden" id="stc-accept-return-mode" value="single">
                 <p id="stc-accept-return-info" style="font-size:12px;color:#888;margin-bottom:12px;padding:6px 10px;background:#f3e5f5;border-left:3px solid #9b59b6;border-radius:3px;"></p>
                 <div style="margin-bottom:4px;">
                     <span style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:6px;">Description / Note <span style="color:#e74c3c;">*</span></span>
@@ -755,6 +835,47 @@ STCAuthHelper::checkAuth();
                 <button type="button" class="btn btn-success btn-sm" id="stc-accept-return-submit">
                     <i class="fa fa-check"></i> Accept Return
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return Item Adhoc Details Overlay -->
+    <div id="stcReturnAdhocOverlay" role="dialog" aria-modal="true" aria-labelledby="stcReturnAdhocOverlayLabel">
+        <div class="stc-overlay-dialog">
+            <div class="stc-overlay-header">
+                <h5 id="stcReturnAdhocOverlayLabel">
+                    <i class="fa fa-eye" style="color:#3f6ad8;"></i> Adhoc Product Details
+                </h5>
+                <button type="button" class="stc-overlay-close stc-return-adhoc-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="stc-overlay-body">
+                <p id="stc-return-adhoc-info" style="font-size:12px;color:#555;margin-bottom:12px;padding:6px 10px;background:#eef2ff;border-left:3px solid #3f6ad8;border-radius:3px;"></p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm mb-0" id="stc-return-adhoc-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Adhoc ID</th>
+                                <th>Item Desc</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-center">Stock</th>
+                                <th class="text-center">Unit</th>
+                                <th class="text-right">P.Rate</th>
+                                <th>Source</th>
+                                <th>Destination</th>
+                                <th>Rack</th>
+                                <th class="text-center">Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stc-return-adhoc-tbody">
+                            <tr><td colspan="12" class="text-center text-muted">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="stc-overlay-footer">
+                <button type="button" class="btn btn-secondary btn-sm stc-return-adhoc-close">Close</button>
             </div>
         </div>
     </div>
@@ -775,7 +896,7 @@ STCAuthHelper::checkAuth();
             var month=$('.stc-dash-month').val();
             var type=$('.stc-dash-type').val();
             // Keep pending note modal on body; accept-return uses custom overlay
-            $('#stcPendingNoteModal, #stcAcceptReturnOverlay').appendTo('body');
+            $('#stcPendingNoteModal, #stcAcceptReturnOverlay, #stcReturnAdhocOverlay').appendTo('body');
             $('body').delegate('.stc-dash-month', 'change', function() {
                 month=$(this).val();
                 type=$('.stc-dash-type').val();
@@ -1247,6 +1368,28 @@ STCAuthHelper::checkAuth();
         var stcReturnCurrentPage = 1;
         var stcReturnSortCol     = 'req_date';
         var stcReturnSortDir     = 'DESC';
+        var stcReturnBulkIds     = [];
+
+        function stcUpdateReturnBulkBar(){
+            var checked = $('.stc-return-row-cb:checked').length;
+            if(checked > 0){
+                $('#stc-return-bulk-selected-count').text(checked + ' item(s) selected');
+                $('#stc-return-bulk-action-bar').css('display','flex');
+            } else {
+                $('#stc-return-bulk-action-bar').css('display','none');
+                $('#stc-return-select-all').prop('checked', false).prop('indeterminate', false);
+            }
+            var total = $('.stc-return-row-cb').length;
+            if(total > 0){
+                if(checked === 0){
+                    $('#stc-return-select-all').prop('checked', false).prop('indeterminate', false);
+                } else if(checked === total){
+                    $('#stc-return-select-all').prop('checked', true).prop('indeterminate', false);
+                } else {
+                    $('#stc-return-select-all').prop('checked', false).prop('indeterminate', true);
+                }
+            }
+        }
 
         function stcLoadReturnList(page){
             stcReturnCurrentPage = page;
@@ -1255,6 +1398,8 @@ STCAuthHelper::checkAuth();
 
             $tbody.html('<tr><td colspan="10" class="text-center" style="padding:25px;color:#888;"><i>Loading&hellip;</i></td></tr>');
             $pag.html('');
+            $('#stc-return-bulk-action-bar').css('display','none');
+            $('#stc-return-select-all').prop('checked', false).prop('indeterminate', false);
 
             $.ajax({
                 url     : 'kattegat/ragnar_lothbrok.php',
@@ -1308,11 +1453,19 @@ STCAuthHelper::checkAuth();
                             'style="font-size:12px;padding:3px 10px;" title="Accept this return">' +
                             '<i class="fa fa-check"></i> Accept</button>';
 
+                        var eyeHtml = '';
+                        if(parseInt(r.product_id, 10) > 0){
+                            eyeHtml = ' <a href="#" class="stc-return-adhoc-eye" title="View adhoc details" data-product-id="' + r.product_id + '" data-item-title="' + String(r.item_title || '').replace(/"/g, '&quot;') + '"><i class="fa fa-eye"></i></a>';
+                        }
+
                         html += '<tr data-item-id="' + r.req_list_id + '">' +
-                            '<td class="text-center" style="vertical-align:middle;">' + r.slno + '</td>' +
+                            '<td class="text-center" style="vertical-align:middle;">' +
+                                '<input type="checkbox" class="stc-return-row-cb" data-item-id="' + r.req_list_id + '" style="cursor:pointer;width:15px;height:15px;">' +
+                                '<div style="font-size:10px;color:#999;margin-top:2px;">' + r.slno + '</div>' +
+                            '</td>' +
                             '<td>' + (r.req_date || '') + '<br>' + (r.req_id || '') + '</td>' +
                             '<td>' + (r.project_title || '') + '</td>' +
-                            '<td>' + (r.item_title || '') + '</td>' +
+                            '<td>' + (r.item_title || '') + eyeHtml + '</td>' +
                             '<td>' + (r.unit || '') + '</td>' +
                             '<td align="right">' + r.final_qty + '</td>' +
                             '<td class="text-center">' + statusHtml + '</td>' +
@@ -1322,6 +1475,7 @@ STCAuthHelper::checkAuth();
                             '</tr>';
                     });
                     $tbody.html(html);
+                    stcUpdateReturnBulkBar();
 
                     var pagHtml = '';
                     if(data.total_pages > 1){
@@ -1416,6 +1570,9 @@ STCAuthHelper::checkAuth();
         function stcCloseAcceptReturnOverlay(){
             $('#stcAcceptReturnOverlay').removeClass('is-open');
             $('body').css('overflow', '');
+            stcReturnBulkIds = [];
+            $('#stc-accept-return-mode').val('single');
+            $('#stc-accept-return-item-id').val('');
         }
         function stcOpenAcceptReturnOverlay(){
             $('#stcAcceptReturnOverlay').appendTo('body').addClass('is-open');
@@ -1423,12 +1580,52 @@ STCAuthHelper::checkAuth();
             setTimeout(function(){ $('#stc-accept-return-msg').focus(); }, 50);
         }
 
+        // Select all / row checkboxes
+        $(document).on('change', '#stc-return-select-all', function(){
+            var checked = $(this).is(':checked');
+            $('.stc-return-row-cb').prop('checked', checked).each(function(){
+                var $row = $(this).closest('tr');
+                $row.css('background-color', checked ? '#f3e5f5' : '');
+            });
+            stcUpdateReturnBulkBar();
+        });
+
+        $(document).on('change', '.stc-return-row-cb', function(){
+            var $row = $(this).closest('tr');
+            $row.css('background-color', $(this).is(':checked') ? '#f3e5f5' : '');
+            stcUpdateReturnBulkBar();
+        });
+
+        // Bulk Accept Selected
+        $(document).on('click', '#stc-return-bulk-accept-btn', function(e){
+            e.preventDefault();
+            stcReturnBulkIds = [];
+            $('.stc-return-row-cb:checked').each(function(){
+                var id = parseInt($(this).data('item-id'), 10);
+                if(id > 0) stcReturnBulkIds.push(id);
+            });
+            if(stcReturnBulkIds.length === 0){
+                alert('Please select at least one item.');
+                return;
+            }
+            $('#stc-accept-return-mode').val('bulk');
+            $('#stc-accept-return-item-id').val('');
+            $('#stc-accept-return-msg').val('');
+            $('#stc-accept-return-err').hide();
+            $('#stc-accept-return-info').html(
+                'Accepting <strong>' + stcReturnBulkIds.length + '</strong> selected return item(s).<br>Enter one note that will apply to all.'
+            );
+            stcOpenAcceptReturnOverlay();
+        });
+
         $(document).on('click', '.stc-accept-return-btn', function(e){
             e.preventDefault();
             var itemId = $(this).data('item-id');
             var site   = $(this).data('site') || '';
             var item   = $(this).data('item-title') || '';
             var req    = $(this).data('req') || '';
+            stcReturnBulkIds = [];
+            $('#stc-accept-return-mode').val('single');
             $('#stc-accept-return-item-id').val(itemId);
             $('#stc-accept-return-msg').val('');
             $('#stc-accept-return-err').hide();
@@ -1450,10 +1647,10 @@ STCAuthHelper::checkAuth();
             if(e.target === this){ stcCloseAcceptReturnOverlay(); }
         });
 
-        // Submit Accept Return
+        // Submit Accept Return (single or bulk)
         $('#stc-accept-return-submit').on('click', function(){
-            var itemId = parseInt($('#stc-accept-return-item-id').val(), 10) || 0;
-            var note   = $.trim($('#stc-accept-return-msg').val());
+            var mode = $('#stc-accept-return-mode').val() || 'single';
+            var note = $.trim($('#stc-accept-return-msg').val());
             if(!note){
                 $('#stc-accept-return-err').show();
                 return;
@@ -1464,14 +1661,32 @@ STCAuthHelper::checkAuth();
             $btn.data('busy', 1).prop('disabled', true);
             var prev = $btn.html();
             $btn.html('<i class="fa fa-spinner fa-spin"></i> Saving…');
-            $.ajax({
-                url     : 'kattegat/ragnar_lothbrok.php',
-                method  : 'POST',
-                data    : {
+
+            var postData;
+            if(mode === 'bulk'){
+                if(!stcReturnBulkIds.length){
+                    alert('No items selected.');
+                    $btn.data('busy', 0).prop('disabled', false).html(prev);
+                    return;
+                }
+                postData = {
+                    bulk_accept_return: 1,
+                    item_ids: stcReturnBulkIds,
+                    description: note
+                };
+            } else {
+                var itemId = parseInt($('#stc-accept-return-item-id').val(), 10) || 0;
+                postData = {
                     accept_return_item: 1,
                     item_id: itemId,
                     description: note
-                },
+                };
+            }
+
+            $.ajax({
+                url     : 'kattegat/ragnar_lothbrok.php',
+                method  : 'POST',
+                data    : postData,
                 dataType: 'json',
                 success : function(res){
                     if(res && res.success){
@@ -1488,6 +1703,93 @@ STCAuthHelper::checkAuth();
                     $btn.data('busy', 0).prop('disabled', false).html(prev);
                 }
             });
+        });
+
+        // Eye → Adhoc product details overlay
+        function stcCloseReturnAdhocOverlay(){
+            $('#stcReturnAdhocOverlay').removeClass('is-open');
+            $('body').css('overflow', '');
+        }
+        function stcOpenReturnAdhocOverlay(){
+            $('#stcReturnAdhocOverlay').appendTo('body').addClass('is-open');
+            $('body').css('overflow', 'hidden');
+        }
+
+        $(document).on('click', '.stc-return-adhoc-eye', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var productId = parseInt($(this).data('product-id'), 10) || 0;
+            var title = $(this).data('item-title') || '';
+            if(productId <= 0){
+                alert('Product ID not found for this item.');
+                return;
+            }
+            $('#stc-return-adhoc-info').html(
+                'Looking up adhoc for product ID: <strong>' + productId + '</strong>' +
+                (title ? ' &mdash; ' + $('<div/>').text(title).html() : '')
+            );
+            $('#stc-return-adhoc-tbody').html('<tr><td colspan="12" class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i> Loading…</td></tr>');
+            stcOpenReturnAdhocOverlay();
+            $.ajax({
+                url     : 'kattegat/ragnar_lothbrok.php',
+                method  : 'POST',
+                data    : { return_item_adhoc_details: 1, product_id: productId },
+                dataType: 'json',
+                success : function(res){
+                    if(!res || !res.success){
+                        $('#stc-return-adhoc-tbody').html('<tr><td colspan="12" class="text-center text-danger">' + ((res && res.message) ? res.message : 'Failed to load adhoc details.') + '</td></tr>');
+                        return;
+                    }
+                    var label = 'Product ID: <strong>' + (res.product_id || productId) + '</strong>';
+                    if(res.product_name){
+                        label += ' &mdash; ' + $('<div/>').text(res.product_name).html();
+                    } else if(title){
+                        label += ' &mdash; ' + $('<div/>').text(title).html();
+                    }
+                    $('#stc-return-adhoc-info').html(
+                        label + ' &nbsp; <span class="text-muted">(' + (res.total || 0) + ' found)</span>'
+                    );
+                    if(!res.rows || !res.rows.length){
+                        $('#stc-return-adhoc-tbody').html('<tr><td colspan="12" class="text-center text-muted">No matching adhoc product found for this product ID.</td></tr>');
+                        return;
+                    }
+                    var html = '';
+                    $.each(res.rows, function(i, r){
+                        var statusBg = '#6c757d';
+                        if(r.status_code == 1) statusBg = '#3f6ad8';
+                        else if(r.status_code == 2) statusBg = '#16aaff';
+                        else if(r.status_code == 3) statusBg = '#f7b924';
+                        else if(r.status_code == 4) statusBg = '#3ac47d';
+                        else if(r.status_code == 5) statusBg = '#d92550';
+                        html += '<tr>' +
+                            '<td class="text-center">' + (i + 1) + '</td>' +
+                            '<td class="text-center">' + r.adhoc_id + '</td>' +
+                            '<td>' + $('<div/>').text(r.item_desc || '').html() + '</td>' +
+                            '<td class="text-right">' + r.qty + '</td>' +
+                            '<td class="text-right">' + r.stock + '</td>' +
+                            '<td class="text-center">' + $('<div/>').text(r.unit || '').html() + '</td>' +
+                            '<td class="text-right">' + r.prate + '</td>' +
+                            '<td>' + $('<div/>').text(r.source || '').html() + '</td>' +
+                            '<td>' + $('<div/>').text(r.destination || '').html() + '</td>' +
+                            '<td>' + $('<div/>').text(r.rack_name || '').html() + '</td>' +
+                            '<td class="text-center"><span style="background:' + statusBg + ';color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;">' + $('<div/>').text(r.status || '').html() + '</span></td>' +
+                            '<td style="font-size:11px;">' + $('<div/>').text(r.created_date || '').html() + '<br><span class="text-muted">' + $('<div/>').text(r.created_by || '').html() + '</span></td>' +
+                            '</tr>';
+                    });
+                    $('#stc-return-adhoc-tbody').html(html);
+                },
+                error: function(){
+                    $('#stc-return-adhoc-tbody').html('<tr><td colspan="12" class="text-center text-danger">Error loading adhoc details.</td></tr>');
+                }
+            });
+        });
+
+        $(document).on('click', '.stc-return-adhoc-close', function(e){
+            e.preventDefault();
+            stcCloseReturnAdhocOverlay();
+        });
+        $(document).on('click', '#stcReturnAdhocOverlay', function(e){
+            if(e.target === this){ stcCloseReturnAdhocOverlay(); }
         });
         // =====================================================================
 
