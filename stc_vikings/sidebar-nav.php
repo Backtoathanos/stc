@@ -40,7 +40,18 @@
                                 <i class="metismenu-icon pe-7s-home"></i>
                                 Home
                             </a>
-                        </li>                    
+                        </li>
+                        <?php
+                        require_once __DIR__ . '/kattegat/ms365_access.php';
+                        if (stc_ms365_user_allowed()):
+                        ?>
+                        <li>
+                            <a href="ms365-dashboard.php?page=ms365" class="ms365">
+                                <i class="metismenu-icon pe-7s-graph1"></i>
+                                Microsoft 365
+                            </a>
+                        </li>
+                        <?php endif; ?>                    
                         <!-- Accounts -->
                         <li>
                             <a href="#" class="accounts">
