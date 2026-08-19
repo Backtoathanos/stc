@@ -209,6 +209,25 @@ include("kattegat/role_check.php");
                                             />
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="card-border mb-3 card card-body border-primary">
+                                            <h5
+                                              for="initialrate"
+                                              >Initial Rate : <span><?php echo isset($stcretresult['stc_product_initial_rate']) ? $stcretresult['stc_product_initial_rate'] : '0';?></span></h5
+                                            >
+                                            <input
+                                              id="initialrate"
+                                              name="stcpdinitrate"
+                                              type="number"
+                                              min="0"
+                                              step="0.01"
+                                              placeholder="Initial Rate"
+                                              class="form-control validate"
+                                              required
+                                              value="<?php echo isset($stcretresult['stc_product_initial_rate']) ? $stcretresult['stc_product_initial_rate'] : '0';?>"
+                                            />
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
@@ -220,6 +239,30 @@ include("kattegat/role_check.php");
                                               class="custom-select tm-select-accounts call_brand"
                                               name="stcpdbrand"
                                             >
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="card-border mb-3 card card-body border-primary">
+                                            <h5
+                                              for="producttype"
+                                              >Product Type : <span><?php echo !empty($stcretresult['stc_product_type']) ? htmlspecialchars($stcretresult['stc_product_type']) : '-';?></span></h5
+                                            >
+                                            <select
+                                              id="producttype"
+                                              class="custom-select tm-select-accounts"
+                                              name="stcpdtype"
+                                              required
+                                            >
+                                              <option value="NA">Select Product Type</option>
+                                              <?php
+                                                $stc_pd_types = array('Mechanical','Electrical','Civil','Instrumentation','Plumbing','HVAC','Safety','Electronics','Hardware','Consumable','Tools','Others');
+                                                $curType = isset($stcretresult['stc_product_type']) ? $stcretresult['stc_product_type'] : '';
+                                                foreach($stc_pd_types as $stc_pd_type){
+                                                  $sel = ($curType === $stc_pd_type) ? ' selected' : '';
+                                                  echo '<option value="'.$stc_pd_type.'"'.$sel.'>'.$stc_pd_type.'</option>';
+                                                }
+                                              ?>
                                             </select>
                                         </div>
                                     </div>

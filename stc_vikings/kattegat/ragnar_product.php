@@ -78,7 +78,7 @@ class ragnarProduct extends tesseract{
 	}
 
 	// add product to the database
-	public function stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand){
+	public function stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand, $stcpdtype = '', $stcpdinitrate = 0){
 		$this->last_inserted_product_id = 0;
 		$stc_filter_add_product=$stcpdname;
 		$check_loki=mysqli_query($this->stc_dbs, "
@@ -103,6 +103,8 @@ class ragnarProduct extends tesseract{
 					`stc_product_image`,
 					`stc_product_sale_percentage`,
 					`stc_product_brand_id`,
+					`stc_product_type`,
+					`stc_product_initial_rate`,
 					`stc_product_avail`
 				) 
 				VALUES(
@@ -116,6 +118,8 @@ class ragnarProduct extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $stcpdimages)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stcpdpercentage)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcpdtype)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcpdinitrate)."',
 					'1'
 				)
 			");
@@ -230,6 +234,7 @@ class ragnarProduct extends tesseract{
 		        								'.$filterrow["stc_product_gst"].'%
 		        							</span>
 		        							<span class="p-qty" >'.$stcqty.' '.$filterrow["stc_product_unit"].'</span>'.$adhoc_mark.'
+		        							<span class="p-qty">'.(!empty($filterrow["stc_product_type"]) ? htmlspecialchars($filterrow["stc_product_type"]) : '-').' / Rate: '.number_format((float)($filterrow["stc_product_initial_rate"] ?? 0), 2).'</span>
 		        							<span>
 												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-purchase-mod-btn"  data-toggle="modal" data-target="#view-products-purchase-modal"><i class="fas fa-eye"></i> Purchase</a>
 												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-sale-mod-btn"  data-toggle="modal" data-target="#view-products-sale-modal"><i class="fas fa-eye"></i> Sale</a>
@@ -659,7 +664,7 @@ class ragnarProduct extends tesseract{
 
 	/*---------------------------- Edit product page-----------------------------*/
 	// edit product function
-	public function stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available){
+	public function stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available, $stcpdtype = '', $stcpdinitrate = 0){
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT `stc_product_name` FROM `stc_product` 
 			WHERE `stc_product_desc`		=	'".mysqli_real_escape_string($this->stc_dbs, $stcpddsc				)."'
@@ -683,6 +688,8 @@ class ragnarProduct extends tesseract{
 					`stc_product_gst`				='".mysqli_real_escape_string($this->stc_dbs, $stcpdgst			)."',
 					`stc_product_sale_percentage`	='".mysqli_real_escape_string($this->stc_dbs, $stcpdpercentage	)."',
 					`stc_product_brand_id`			='".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand		)."',
+					`stc_product_type`				='".mysqli_real_escape_string($this->stc_dbs, $stcpdtype		)."',
+					`stc_product_initial_rate`		='".mysqli_real_escape_string($this->stc_dbs, $stcpdinitrate	)."',
 					`stc_product_avail`			='".mysqli_real_escape_string($this->stc_dbs, $available		)."' 
 				WHERE 
 					`stc_product_id`				='".mysqli_real_escape_string($this->stc_dbs, $product_id 		)."'
@@ -993,6 +1000,8 @@ if(isset($_POST['stc_add_product_hit'])){
 	$stcpdpercentage=$_POST['stcpdpercentage'];
 	$stcpdunit=strtoupper($_POST['stcpdunit']);
 	$stcpdbrand=$_POST['stcpdbrand'];
+	$stcpdtype=isset($_POST['stcpdtype']) ? $_POST['stcpdtype'] : 'NA';
+	$stcpdinitrate=isset($_POST['stcpdinitrate']) && is_numeric($_POST['stcpdinitrate']) ? $_POST['stcpdinitrate'] : 0;
 	$stcpdstatus=1;
 	$stcpdgst=$_POST['stcpdgst'];
 	$stcpdimages=$_FILES['stcpdimage']['name'];
@@ -1013,10 +1022,10 @@ if(isset($_POST['stc_add_product_hit'])){
 	$adago=new ragnarProduct();
 
 	// function calling
-	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || $stcpdunit=="NA" || $stcpdgst=="0"){
+	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || $stcpdunit=="NA" || $stcpdgst=="0" || $stcpdtype=="NA"){
 		echo "Sab field bhar pahle!!!";
 	}else{
-		$objadago=$adago->stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand);
+		$objadago=$adago->stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand, $stcpdtype, $stcpdinitrate);
 
 		if($objadago == "success"){
 			$newPid = (int) $adago->last_inserted_product_id;
@@ -1134,11 +1143,13 @@ if(isset($_POST['stc_edit_product_hit'])){
 	$stcpdbrand=strtoupper($_POST['stcpdbrand']);
 	$available=strtoupper($_POST['available']);
 	$stcpdgst=$_POST['stcpdgst'];
+	$stcpdtype=isset($_POST['stcpdtype']) ? $_POST['stcpdtype'] : '';
+	$stcpdinitrate=isset($_POST['stcpdinitrate']) && is_numeric($_POST['stcpdinitrate']) ? $_POST['stcpdinitrate'] : 0;
 	$objthor=new ragnarProduct();
-	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || empty($stcpdname) || empty($stcpddsc)){
+	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || empty($stcpdname) || empty($stcpddsc) || $stcpdtype=="NA"){
 		$out="Kid!!! Don't let any field empty otherwise i will cursed you out.";
 	}else{
-		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available);
+		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available, $stcpdtype, $stcpdinitrate);
 		$out=$objthorout;
 	}
 	echo json_encode($objthorout);
