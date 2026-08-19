@@ -1151,8 +1151,43 @@ if(isset($_POST['stc_edit_product_hit'])){
 	}else{
 		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available, $stcpdtype, $stcpdinitrate);
 		$out=$objthorout;
+		if($objthorout == "Product Updated Successfully!!!"
+			&& !empty($_FILES['stcpdimage']['name'])
+			&& is_uploaded_file($_FILES['stcpdimage']['tmp_name'])){
+			$stcpdimages=$_FILES['stcpdimage']['name'];
+			$stcpdtmpname=$_FILES['stcpdimage']['tmp_name'];
+			$stcpdslug=strtolower($stcpdname);
+			$stcpdslug=preg_replace('/[^a-z0-9]+/i', '-', $stcpdslug);
+			$stcpdslug=trim($stcpdslug, '-');
+			$stcpdextension=strtolower(pathinfo($stcpdimages, PATHINFO_EXTENSION));
+			$stcpdrandom=random_int(1000000000000, 9999999999999);
+			if(!empty($stcpdextension)){
+				$stcpdimages=$stcpdslug.'-'.$stcpdrandom.'.'.$stcpdextension;
+			}else{
+				$stcpdimages=$stcpdslug.'-'.$stcpdrandom;
+			}
+			$cloudOk = false;
+			if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+				&& function_exists('stc_r2_upload_product_image_from_path')) {
+				$r2 = stc_r2_upload_product_image_from_path($stcpdtmpname, (int) $product_id);
+				if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+					$updUrl = $objthor->stc_alter_pdimage($product_id, $r2['public_url']);
+					if ($updUrl == "success") {
+						$cloudOk = true;
+					}
+				}
+			}
+			if (!$cloudOk) {
+				$moved=move_uploaded_file($stcpdtmpname, "../../stc_symbiote/stc_product_image/".$stcpdimages);
+				if($moved){
+					$objthor->stc_alter_pdimage($product_id, $stcpdimages);
+				}else{
+					$out="Product updated but image could not be saved!!!";
+				}
+			}
+		}
 	}
-	echo json_encode($objthorout);
+	echo $out;
 }
 
 #<--------------------------------------Add Product support objects-------------------------------->
