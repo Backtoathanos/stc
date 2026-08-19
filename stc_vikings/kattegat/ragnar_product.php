@@ -1021,9 +1021,20 @@ if(isset($_POST['stc_add_product_hit'])){
 
 	$adago=new ragnarProduct();
 
-	// function calling
-	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || $stcpdunit=="NA" || $stcpdgst=="0" || $stcpdtype=="NA"){
-		echo "Sab field bhar pahle!!!";
+	$missing=array();
+	if(trim($stcpdname)===''){ $missing[]='Product Name'; }
+	if(trim($stcpddsc)===''){ $missing[]='Description'; }
+	if($stcpdcat==="NA" || $stcpdcat===''){ $missing[]='Category'; }
+	if($stcpdsubcat==="NA" || $stcpdsubcat===''){ $missing[]='Sub Category'; }
+	if($stcpdtype==="NA" || $stcpdtype===''){ $missing[]='Product Type'; }
+	if($stcpdunit==="NA" || trim($stcpdunit)===''){ $missing[]='Unit'; }
+	if($stcpdgst==="0" || $stcpdgst===''){ $missing[]='GST'; }
+	if($stcpdhsn==='' || $stcpdhsn===null){ $missing[]='HSN Code'; }
+	if($stcpdpercentage==='' || $stcpdpercentage===null){ $missing[]='Percentage'; }
+	if($stcpdinitrate==='' || $stcpdinitrate===null){ $missing[]='Initial Rate'; }
+
+	if(!empty($missing)){
+		echo "Please fill all required fields marked with *. Missing: ".implode(', ', $missing).".";
 	}else{
 		$objadago=$adago->stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand, $stcpdtype, $stcpdinitrate);
 
@@ -1146,8 +1157,19 @@ if(isset($_POST['stc_edit_product_hit'])){
 	$stcpdtype=isset($_POST['stcpdtype']) ? $_POST['stcpdtype'] : '';
 	$stcpdinitrate=isset($_POST['stcpdinitrate']) && is_numeric($_POST['stcpdinitrate']) ? $_POST['stcpdinitrate'] : 0;
 	$objthor=new ragnarProduct();
-	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || empty($stcpdname) || empty($stcpddsc) || $stcpdtype=="NA"){
-		$out="Kid!!! Don't let any field empty otherwise i will cursed you out.";
+	$missing=array();
+	if(trim($stcpdname)===''){ $missing[]='Product Name'; }
+	if(trim($stcpddsc)===''){ $missing[]='Description'; }
+	if($stcpdcat==="NA" || $stcpdcat===''){ $missing[]='Category'; }
+	if($stcpdsubcat==="NA" || $stcpdsubcat===''){ $missing[]='Sub Category'; }
+	if($stcpdtype==="NA" || $stcpdtype===''){ $missing[]='Product Type'; }
+	if($stcpdunit==="NA" || trim($stcpdunit)===''){ $missing[]='Unit'; }
+	if($stcpdgst==="0" || $stcpdgst===''){ $missing[]='GST'; }
+	if($stcpdhsncode==='' || $stcpdhsncode===null){ $missing[]='HSN Code'; }
+	if($stcpdpercentage==='' || $stcpdpercentage===null){ $missing[]='Percentage'; }
+	if($stcpdinitrate==='' || $stcpdinitrate===null){ $missing[]='Initial Rate'; }
+	if(!empty($missing)){
+		$out="Please fill all required fields marked with *. Missing: ".implode(', ', $missing).".";
 	}else{
 		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available, $stcpdtype, $stcpdinitrate);
 		$out=$objthorout;

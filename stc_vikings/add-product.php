@@ -276,10 +276,23 @@ include("kattegat/role_check.php");
             padding-top: 10px;
             resize: vertical;
         }
+        .stc-req {
+            color: #e63757;
+            font-weight: 700;
+            margin-left: 3px;
+        }
+        .stc-ap-field.is-invalid .form-control,
+        .stc-ap-field.is-invalid .custom-select {
+            border-color: #e63757;
+            box-shadow: 0 0 0 3px rgba(230, 55, 87, .12);
+        }
         .stc-ap-field .form-control:focus,
         .stc-ap-field .custom-select:focus {
             border-color: #3f6ad8;
             box-shadow: 0 0 0 3px rgba(63, 106, 216, .12);
+        }
+        .swal2-container {
+            z-index: 30000 !important;
         }
         .stc-ap-upload-card {
             margin-bottom: 0;
@@ -353,7 +366,7 @@ include("kattegat/role_check.php");
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade  " id="tab-content-1" role="tabpanel">
-                                <form action="" class="stc-add-product-form">
+                                <form action="" class="stc-add-product-form" novalidate>
                                     <input type="hidden" name="stc_add_product_hit">
                                     <div class="stc-ap-wrap">
                                         <div class="stc-ap-header">
@@ -368,11 +381,11 @@ include("kattegat/role_check.php");
                                                     <div class="stc-ap-section">
                                                         <h6 class="stc-ap-section-title">Basic details</h6>
                                                         <div class="stc-ap-field">
-                                                            <span class="stc-ap-label">Product Name</span>
+                                                            <span class="stc-ap-label">Product Name <span class="stc-req">*</span></span>
                                                             <textarea class="form-control validate" rows="3" id="stcpdname" name="stcpdname" placeholder="Enter product name" required></textarea>
                                                         </div>
                                                         <div class="stc-ap-field">
-                                                            <span class="stc-ap-label">Description</span>
+                                                            <span class="stc-ap-label">Description <span class="stc-req">*</span></span>
                                                             <textarea class="form-control validate" rows="3" id="stcpddesc" name="stcpddesc" placeholder="Enter product description" required></textarea>
                                                         </div>
                                                     </div>
@@ -381,19 +394,19 @@ include("kattegat/role_check.php");
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Category</span>
+                                                                    <span class="stc-ap-label">Category <span class="stc-req">*</span></span>
                                                                     <select class="custom-select tm-select-accounts call_cat" name="stcpdcategory"></select>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Sub Category</span>
+                                                                    <span class="stc-ap-label">Sub Category <span class="stc-req">*</span></span>
                                                                     <select class="custom-select tm-select-accounts call_sub_cat" name="stcpdsubcategory"></select>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Product Type</span>
+                                                                    <span class="stc-ap-label">Product Type <span class="stc-req">*</span></span>
                                                                     <select class="custom-select tm-select-accounts" name="stcpdtype" required>
                                                                         <option value="NA" selected>Select Product Type</option>
                                                                         <option value="Mechanical">Mechanical</option>
@@ -419,7 +432,7 @@ include("kattegat/role_check.php");
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Unit</span>
+                                                                    <span class="stc-ap-label">Unit <span class="stc-req">*</span></span>
                                                                     <select class="custom-select tm-select-accounts" name="stcpdunit">
                                                                         <option value="NA" selected>Select Unit</option>
                                                                         <option value="Nos">Nos</option>
@@ -476,13 +489,13 @@ include("kattegat/role_check.php");
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">HSN Code</span>
+                                                                    <span class="stc-ap-label">HSN Code <span class="stc-req">*</span></span>
                                                                     <input name="stcpdhsncode" type="number" placeholder="HSN Code" class="form-control validate" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">GST</span>
+                                                                    <span class="stc-ap-label">GST <span class="stc-req">*</span></span>
                                                                     <select class="custom-select tm-select-accounts" name="stcpdgst">
                                                                         <option value="0" selected>Select GST</option>
                                                                         <option value="5">5%</option>
@@ -494,13 +507,13 @@ include("kattegat/role_check.php");
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Percentage</span>
+                                                                    <span class="stc-ap-label">Percentage <span class="stc-req">*</span></span>
                                                                     <input name="stcpdpercentage" type="number" placeholder="Sale percentage" class="form-control validate" required />
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="stc-ap-field">
-                                                                    <span class="stc-ap-label">Initial Rate</span>
+                                                                    <span class="stc-ap-label">Initial Rate <span class="stc-req">*</span></span>
                                                                     <input name="stcpdinitrate" type="number" min="0" step="0.01" placeholder="0.00" class="form-control validate" required />
                                                                 </div>
                                                             </div>
@@ -764,6 +777,7 @@ include("kattegat/role_check.php");
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
@@ -771,6 +785,58 @@ include("kattegat/role_check.php");
     <script src="assets/vendor/cropperjs/cropper.min.js"></script>
     <script>
         $(document).ready(function(){
+          function stcPdAlert(icon, title, text, html) {
+            if (typeof Swal !== 'undefined' && Swal.fire) {
+              var opts = { icon: icon || 'info', title: title || '', confirmButtonText: 'OK' };
+              if (html) opts.html = html;
+              else opts.text = text || '';
+              return Swal.fire(opts);
+            }
+            alert((title ? title + '\n' : '') + (text || '').replace(/<[^>]+>/g, ''));
+          }
+          function validateProductForm($form) {
+            $form.find('.stc-ap-field').removeClass('is-invalid');
+            var checks = [
+              { name: 'stcpdname', label: 'Product Name', empty: [''] },
+              { name: 'stcpddesc', label: 'Description', empty: [''] },
+              { name: 'stcpdcategory', label: 'Category', empty: ['', 'NA'] },
+              { name: 'stcpdsubcategory', label: 'Sub Category', empty: ['', 'NA'] },
+              { name: 'stcpdtype', label: 'Product Type', empty: ['', 'NA'] },
+              { name: 'stcpdunit', label: 'Unit', empty: ['', 'NA'] },
+              { name: 'stcpdhsncode', label: 'HSN Code', empty: [''] },
+              { name: 'stcpdgst', label: 'GST', empty: ['', '0'] },
+              { name: 'stcpdpercentage', label: 'Percentage', empty: [''] },
+              { name: 'stcpdinitrate', label: 'Initial Rate', empty: [''] }
+            ];
+            var missing = [];
+            $.each(checks, function(_, c) {
+              var $el = $form.find('[name="' + c.name + '"]');
+              var val = $.trim(String($el.val() == null ? '' : $el.val()));
+              if (c.empty.indexOf(val) !== -1) {
+                missing.push(c.label);
+                $el.closest('.stc-ap-field').addClass('is-invalid');
+              }
+            });
+            if (missing.length) {
+              var $first = $form.find('.stc-ap-field.is-invalid').first();
+              if ($first.length && $first.offset()) {
+                $('html, body').animate({ scrollTop: $first.offset().top - 120 }, 300);
+                $first.find('input, select, textarea').first().focus();
+              }
+              stcPdAlert('warning', 'Required fields missing', '',
+                '<p>Please fill the fields marked with <span style="color:#e63757">*</span>.</p>' +
+                '<ul style="text-align:left;margin:8px 0 0 18px;">' +
+                missing.map(function(m){ return '<li>' + m + '</li>'; }).join('') +
+                '</ul>'
+              );
+              return false;
+            }
+            return true;
+          }
+          $('.stc-add-product-form').on('input change', 'input, select, textarea', function() {
+            $(this).closest('.stc-ap-field').removeClass('is-invalid');
+          });
+
           var $fileInput = $('#fileInput');
           var $dropzone = $('#stcPdDropzone');
           var $uploadCard = $('.stc-pd-upload-card');
@@ -1121,6 +1187,8 @@ include("kattegat/role_check.php");
           // js add product with some support
           $('.stc-add-product-form').on('submit',function(e){
             e.preventDefault();
+            var $form = $(this);
+            if (!validateProductForm($form)) return;
             $.ajax({
               xhr: function() {
                         var xhr = new window.XMLHttpRequest();
@@ -1140,12 +1208,17 @@ include("kattegat/role_check.php");
               cache: false,
               processData : false,
               success : function(data){
-                data=data.trim();
-                alert(data);
-                if(data=="Product's added!!"){
+                data = String(data).trim().replace(/^"|"$/g, '');
+                var ok = data.indexOf("Product's added") !== -1;
+                stcPdAlert(ok ? 'success' : (data.indexOf('required fields') !== -1 ? 'warning' : 'error'),
+                  ok ? 'Product added' : 'Could not add product', data);
+                if(ok){
                   $('.stc-add-product-form')[0].reset();
                   clearProductImagePreview();
                 }
+              },
+              error : function(){
+                stcPdAlert('error', 'Could not add product', 'Something went wrong. Please try again.');
               }
             });
           });

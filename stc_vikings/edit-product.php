@@ -105,9 +105,16 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
             border-radius: 6px; background: #fff; line-height: 1.4;
         }
         .stc-ap-field textarea.form-control { height: auto; min-height: 92px; padding-top: 10px; resize: vertical; }
+        .stc-req { color: #e63757; font-weight: 700; margin-left: 3px; }
+        .stc-ap-field.is-invalid .form-control,
+        .stc-ap-field.is-invalid .custom-select {
+            border-color: #e63757;
+            box-shadow: 0 0 0 3px rgba(230, 55, 87, .12);
+        }
         .stc-ap-field .form-control:focus, .stc-ap-field .custom-select:focus {
             border-color: #3f6ad8; box-shadow: 0 0 0 3px rgba(63, 106, 216, .12);
         }
+        .swal2-container { z-index: 30000 !important; }
         .stc-ap-upload-card { margin-bottom: 0; padding: 0; min-height: 0; background: transparent; border: 0; }
         .stc-ap-wrap .stc-pd-dropzone { min-height: 188px; }
         .stc-ap-footer { display: flex; align-items: center; gap: 16px; padding: 14px 22px; border-top: 1px solid #eef1f6; background: #fbfcfe; }
@@ -143,7 +150,7 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <?php if (!$stcretresult) { ?>
                                 <div class="alert alert-danger">Product not found.</div>
                             <?php } else { ?>
-                            <form action="" class="stc-edit-product-form"
+                            <form action="" class="stc-edit-product-form" novalidate
                                 data-cat-id="<?php echo $h($stcretresult['stc_product_cat_id']); ?>"
                                 data-subcat-id="<?php echo $h($stcretresult['stc_product_sub_cat_id']); ?>"
                                 data-brand-id="<?php echo $h($stcretresult['stc_product_brand_id']); ?>"
@@ -171,11 +178,11 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                 <div class="stc-ap-section">
                                                     <h6 class="stc-ap-section-title">Basic details</h6>
                                                     <div class="stc-ap-field">
-                                                        <span class="stc-ap-label">Product Name</span>
+                                                        <span class="stc-ap-label">Product Name <span class="stc-req">*</span></span>
                                                         <textarea class="form-control validate" rows="3" name="stcpdname" placeholder="Enter product name" required><?php echo $h($stcretresult['stc_product_name']); ?></textarea>
                                                     </div>
                                                     <div class="stc-ap-field">
-                                                        <span class="stc-ap-label">Description</span>
+                                                        <span class="stc-ap-label">Description <span class="stc-req">*</span></span>
                                                         <textarea class="form-control validate" rows="3" name="stcpddesc" placeholder="Enter product description" required><?php echo $h($stcretresult['stc_product_desc']); ?></textarea>
                                                     </div>
                                                 </div>
@@ -184,19 +191,19 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Category</span>
+                                                                <span class="stc-ap-label">Category <span class="stc-req">*</span></span>
                                                                 <select class="custom-select tm-select-accounts call_cat" name="stcpdcategory"></select>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Sub Category</span>
+                                                                <span class="stc-ap-label">Sub Category <span class="stc-req">*</span></span>
                                                                 <select class="custom-select tm-select-accounts call_sub_cat" name="stcpdsubcategory"></select>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Product Type</span>
+                                                                <span class="stc-ap-label">Product Type <span class="stc-req">*</span></span>
                                                                 <select class="custom-select tm-select-accounts" name="stcpdtype" required>
                                                                     <option value="NA">Select Product Type</option>
                                                                     <?php foreach ($stc_pd_types as $stc_pd_type) { ?>
@@ -213,7 +220,7 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Unit</span>
+                                                                <span class="stc-ap-label">Unit <span class="stc-req">*</span></span>
                                                                 <select class="custom-select tm-select-accounts stcpdunit" name="stcpdunit">
                                                                     <option value="NA">Select Unit</option>
                                                                     <?php foreach ($stc_pd_units as $u) { ?>
@@ -268,13 +275,13 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">HSN Code</span>
+                                                                <span class="stc-ap-label">HSN Code <span class="stc-req">*</span></span>
                                                                 <input name="stcpdhsncode" type="number" placeholder="HSN Code" class="form-control validate" required value="<?php echo $h($stcretresult['stc_product_hsncode']); ?>" />
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">GST</span>
+                                                                <span class="stc-ap-label">GST <span class="stc-req">*</span></span>
                                                                 <select class="custom-select tm-select-accounts gst" name="stcpdgst">
                                                                     <option value="0">Select GST</option>
                                                                     <?php foreach (array('5','12','18','28') as $g) { ?>
@@ -285,13 +292,13 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Percentage</span>
+                                                                <span class="stc-ap-label">Percentage <span class="stc-req">*</span></span>
                                                                 <input name="stcpdpercentage" type="number" placeholder="Sale percentage" class="form-control validate" required value="<?php echo $h($stcretresult['stc_product_sale_percentage']); ?>" />
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="stc-ap-field">
-                                                                <span class="stc-ap-label">Initial Rate</span>
+                                                                <span class="stc-ap-label">Initial Rate <span class="stc-req">*</span></span>
                                                                 <input name="stcpdinitrate" type="number" min="0" step="0.01" placeholder="0.00" class="form-control validate" required value="<?php echo $h(isset($stcretresult['stc_product_initial_rate']) ? $stcretresult['stc_product_initial_rate'] : '0'); ?>" />
                                                             </div>
                                                         </div>
@@ -363,6 +370,7 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     </div>
 
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
@@ -370,6 +378,58 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     <script src="assets/vendor/cropperjs/cropper.min.js"></script>
     <script>
         $(document).ready(function(){
+          function stcPdAlert(icon, title, text, html) {
+            if (typeof Swal !== 'undefined' && Swal.fire) {
+              var opts = { icon: icon || 'info', title: title || '', confirmButtonText: 'OK' };
+              if (html) opts.html = html;
+              else opts.text = text || '';
+              return Swal.fire(opts);
+            }
+            alert((title ? title + '\n' : '') + (text || '').replace(/<[^>]+>/g, ''));
+          }
+          function validateProductForm($form) {
+            $form.find('.stc-ap-field').removeClass('is-invalid');
+            var checks = [
+              { name: 'stcpdname', label: 'Product Name', empty: [''] },
+              { name: 'stcpddesc', label: 'Description', empty: [''] },
+              { name: 'stcpdcategory', label: 'Category', empty: ['', 'NA'] },
+              { name: 'stcpdsubcategory', label: 'Sub Category', empty: ['', 'NA'] },
+              { name: 'stcpdtype', label: 'Product Type', empty: ['', 'NA'] },
+              { name: 'stcpdunit', label: 'Unit', empty: ['', 'NA'] },
+              { name: 'stcpdhsncode', label: 'HSN Code', empty: [''] },
+              { name: 'stcpdgst', label: 'GST', empty: ['', '0'] },
+              { name: 'stcpdpercentage', label: 'Percentage', empty: [''] },
+              { name: 'stcpdinitrate', label: 'Initial Rate', empty: [''] }
+            ];
+            var missing = [];
+            $.each(checks, function(_, c) {
+              var $el = $form.find('[name="' + c.name + '"]');
+              var val = $.trim(String($el.val() == null ? '' : $el.val()));
+              if (c.empty.indexOf(val) !== -1) {
+                missing.push(c.label);
+                $el.closest('.stc-ap-field').addClass('is-invalid');
+              }
+            });
+            if (missing.length) {
+              var $first = $form.find('.stc-ap-field.is-invalid').first();
+              if ($first.length && $first.offset()) {
+                $('html, body').animate({ scrollTop: $first.offset().top - 120 }, 300);
+                $first.find('input, select, textarea').first().focus();
+              }
+              stcPdAlert('warning', 'Required fields missing', '',
+                '<p>Please fill the fields marked with <span style="color:#e63757">*</span>.</p>' +
+                '<ul style="text-align:left;margin:8px 0 0 18px;">' +
+                missing.map(function(m){ return '<li>' + m + '</li>'; }).join('') +
+                '</ul>'
+              );
+              return false;
+            }
+            return true;
+          }
+          $('.stc-edit-product-form').on('input change', 'input, select, textarea', function() {
+            $(this).closest('.stc-ap-field').removeClass('is-invalid');
+          });
+
           var $fileInput = $('#fileInput');
           var $dropzone = $('#stcPdDropzone');
           var $uploadCard = $('.stc-pd-upload-card');
@@ -693,6 +753,8 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
           $('.stc-edit-product-form').on('submit', function(e){
             e.preventDefault();
+            var $form = $(this);
+            if (!validateProductForm($form)) return;
             $.ajax({
               xhr: function() {
                 var xhr = new window.XMLHttpRequest();
@@ -713,11 +775,16 @@ $h = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
               processData : false,
               success : function(data){
                 data = String(data).trim().replace(/^"|"$/g, '');
-                alert(data);
-                if (data.indexOf('Updated Successfully') !== -1) {
+                var ok = data.indexOf('Updated Successfully') !== -1;
+                var warn = !ok && data.indexOf('required fields') !== -1;
+                stcPdAlert(ok ? 'success' : (warn ? 'warning' : 'error'), ok ? 'Product updated' : (warn ? 'Required fields missing' : 'Could not update'), data);
+                if (ok) {
                   var newSrc = $('#stcPdPreviewImg').attr('src');
                   if (newSrc && newSrc.indexOf('blob:') !== 0) existingImageSrc = newSrc;
                 }
+              },
+              error : function(){
+                stcPdAlert('error', 'Could not update', 'Something went wrong. Please try again.');
               }
             });
           });
