@@ -1,124 +1,248 @@
 <?php
 include "../../MCU/obdb.php";
 class ragnarMerchants extends tesseract{
-	// by merchant name
-	public function stc_search_merchant_byname($searchmebyname){
-		$perfectsearchme=strtoupper($searchmebyname);
-		$alagsequery="
-					SELECT DISTINCT * FROM `stc_merchant` 
-					LEFT JOIN `stc_state` ON `stc_state_id`=`stc_merchant_state_id` 
-					LEFT JOIN `stc_city` ON `stc_city_id`=`stc_merchant_city_id` 
-					WHERE 
-						`stc_merchant_name` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $searchmebyname)."' OR 
-						`stc_merchant_address` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $searchmebyname)."'
-					ORDER BY `stc_merchant_id` ASC
-					";
-		$check_loki=mysqli_query($this->stc_dbs, $alagsequery);
-		$odin='';               
-		$do_action=mysqli_num_rows($check_loki);
-		if($do_action > 0){
-			foreach ($check_loki as $row) {
-				$correct_stcpdname=strlen($row["stc_merchant_name"]);
-				$odin.='	
-						<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-			             	<div style="padding: 15px; background-color: #fff;border-radius:20px;">
-			             		<div class="row">
-				             	  	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-				             	  		<h5>Merchant Name - '.$row['stc_merchant_name'].'</h5>
-				             	  	</div>
-				             	  	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-				             	  		<p>Address - '.$row['stc_merchant_address'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>Email - '.$row['stc_merchant_email'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>Contact - '.$row['stc_merchant_phone'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>GSTIN - '.$row['stc_merchant_gstin'].'</p>
-				             	  	</div>
-			             	 	</div>
-			             	</div>
-		             	</div>
-							               	
-		        ';				
-			}
-		}else{
-			$odin .= '
-					<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-						<a 
-			              href="#" 
-			              class="btn btn-primary btn-block text-uppercase mb-3">
-			              No Records Found!!!
-			            </a>
-					</div>
-
-					';
-		}
-		$odin.='';
-		return $odin;
+	private function stc_h($v){
+		return htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 	}
 
-	// by merchant skf
-	public function stc_search_merchant_byskf($searchmebyskf){
-		$perfectsearchme=strtoupper($searchmebyskf);
-		$alagsequery="
-					SELECT DISTINCT * FROM `stc_merchant` 
-					LEFT JOIN `stc_state` ON `stc_state_id`=`stc_merchant_state_id` 
-					LEFT JOIN `stc_city` ON `stc_city_id`=`stc_merchant_city_id` 
-					WHERE `stc_merchant_specially_known_for` REGEXP '".$searchmebyskf."' ORDER BY `stc_merchant_id` ASC
-					";
-		$check_loki=mysqli_query($this->stc_dbs, $alagsequery);
-		$odin='';               
-		$do_action=mysqli_num_rows($check_loki);
-		if($do_action > 0){
-			foreach ($check_loki as $row) {
-				$correct_stcpdname=strlen($row["stc_merchant_name"]);
-				$odin.='	
-						<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-			             	<div style="padding: 15px; background-color: #fff;border-radius:20px;">
-			             		<div class="row">
-				             	  	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-				             	  		<h5>Merchant Name - '.$row['stc_merchant_name'].'</h5>
-				             	  	</div>
-				             	  	<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-				             	  		<p>Address - '.$row['stc_merchant_address'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>Email - '.$row['stc_merchant_email'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>Contact - '.$row['stc_merchant_phone'].'</p>
-				             	  	</div>
-				             	  	<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-				             	  		<p>GSTIN - '.$row['stc_merchant_gstin'].'</p>
-				             	  	</div>
-			             	 	</div>
-			             	</div>
-		             	</div>
-							               	
-		            	';				
+	private function stc_like_escape($v){
+		return str_replace(array('\\', '%', '_'), array('\\\\', '\\%', '\\_'), $v);
+	}
+
+	public function stc_merchant_category_options(){
+		return array('Manufacturer','Retailer','Wholesaler','Distributor','Dealer','Supplier','Trader','Service Provider','Others');
+	}
+
+	private function stc_merchant_search_where($name, $skf){
+		$name = trim((string) $name);
+		$skf = trim((string) $skf);
+		$where = array('1=1');
+		if($name !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $this->stc_like_escape($name));
+			$where[] = "(
+				`stc_merchant_name` LIKE '%".$esc."%'
+				OR `stc_merchant_address` LIKE '%".$esc."%'
+				OR `stc_merchant_gstin` LIKE '%".$esc."%'
+				OR `stc_merchant_phone` LIKE '%".$esc."%'
+				OR `stc_merchant_email` LIKE '%".$esc."%'
+				OR `stc_merchant_contact_person` LIKE '%".$esc."%'
+				OR `stc_merchant_category` LIKE '%".$esc."%'
+			)";
+		}
+		if($skf !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $this->stc_like_escape($skf));
+			$where[] = "`stc_merchant_specially_known_for` LIKE '%".$esc."%'";
+		}
+		return implode(' AND ', $where);
+	}
+
+	private function stc_num($v){
+		return ($v === null || $v === '') ? 0.0 : (float) $v;
+	}
+
+	private function stc_dash($v){
+		$v = trim((string) $v);
+		return $v === '' ? '—' : $this->stc_h($v);
+	}
+
+	private function stc_merchant_initials($name){
+		$parts = preg_split('/\s+/', strtoupper(trim((string) $name)));
+		$skip = array('AND','&','THE','OF','PVT','LTD','LLP','CO','COMPANY');
+		$letters = '';
+		foreach($parts as $p){
+			$p = preg_replace('/[^A-Z0-9]/', '', $p);
+			if($p === '' || in_array($p, $skip, true)) continue;
+			$letters .= $p[0];
+			if(strlen($letters) >= 2) break;
+		}
+		return $letters !== '' ? $letters : 'M';
+	}
+
+	private function stc_merchant_avatar_color($id){
+		$colors = array('#3f6ad8','#16aaff','#3ac47d','#f7b924','#d92550','#794c8a','#20c997','#e83e8c');
+		return $colors[(int) $id % count($colors)];
+	}
+
+	private function stc_copy_btn($value, $label){
+		$value = trim((string) $value);
+		if($value === '') return '';
+		return '<button type="button" class="stc-mer-copy" data-copy="'.$this->stc_h($value).'" data-label="'.$this->stc_h($label).'" title="Copy '.$this->stc_h($label).'"><i class="fa fa-clone"></i></button>';
+	}
+
+	private function stc_render_merchant_card($row){
+		$id = (int) $row['stc_merchant_id'];
+		$name = isset($row['stc_merchant_name']) ? trim((string) $row['stc_merchant_name']) : '';
+		$city = isset($row['stc_city_name']) ? trim((string) $row['stc_city_name']) : '';
+		$state = isset($row['stc_state_name']) ? trim((string) $row['stc_state_name']) : '';
+		$place = trim($city.(($city && $state) ? ', ' : '').$state);
+		$known = isset($row['stc_merchant_specially_known_for']) ? trim((string) $row['stc_merchant_specially_known_for']) : '';
+		$category = isset($row['stc_merchant_category']) ? trim((string) $row['stc_merchant_category']) : '';
+		$email = isset($row['stc_merchant_email']) ? trim((string) $row['stc_merchant_email']) : '';
+		$phone = isset($row['stc_merchant_phone']) ? trim((string) $row['stc_merchant_phone']) : '';
+		$gstin = isset($row['stc_merchant_gstin']) ? trim((string) $row['stc_merchant_gstin']) : '';
+		$pan = isset($row['stc_merchant_pan']) ? trim((string) $row['stc_merchant_pan']) : '';
+		$person = isset($row['stc_merchant_contact_person']) ? trim((string) $row['stc_merchant_contact_person']) : '';
+		$address = isset($row['stc_merchant_address']) ? trim((string) $row['stc_merchant_address']) : '';
+		$emailHtml = $email !== '' ? '<a href="mailto:'.$this->stc_h($email).'">'.$this->stc_h($email).'</a>' : '—';
+		$phoneHtml = $phone !== '' ? '<a href="tel:'.$this->stc_h($phone).'">'.$this->stc_h($phone).'</a>' : '—';
+		$knownHtml = $known !== '' ? '<span class="stc-mer-chip">'.$this->stc_h($known).'</span>' : '';
+		$categoryHtml = ($category !== '' && strtoupper($category) !== 'NA') ? '<span class="stc-mer-chip stc-mer-chip-cat">'.$this->stc_h($category).'</span>' : '';
+		$placeHtml = $place !== '' ? '<span class="stc-mer-loc"><i class="fa fa-map-marker"></i> '.$this->stc_h($place).'</span>' : '';
+		return '
+			<article class="stc-mer-card">
+				<div class="stc-mer-card-top">
+					<div class="stc-mer-avatar" style="background:'.$this->stc_merchant_avatar_color($id).'">'.$this->stc_h($this->stc_merchant_initials($name)).'</div>
+					<div class="stc-mer-identity">
+						<div class="stc-mer-name-row">
+							<h5 class="stc-mer-name" title="'.$this->stc_h($name).'">'.$this->stc_h($name).'</h5>
+							<span class="stc-mer-id">#'.$id.'</span>
+						</div>
+						<div class="stc-mer-tags">'.$categoryHtml.$knownHtml.$placeHtml.'</div>
+					</div>
+				</div>
+				<p class="stc-mer-address"><i class="fa fa-building-o"></i> '.$this->stc_dash($address).'</p>
+				<div class="stc-mer-facts">
+					<div class="stc-mer-fact">
+						<i class="fa fa-envelope-o"></i>
+						<div><em>Email</em><b>'.$emailHtml.'</b></div>
+						'.$this->stc_copy_btn($email, 'Email').'
+					</div>
+					<div class="stc-mer-fact">
+						<i class="fa fa-phone"></i>
+						<div><em>Contact</em><b>'.$phoneHtml.'</b></div>
+						'.$this->stc_copy_btn($phone, 'Contact').'
+					</div>
+					<div class="stc-mer-fact">
+						<i class="fa fa-id-card-o"></i>
+						<div><em>GSTIN</em><b>'.$this->stc_dash($gstin).'</b></div>
+						'.$this->stc_copy_btn($gstin, 'GSTIN').'
+					</div>
+					<div class="stc-mer-fact">
+						<i class="fa fa-file-text-o"></i>
+						<div><em>PAN</em><b>'.$this->stc_dash($pan).'</b></div>
+						'.$this->stc_copy_btn($pan, 'PAN').'
+					</div>
+					<div class="stc-mer-fact stc-mer-fact-wide">
+						<i class="fa fa-user"></i>
+						<div><em>Contact person</em><b>'.$this->stc_dash($person).'</b></div>
+						'.$this->stc_copy_btn($person, 'Contact person').'
+					</div>
+				</div>
+			</article>
+		';
+	}
+
+	private function stc_render_merchant_table_row($row){
+		$id = (int) $row['stc_merchant_id'];
+		$name = isset($row['stc_merchant_name']) ? trim((string) $row['stc_merchant_name']) : '';
+		$city = isset($row['stc_city_name']) ? trim((string) $row['stc_city_name']) : '';
+		$state = isset($row['stc_state_name']) ? trim((string) $row['stc_state_name']) : '';
+		$place = trim($city.(($city && $state) ? ', ' : '').$state);
+		$known = isset($row['stc_merchant_specially_known_for']) ? trim((string) $row['stc_merchant_specially_known_for']) : '';
+		$category = isset($row['stc_merchant_category']) ? trim((string) $row['stc_merchant_category']) : '';
+		$email = isset($row['stc_merchant_email']) ? trim((string) $row['stc_merchant_email']) : '';
+		$phone = isset($row['stc_merchant_phone']) ? trim((string) $row['stc_merchant_phone']) : '';
+		$gstin = isset($row['stc_merchant_gstin']) ? trim((string) $row['stc_merchant_gstin']) : '';
+		$person = isset($row['stc_merchant_contact_person']) ? trim((string) $row['stc_merchant_contact_person']) : '';
+		return '
+			<tr>
+				<td>
+					<div class="stc-mer-td-name">
+						<span class="stc-mer-avatar sm" style="background:'.$this->stc_merchant_avatar_color($id).'">'.$this->stc_h($this->stc_merchant_initials($name)).'</span>
+						<div>
+							<strong>'.$this->stc_h($name).'</strong>
+							<small>#'.$id.($known !== '' ? ' · '.$this->stc_h($known) : '').'</small>
+						</div>
+					</div>
+				</td>
+				<td>'.$this->stc_dash($category).'</td>
+				<td>'.$this->stc_dash($place).'</td>
+				<td>
+					<div class="stc-mer-td-stack">
+						'.($email !== '' ? '<a href="mailto:'.$this->stc_h($email).'">'.$this->stc_h($email).'</a>' : '—').'
+						<span>'.$this->stc_dash($phone).'</span>
+					</div>
+				</td>
+				<td><code>'.$this->stc_dash($gstin).'</code></td>
+				<td>'.$this->stc_dash($person).'</td>
+			</tr>
+		';
+	}
+
+	private function stc_render_merchant_empty(){
+		return '
+			<div class="stc-mer-empty">
+				<div class="stc-mer-empty-icon"><i class="fa fa-users"></i></div>
+				<h5>No merchants match this search</h5>
+				<p>Try a different name, GSTIN, phone, or specialty.</p>
+			</div>
+		';
+	}
+
+	public function stc_search_merchant_paged($name, $skf, $page = 1, $per_page = 10){
+		$where = $this->stc_merchant_search_where($name, $skf);
+		$from = "
+			FROM `stc_merchant`
+			LEFT JOIN `stc_state` ON `stc_state_id`=`stc_merchant_state_id`
+			LEFT JOIN `stc_city` ON `stc_city_id`=`stc_merchant_city_id`
+			WHERE ".$where."
+		";
+		$total = 0;
+		$cntq = mysqli_query($this->stc_dbs, "SELECT COUNT(DISTINCT `stc_merchant_id`) AS cnt ".$from);
+		if($cntq && ($cr = mysqli_fetch_assoc($cntq))){
+			$total = (int) $cr['cnt'];
+		}
+		$page = max(1, (int) $page);
+		$per_page = max(1, min(50, (int) $per_page));
+		$total_pages = $total > 0 ? (int) ceil($total / $per_page) : 1;
+		if($page > $total_pages){
+			$page = $total_pages;
+		}
+		$offset = ($page - 1) * $per_page;
+		$html = '';
+		$table = '';
+		$qry = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_merchant`.*, `stc_state_name`, `stc_city_name`
+			".$from."
+			ORDER BY `stc_merchant_name` ASC
+			LIMIT ".(int) $offset.", ".(int) $per_page."
+		");
+		if($qry && mysqli_num_rows($qry) > 0){
+			foreach($qry as $row){
+				$html .= $this->stc_render_merchant_card($row);
+				$table .= $this->stc_render_merchant_table_row($row);
 			}
 		}else{
-			$odin .= '
-					<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-						<a 
-			              href="#" 
-			              class="btn btn-primary btn-block text-uppercase mb-3">
-			              No Records Found!!!
-			            </a>
-					</div>
-
-					';
+			$html = $this->stc_render_merchant_empty();
 		}
-		$odin.='';
-		return $odin;
+		$from_row = $total === 0 ? 0 : ($offset + 1);
+		$to_row = min($total, $offset + $per_page);
+		return array(
+			'html' => $html,
+			'table_html' => $table,
+			'total' => $total,
+			'total_pages' => $total_pages,
+			'page' => $page,
+			'per_page' => $per_page,
+			'from' => $from_row,
+			'to' => $to_row
+		);
+	}
+
+	public function stc_search_merchant_byname($searchmebyname){
+		$res = $this->stc_search_merchant_paged($searchmebyname, '', 1, 50);
+		return $res['html'];
+	}
+
+	public function stc_search_merchant_byskf($searchmebyskf){
+		$res = $this->stc_search_merchant_paged('', $searchmebyskf, 1, 50);
+		return $res['html'];
 	}
 
 	// vendor add to table
-	public function stc_vendor_hit($stcmername, $stcmeraddress, $stcmercity, $stcmerstate, $stcmercontperson, $stcmeremail, $stcmercontnumber, $stcmerskf, $stcmerpan, $stcmergst, $stcmerimages){
+	public function stc_vendor_hit($stcmername, $stcmeraddress, $stcmercity, $stcmerstate, $stcmercontperson, $stcmeremail, $stcmercontnumber, $stcmerskf, $stcmerpan, $stcmergst, $stcmerimages, $stcmercategory = ''){
 		$stc_filter_add_merchant=mysqli_real_escape_string($this->stc_dbs, $stcmername);
+		$stcmercategory=mysqli_real_escape_string($this->stc_dbs, $stcmercategory);
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_merchant` 
 			WHERE `stc_merchant_name`='".mysqli_real_escape_string($this->stc_dbs, $stc_filter_add_merchant)."'
@@ -139,6 +263,7 @@ class ragnarMerchants extends tesseract{
 					`stc_merchant_pan`, 
 					`stc_merchant_gstin`, 
 					`stc_merchant_specially_known_for`, 
+					`stc_merchant_category`,
 					`stc_merchant_image`
 				) VALUES(
 					'".$stc_filter_add_merchant."', 
@@ -151,6 +276,7 @@ class ragnarMerchants extends tesseract{
 					'".$stcmerpan."', 
 					'".$stcmergst."', 
 					'".$stcmerskf."', 
+					'".$stcmercategory."',
 					'".$stcmerimages."'
 				)
 			");
@@ -263,7 +389,7 @@ class ragnarMerchants extends tesseract{
 
 				$total_po_qty= 0;
 				foreach($odinallpoqry as $odinallporow){
-					$total_po_qty=$odinallporow['total_po_qty'];
+					$total_po_qty=$this->stc_num($odinallporow['total_po_qty']);
 				}
 
 				$odinpoqry=mysqli_query($this->stc_dbs, "
@@ -283,7 +409,7 @@ class ragnarMerchants extends tesseract{
 
 				$merchant_po_qty= 0;
 				foreach($odinpoqry as $odiporow){
-					$merchant_po_qty=$odiporow['merchant_po_qty'];
+					$merchant_po_qty=$this->stc_num($odiporow['merchant_po_qty']);
 				}
 
 				$odinallgrnqry=mysqli_query($this->stc_dbs, "
@@ -297,7 +423,7 @@ class ragnarMerchants extends tesseract{
 
 				$allgrn_qty= 0;
 				foreach($odinallgrnqry as $odinallgrnrow){
-					$allgrn_qty=$odinallgrnrow['allgrn_qty'];
+					$allgrn_qty=$this->stc_num($odinallgrnrow['allgrn_qty']);
 				}
 
 				$odingrnqry=mysqli_query($this->stc_dbs, "
@@ -317,7 +443,7 @@ class ragnarMerchants extends tesseract{
 
 				$grn_qty= 0;
 				foreach($odingrnqry as $odingrnrow){
-					$grn_qty=$odingrnrow['grn_qty'];
+					$grn_qty=$this->stc_num($odingrnrow['grn_qty']);
 				}
 
 				$odininvqry=mysqli_query($this->stc_dbs, "
@@ -331,7 +457,7 @@ class ragnarMerchants extends tesseract{
 
 				$inv_qty= 0;
 				foreach($odininvqry as $odininvrow){
-					$inv_qty=$odininvrow['inv_qty'];
+					$inv_qty=$this->stc_num($odininvrow['inv_qty']);
 				}
 
 				$odinchallanqry=mysqli_query($this->stc_dbs, "
@@ -345,7 +471,7 @@ class ragnarMerchants extends tesseract{
 
 				$challan_qty= 0;
 				foreach($odinchallanqry as $odinchallanrow){
-					$challan_qty=$odinchallanrow['challan_qty'];
+					$challan_qty=$this->stc_num($odinchallanrow['challan_qty']);
 				}
 
 				$odineinvqry=mysqli_query($this->stc_dbs, "
@@ -359,7 +485,7 @@ class ragnarMerchants extends tesseract{
 
 				$einv_qty= 0;
 				foreach($odineinvqry as $odineinvrow){
-					$einv_qty=$odineinvrow['einv_qty'];
+					$einv_qty=$this->stc_num($odineinvrow['einv_qty']);
 				}
 
 				$odinechallanqry=mysqli_query($this->stc_dbs, "
@@ -373,7 +499,7 @@ class ragnarMerchants extends tesseract{
 
 				$echallan_qty= 0;
 				foreach($odinechallanqry as $odinechallanrow){
-					$echallan_qty=$odinechallanrow['echallan_qty'];
+					$echallan_qty=$this->stc_num($odinechallanrow['echallan_qty']);
 				}
 
 				$odin.='
@@ -405,6 +531,38 @@ class ragnarMerchants extends tesseract{
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Merchant class-------------------------------->
 #<------------------------------------------------------------------------------------------------------>
+if(isset($_POST['stc_search_merchant_paged'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$objloki=new ragnarMerchants();
+	$name=isset($_POST['stcmername']) ? $_POST['stcmername'] : '';
+	$skf=isset($_POST['stcmerskf']) ? $_POST['stcmerskf'] : '';
+	$page=isset($_POST['page']) ? (int) $_POST['page'] : 1;
+	$per_page=isset($_POST['per_page']) ? (int) $_POST['per_page'] : 10;
+	$payload=$objloki->stc_search_merchant_paged($name, $skf, $page, $per_page);
+	$flags=JSON_UNESCAPED_UNICODE;
+	if(defined('JSON_INVALID_UTF8_SUBSTITUTE')){
+		$flags=$flags | JSON_INVALID_UTF8_SUBSTITUTE;
+	}
+	$json=json_encode($payload, $flags);
+	if($json===false){
+		$json=json_encode(array(
+			'html' => '<div class="stc-mer-empty"><h5>Could not load merchants</h5><p>Invalid data encoding.</p></div>',
+			'table_html' => '',
+			'total' => 0,
+			'total_pages' => 1,
+			'page' => 1,
+			'per_page' => $per_page,
+			'from' => 0,
+			'to' => 0
+		));
+	}
+	echo $json;
+	exit;
+}
+
 // by merchant name
 if(isset($_POST['search_mer_byname_var_in'])){
 	$out='';
@@ -459,17 +617,19 @@ if(isset($_POST['stc_add_merchant_hit'])){
 	$stcmeremail=$_POST['stcmeremail'];
 	$stcmercontnumber=$_POST['stcmercontnumber'];
 	$stcmerskf=$_POST['stcmerskf'];
+	$stcmercategory=isset($_POST['stcmercategory']) ? $_POST['stcmercategory'] : 'NA';
 	$stcmerpan=strtoupper($_POST['stcmerpan']);
 	$stcmergst=strtoupper($_POST['stcmergstin']);
 	$stcmerimages='NA';
 
 	$adago=new ragnarMerchants();
+	$allowedCats=$adago->stc_merchant_category_options();
 
-	if(empty($stcmername) || empty($stcmeraddress) || empty($stcmeremail) || empty($stcmercontnumber) || empty($stcmerpan) || empty($stcmergst)){
+	if(empty($stcmername) || empty($stcmeraddress) || empty($stcmeremail) || empty($stcmercontnumber) || empty($stcmerpan) || empty($stcmergst) || $stcmercategory==='NA' || !in_array($stcmercategory, $allowedCats, true)){
 		echo "Please Fill All Fields!!!";
 	}else{
 		// function calling
-		$objadago=$adago->stc_vendor_hit($stcmername, $stcmeraddress, $stcmercity, $stcmerstate, $stcmercontperson, $stcmeremail, $stcmercontnumber, $stcmerskf, $stcmerpan, $stcmergst, $stcmerimages);
+		$objadago=$adago->stc_vendor_hit($stcmername, $stcmeraddress, $stcmercity, $stcmerstate, $stcmercontperson, $stcmeremail, $stcmercontnumber, $stcmerskf, $stcmerpan, $stcmergst, $stcmerimages, $stcmercategory);
 
 		if($objadago == "success"){	
 			echo "Merchant added!!";
