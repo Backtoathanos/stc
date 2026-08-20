@@ -174,6 +174,7 @@
               <tr>
                 <th class="text-center"><input type="checkbox" class="adhoc-source-check-all" title="Select page"></th>
                 <th class="text-center">Source name</th>
+                <th class="text-center">Similar merchant</th>
                 <th class="text-center">Used</th>
                 <th class="text-center">Actions</th>
               </tr>
@@ -384,7 +385,8 @@
 
       function selectedAdhocUsage() {
         var total = 0;
-        $.each(selectedAdhocSources, function(name, count) {
+        $.each(selectedAdhocSources, function(name, meta) {
+          var count = (meta && typeof meta === 'object') ? meta.count : meta;
           total += parseInt(count, 10) || 0;
         });
         return total;
@@ -432,7 +434,7 @@
           $('#rename-old-single-wrap').show();
           $('#rename-old-multi-wrap').hide();
           $('#rename-old-source').val(items[0].source);
-          $('#rename-new-source').val(items[0].source);
+          $('#rename-new-source').val(items[0].similar || items[0].source);
         } else {
           $('#rename-old-single-wrap').hide();
           $('#rename-old-multi-wrap').show();
@@ -441,7 +443,11 @@
           }).join('');
           $('#rename-old-sources-list').html(html);
           $('#rename-old-source').val('');
-          $('#rename-new-source').val(items[0].source);
+          var suggested = '';
+          items.forEach(function(item){
+            if (!suggested && item.similar) suggested = item.similar;
+          });
+          $('#rename-new-source').val(suggested || items[0].source);
         }
         $('#rename-source-hint').text(usage + ' adhoc record(s) will be renamed.');
         $('#rename-source-modal').modal('show');
@@ -463,14 +469,16 @@
           columns: [
             { data: 'select' },
             { data: 'source_name' },
+            { data: 'similar_merchant' },
             { data: 'usage_count' },
             { data: 'actionData' }
           ],
           columnDefs: [
             { orderable: false, targets: 0, className: 'text-center', width: '4%' },
             { targets: 1, className: 'text-left' },
-            { targets: 2, className: 'text-center', width: '12%' },
-            { orderable: false, targets: 3, className: 'text-center', width: '14%' }
+            { orderable: false, targets: 2, className: 'text-left' },
+            { targets: 3, className: 'text-center', width: '10%' },
+            { orderable: false, targets: 4, className: 'text-center', width: '12%' }
           ],
           drawCallback: function() {
             restoreAdhocChecks();
@@ -495,7 +503,7 @@
         var p = parseSourcePayload($(this));
         if (!p || !p.source) return;
         if (this.checked) {
-          selectedAdhocSources[p.source] = p.count || 0;
+          selectedAdhocSources[p.source] = { count: p.count || 0, similar: p.similar || '' };
         } else {
           delete selectedAdhocSources[p.source];
         }
@@ -509,7 +517,7 @@
           if (!p || !p.source) return;
           $(this).prop('checked', checked);
           if (checked) {
-            selectedAdhocSources[p.source] = p.count || 0;
+            selectedAdhocSources[p.source] = { count: p.count || 0, similar: p.similar || '' };
           } else {
             delete selectedAdhocSources[p.source];
           }
@@ -524,7 +532,11 @@
 
       $('#rename-selected-btn').on('click', function(){
         var items = selectedAdhocList().map(function(name){
-          return { source: name, count: selectedAdhocSources[name] || 0 };
+          var meta = selectedAdhocSources[name] || {};
+          if (typeof meta !== 'object') {
+            meta = { count: meta, similar: '' };
+          }
+          return { source: name, count: meta.count || 0, similar: meta.similar || '' };
         });
         openRenameModal(items);
       });

@@ -371,6 +371,139 @@ class MerchantController extends Controller
             )");
     }
 
+    protected $merchantNamesCache = null;
+
+    protected function merchantNamesList(): array
+    {
+        if ($this->merchantNamesCache !== null) {
+            return $this->merchantNamesCache;
+        }
+
+        $out = [];
+        $names = Merchant::query()
+            ->whereNotNull('stc_merchant_name')
+            ->whereRaw("TRIM(stc_merchant_name) <> ''")
+            ->pluck('stc_merchant_name');
+
+        foreach ($names as $name) {
+            $orig = trim((string) $name);
+            if ($orig === '') {
+                continue;
+            }
+            $out[] = [
+                'name' => $orig,
+                'norm' => $this->normalizeComparableName($orig),
+            ];
+        }
+
+        return $this->merchantNamesCache = $out;
+    }
+
+    protected function normalizeComparableName(string $name): string
+    {
+        $n = strtoupper(trim($name));
+        $n = str_replace(['&', '.', ',', '-', '/', '\\', "'", '"', '(', ')', '_'], ' ', $n);
+        $n = preg_replace('/\b(PVT|PRIVATE|LIMITED|LTD|LLP|CO|COMPANY)\b/', ' ', $n);
+        $n = preg_replace('/\s+/', ' ', $n);
+
+        return trim((string) $n);
+    }
+
+    /**
+     * Closest merchant master names for a free-text adhoc source.
+     *
+     * @return array<int, array{name: string, pct: int}>
+     */
+    protected function similarMerchantMatches(string $source, int $limit = 2): array
+    {
+        $srcNorm = $this->normalizeComparableName($source);
+        if ($srcNorm === '' || strlen($srcNorm) < 4) {
+            return [];
+        }
+
+        $srcLen = strlen($srcNorm);
+        $scored = [];
+
+        foreach ($this->merchantNamesList() as $m) {
+            $merNorm = $m['norm'];
+            if ($merNorm === '') {
+                continue;
+            }
+
+            $pct = 0.0;
+            similar_text($srcNorm, $merNorm, $pct);
+            $merLen = strlen($merNorm);
+            $lev = ($srcLen <= 255 && $merLen <= 255) ? levenshtein($srcNorm, $merNorm) : null;
+            $contains = (strpos($merNorm, $srcNorm) !== false || strpos($srcNorm, $merNorm) !== false);
+            $maxLen = max($srcLen, $merLen);
+            $relLev = ($lev !== null && $maxLen > 0) ? ($lev / $maxLen) : 1;
+
+            $ok = $pct >= 72
+                || ($lev !== null && $lev <= 3 && abs($srcLen - $merLen) <= 8)
+                || ($contains && $pct >= 55 && min($srcLen, $merLen) >= 6)
+                || ($relLev <= 0.2 && $pct >= 60);
+
+            if (!$ok) {
+                continue;
+            }
+
+            $score = $pct;
+            if ($lev !== null) {
+                $score += max(0, 25 - $lev);
+            }
+            if ($contains) {
+                $score += 12;
+            }
+
+            $scored[] = [
+                'name' => $m['name'],
+                'pct' => (int) round($pct),
+                'score' => $score,
+            ];
+        }
+
+        usort($scored, function ($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        $top = [];
+        $seen = [];
+        foreach ($scored as $row) {
+            $key = strtoupper(trim($row['name']));
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $top[] = ['name' => $row['name'], 'pct' => $row['pct']];
+            if (count($top) >= $limit) {
+                break;
+            }
+        }
+
+        return $top;
+    }
+
+    protected function similarMerchantHtml(string $source): array
+    {
+        $matches = $this->similarMerchantMatches($source);
+        if ($matches === []) {
+            return ['html' => '<span class="text-muted">—</span>', 'best' => ''];
+        }
+
+        $parts = [];
+        foreach ($matches as $m) {
+            $parts[] = '<div>'
+                . $this->e($m['name'])
+                . ' <small class="text-muted">(' . $this->e($m['pct']) . '%)</small>'
+                . '</div>';
+        }
+
+        return [
+            'html' => implode('', $parts),
+            'best' => $matches[0]['name'],
+        ];
+    }
+
     protected function merchantNameKeys(): array
     {
         $keys = [];
@@ -407,6 +540,7 @@ class MerchantController extends Controller
         $orderMap = [
             'select' => 'source_name',
             'source_name' => 'source_name',
+            'similar_merchant' => 'source_name',
             'usage_count' => 'usage_count',
             'actionData' => 'source_name',
         ];
@@ -443,14 +577,17 @@ class MerchantController extends Controller
         foreach ($records as $record) {
             $name = (string) $record->source_name;
             $count = (int) $record->usage_count;
+            $similar = $this->similarMerchantHtml($name);
             $payload = htmlspecialchars(json_encode([
                 'source' => $name,
                 'count' => $count,
+                'similar' => $similar['best'],
             ]), ENT_QUOTES, 'UTF-8');
 
             $data_arr[] = [
                 'select' => '<input type="checkbox" class="adhoc-source-check" data-source="' . $payload . '">',
                 'source_name' => '<span>' . $this->e($name) . '</span>',
+                'similar_merchant' => $similar['html'],
                 'usage_count' => '<span class="d-block text-center">' . $this->e($count) . '</span>',
                 'actionData' => '<a href="javascript:void(0)" class="btn btn-primary btn-sm rename-source-btn" data-source="' . $payload . '"><i class="fas fa-edit" title="Rename"></i> Rename</a>',
             ];
