@@ -20,6 +20,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\RackController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\branchElectronicsController;
 use App\Http\Controllers\branchSiteController;
 use App\Http\Controllers\SchoolController;
@@ -169,6 +170,15 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/master/product/create', [ProductController::class, 'create']); 
     Route::post('/master/product/edit', [ProductController::class, 'update']);    
     Route::get('/master/product/delete', [ProductController::class, 'delete']);
+
+    //  merchant through ajax
+    Route::get('/master/merchant', [MerchantController::class, 'show']);
+    Route::get('/master/merchant/list', [MerchantController::class, 'list']);
+    Route::post('/master/merchant/create', [MerchantController::class, 'create']);
+    Route::post('/master/merchant/edit', [MerchantController::class, 'update']);
+    Route::get('/master/merchant/delete', [MerchantController::class, 'delete']);
+    Route::get('/master/merchant/adhoc-sources/list', [MerchantController::class, 'adhocSourcesList']);
+    Route::post('/master/merchant/adhoc-sources/rename', [MerchantController::class, 'adhocSourceRename']);
 
     // for electronics branch
     Route::get('/branch/electronicsbranch', [branchElectronicsController::class, 'show']);  
