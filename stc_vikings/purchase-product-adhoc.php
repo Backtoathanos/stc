@@ -830,6 +830,86 @@ include("kattegat/role_check.php");
       .modal-backdrop {
           z-index: 30090 !important;
       }
+      .bd-modal-merchant-sync-rename,
+      .bd-modal-merchant-sync-add {
+          z-index: 30120;
+      }
+      .bd-modal-merchant-sync-rename label,
+      .bd-modal-merchant-sync-add label,
+      .bd-modal-merchant-sync-rename .stc-mersync-label,
+      .bd-modal-merchant-sync-add .stc-mersync-label {
+          position: relative !important;
+          left: auto !important;
+          top: auto !important;
+          right: auto !important;
+          transform: none !important;
+          display: block;
+          margin: 0 0 6px;
+          font-size: 13px;
+          font-weight: 600;
+          color: #495057;
+          line-height: 1.3;
+      }
+      .bd-modal-merchant-sync-rename .form-group,
+      .bd-modal-merchant-sync-add .form-group {
+          position: relative;
+          margin-bottom: 14px;
+      }
+      .bd-modal-merchant-sync-rename .form-control,
+      .bd-modal-merchant-sync-add .form-control {
+          display: block;
+          width: 100%;
+          height: 38px;
+          padding: 6px 12px;
+      }
+      .stc-mersync-table {
+          width: 100%;
+          font-size: 13px;
+      }
+      .stc-mersync-table th {
+          white-space: nowrap;
+          background: #f8f9fa;
+      }
+      .stc-mersync-sort {
+          cursor: pointer;
+          user-select: none;
+      }
+      .stc-mersync-sort:after {
+          content: "\f0dc";
+          font-family: FontAwesome;
+          margin-left: 6px;
+          opacity: .35;
+          font-size: 12px;
+      }
+      .stc-mersync-sort.is-asc:after {
+          content: "\f0de";
+          opacity: 1;
+      }
+      .stc-mersync-sort.is-desc:after {
+          content: "\f0dd";
+          opacity: 1;
+      }
+      .stc-mersync-table td {
+          vertical-align: middle !important;
+      }
+      .stc-mersync-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 10px;
+      }
+      .stc-mersync-search {
+          display: flex;
+          gap: 6px;
+          flex: 1 1 280px;
+      }
+      .stc-mersync-empty {
+          text-align: center;
+          color: #888;
+          padding: 28px 8px;
+      }
       .stc-poa-product-cell {
           min-width: 380px;
           max-width: 520px;
@@ -1442,6 +1522,14 @@ include("kattegat/role_check.php");
                                             title="Reset Items"
                                             aria-label="Reset Items"
                                           ><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-info stc-poa-merchant-sync"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-merchant-sync"
+                                            href="javascript:void(0)"
+                                            title="Sync Merchants"
+                                            aria-label="Sync Merchants"
+                                          ><i class="fa fa-user-plus" aria-hidden="true"></i></a>
                                         </div>
 
                                         <button
@@ -4763,6 +4851,259 @@ include("kattegat/role_check.php");
               });
           });
 
+          var merSyncPage = 1;
+          var merSyncSelected = {};
+          var merSyncSort = 'source';
+          var merSyncDir = 'asc';
+
+          function merSyncEsc(s) {
+            return $('<div>').text(s == null ? '' : String(s)).html();
+          }
+
+          function merSyncSelectedList() {
+            return Object.keys(merSyncSelected);
+          }
+
+          function merSyncUpdateSelectedUi() {
+            var n = merSyncSelectedList().length;
+            $('#stc-mersync-selected-count').text(n + ' selected');
+            $('#stc-mersync-rename-selected-btn').prop('disabled', n < 1);
+            var $checks = $('#stc-mersync-tbody .stc-mersync-check');
+            var pageCount = $checks.length;
+            var pageChecked = $checks.filter(':checked').length;
+            var $all = $('#stc-mersync-check-all');
+            $all.prop('checked', pageCount > 0 && pageChecked === pageCount);
+            $all.prop('indeterminate', pageChecked > 0 && pageChecked < pageCount);
+          }
+
+          function merSyncOpenRename(items) {
+            items = items || [];
+            if (!items.length) {
+              stcAlert('Select at least one source.');
+              return;
+            }
+            var names = items.map(function(item){ return item.source; });
+            var usage = 0;
+            items.forEach(function(item){ usage += parseInt(item.count, 10) || 0; });
+            $('#stc-mersync-rename-olds').val(JSON.stringify(names));
+            if (items.length === 1) {
+              $('#stc-mersync-rename-single-wrap').show();
+              $('#stc-mersync-rename-multi-wrap').hide();
+              $('#stc-mersync-rename-old').val(items[0].source);
+              $('#stc-mersync-rename-new').val(items[0].best || items[0].source);
+            } else {
+              $('#stc-mersync-rename-single-wrap').hide();
+              $('#stc-mersync-rename-multi-wrap').show();
+              var html = items.map(function(item){
+                return '<div>' + merSyncEsc(item.source + ' (' + item.count + ')') + '</div>';
+              }).join('');
+              $('#stc-mersync-rename-list').html(html);
+              $('#stc-mersync-rename-old').val('');
+              var suggested = '';
+              items.forEach(function(item){
+                if (!suggested && item.best) suggested = item.best;
+              });
+              $('#stc-mersync-rename-new').val(suggested || items[0].source);
+            }
+            $('#stc-mersync-rename-hint').text(usage + ' adhoc record(s) will be renamed.');
+            $('.bd-modal-merchant-sync-rename').modal('show');
+          }
+
+          function merSyncUpdateSortUi() {
+            $('.stc-mersync-sort').removeClass('is-asc is-desc');
+            $('.stc-mersync-sort[data-sort="' + merSyncSort + '"]').addClass(merSyncDir === 'desc' ? 'is-desc' : 'is-asc');
+          }
+
+          function merSyncLoad(page) {
+            merSyncPage = page || 1;
+            $('#stc-mersync-tbody').html('<tr><td colspan="5" class="stc-mersync-empty">Loading…</td></tr>');
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: {
+                stc_adhoc_source_sync_list: 1,
+                search: $('#stc-mersync-search').val() || '',
+                page: merSyncPage,
+                per_page: 25,
+                sort: merSyncSort,
+                dir: merSyncDir
+              },
+              success: function(res) {
+                if (!res || res.ok !== true) {
+                  $('#stc-mersync-tbody').html('<tr><td colspan="5" class="stc-mersync-empty">Could not load sources.</td></tr>');
+                  return;
+                }
+                merSyncUpdateSortUi();
+                var rows = res.rows || [];
+                if (!rows.length) {
+                  $('#stc-mersync-tbody').html('<tr><td colspan="5" class="stc-mersync-empty">No unmatched adhoc sources.</td></tr>');
+                  $('#stc-mersync-pageinfo').text('');
+                  $('#stc-mersync-pagination').empty();
+                  merSyncUpdateSelectedUi();
+                  return;
+                }
+                var html = '';
+                rows.forEach(function(row) {
+                  var payloadEnc = encodeURIComponent(JSON.stringify({
+                    source: row.source,
+                    count: row.count,
+                    best: row.best || ''
+                  }));
+                  var similar = (row.similar_text && row.similar_text.length)
+                    ? merSyncEsc(row.similar_text.join(' · '))
+                    : '<span class="text-muted">—</span>';
+                  var checked = merSyncSelected.hasOwnProperty(row.source) ? ' checked' : '';
+                  html += '<tr>'
+                    + '<td class="text-center"><input type="checkbox" class="stc-mersync-check" data-row="' + payloadEnc + '"' + checked + '></td>'
+                    + '<td>' + merSyncEsc(row.source) + '</td>'
+                    + '<td>' + similar + '</td>'
+                    + '<td class="text-center">' + merSyncEsc(row.count) + '</td>'
+                    + '<td class="text-center nowrap">'
+                    + '<button type="button" class="btn btn-primary btn-xs stc-mersync-rename-btn" data-row="' + payloadEnc + '"><i class="fa fa-pencil"></i> Rename</button> '
+                    + '<button type="button" class="btn btn-success btn-xs stc-mersync-add-btn" data-row="' + payloadEnc + '"><i class="fa fa-plus"></i> Add merchant</button>'
+                    + '</td>'
+                    + '</tr>';
+                });
+                $('#stc-mersync-tbody').html(html);
+                $('#stc-mersync-pageinfo').text('Showing ' + res.from + '–' + res.to + ' of ' + res.total);
+                var pg = '';
+                if (res.page > 1) pg += '<button type="button" class="btn btn-default btn-sm stc-mersync-pg" data-page="' + (res.page - 1) + '">Prev</button> ';
+                pg += '<span class="text-muted">Page ' + res.page + ' / ' + res.pages + '</span> ';
+                if (res.page < res.pages) pg += '<button type="button" class="btn btn-default btn-sm stc-mersync-pg" data-page="' + (res.page + 1) + '">Next</button>';
+                $('#stc-mersync-pagination').html(pg);
+                merSyncUpdateSelectedUi();
+              },
+              error: function() {
+                $('#stc-mersync-tbody').html('<tr><td colspan="5" class="stc-mersync-empty">Could not load sources.</td></tr>');
+              }
+            });
+          }
+
+          function merSyncParseRow($el) {
+            var raw = $el.attr('data-row') || '';
+            try { return JSON.parse(decodeURIComponent(raw)); } catch (e) { return null; }
+          }
+
+          $('.bd-modal-merchant-sync').on('shown.bs.modal', function(){
+            merSyncLoad(1);
+          });
+
+          $('#stc-mersync-search-btn').on('click', function(){ merSyncLoad(1); });
+          $('#stc-mersync-search').on('keydown', function(e){
+            if (e.which === 13) { e.preventDefault(); merSyncLoad(1); }
+          });
+          $('body').delegate('.stc-mersync-sort', 'click', function(){
+            var sort = $(this).attr('data-sort') || 'source';
+            if (merSyncSort === sort) {
+              merSyncDir = merSyncDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              merSyncSort = sort;
+              merSyncDir = sort === 'count' ? 'desc' : 'asc';
+            }
+            merSyncUpdateSortUi();
+            merSyncLoad(1);
+          });
+          $('body').delegate('.stc-mersync-pg', 'click', function(){
+            merSyncLoad(parseInt($(this).attr('data-page'), 10) || 1);
+          });
+          $('body').delegate('.stc-mersync-check', 'change', function(){
+            var p = merSyncParseRow($(this));
+            if (!p || !p.source) return;
+            if (this.checked) {
+              merSyncSelected[p.source] = { count: p.count || 0, best: p.best || '' };
+            } else {
+              delete merSyncSelected[p.source];
+            }
+            merSyncUpdateSelectedUi();
+          });
+          $('#stc-mersync-check-all').on('change', function(){
+            var checked = this.checked;
+            $('#stc-mersync-tbody .stc-mersync-check').each(function(){
+              var p = merSyncParseRow($(this));
+              if (!p || !p.source) return;
+              $(this).prop('checked', checked);
+              if (checked) merSyncSelected[p.source] = { count: p.count || 0, best: p.best || '' };
+              else delete merSyncSelected[p.source];
+            });
+            merSyncUpdateSelectedUi();
+          });
+          $('#stc-mersync-clear-btn').on('click', function(){
+            merSyncSelected = {};
+            $('#stc-mersync-tbody .stc-mersync-check').prop('checked', false);
+            merSyncUpdateSelectedUi();
+          });
+          $('#stc-mersync-rename-selected-btn').on('click', function(){
+            var items = merSyncSelectedList().map(function(name){
+              var meta = merSyncSelected[name] || {};
+              return { source: name, count: meta.count || 0, best: meta.best || '' };
+            });
+            merSyncOpenRename(items);
+          });
+          $('body').delegate('.stc-mersync-rename-btn', 'click', function(){
+            var p = merSyncParseRow($(this));
+            if (!p) { stcAlert('Could not load source.'); return; }
+            merSyncOpenRename([p]);
+          });
+          $('body').delegate('.stc-mersync-add-btn', 'click', function(){
+            var p = merSyncParseRow($(this));
+            if (!p) { stcAlert('Could not load source.'); return; }
+            $('#stc-mersync-add-name').val(p.source || '');
+            $('#stc-mersync-add-category').val('');
+            $('.bd-modal-merchant-sync-add').modal('show');
+          });
+          $('.bd-modal-merchant-sync-rename, .bd-modal-merchant-sync-add').on('hidden.bs.modal', function(){
+            if ($('.bd-modal-merchant-sync').hasClass('in') || $('.bd-modal-merchant-sync').hasClass('show')) {
+              $('body').addClass('modal-open');
+            }
+          });
+          $('#stc-mersync-rename-save').on('click', function(){
+            var newSource = $.trim($('#stc-mersync-rename-new').val() || '');
+            var olds = [];
+            try { olds = JSON.parse($('#stc-mersync-rename-olds').val() || '[]'); } catch (e) { olds = []; }
+            if (!newSource) { stcAlert('Enter a new source name.'); return; }
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: { stc_adhoc_source_rename: 1, old_sources: olds, new_source: newSource },
+              success: function(res) {
+                if (res && res.ok) {
+                  $('.bd-modal-merchant-sync-rename').modal('hide');
+                  merSyncSelected = {};
+                  merSyncLoad(merSyncPage);
+                  stcAlert(res.message || 'Renamed.', 'success');
+                } else {
+                  stcAlert((res && res.message) || 'Rename failed.');
+                }
+              },
+              error: function(){ stcAlert('Rename failed.'); }
+            });
+          });
+          $('#stc-mersync-add-save').on('click', function(){
+            var name = $.trim($('#stc-mersync-add-name').val() || '');
+            var category = $.trim($('#stc-mersync-add-category').val() || '');
+            if (!name) { stcAlert('Enter merchant name.'); return; }
+            if (!category) { stcAlert('Select merchant category.'); return; }
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: { stc_merchant_quick_add: 1, name: name, category: category },
+              success: function(res) {
+                if (res && res.ok) {
+                  $('.bd-modal-merchant-sync-add').modal('hide');
+                  merSyncSelected = {};
+                  merSyncLoad(merSyncPage);
+                  stcAlert(res.message || 'Merchant added.', 'success');
+                } else {
+                  stcAlert((res && res.message) || 'Could not add merchant.');
+                }
+              },
+              error: function(){ stcAlert('Could not add merchant.'); }
+            });
+          });
+
           
         });
 
@@ -5871,6 +6212,120 @@ include("kattegat/role_check.php");
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-merchant-sync" tabindex="-1" role="dialog" aria-labelledby="stcMerSyncTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stcMerSyncTitle">Sync Merchants</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Distinct adhoc sources that are not already in merchant master. Rename updates every matching adhoc row. Add merchant creates a master record (name + category only).</p>
+                <div class="stc-mersync-bar">
+                    <div class="stc-mersync-search">
+                        <input type="text" class="form-control" id="stc-mersync-search" placeholder="Search source name…">
+                        <button type="button" class="btn btn-success" id="stc-mersync-search-btn"><i class="fa fa-search"></i></button>
+                    </div>
+                    <div>
+                        <span class="text-muted" id="stc-mersync-selected-count">0 selected</span>
+                        <button type="button" class="btn btn-default btn-sm" id="stc-mersync-clear-btn">Clear</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="stc-mersync-rename-selected-btn" disabled>Rename selected</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm stc-mersync-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:36px;"><input type="checkbox" id="stc-mersync-check-all"></th>
+                                <th class="stc-mersync-sort is-asc" data-sort="source">Source name</th>
+                                <th class="stc-mersync-sort" data-sort="similar">Similar merchant</th>
+                                <th class="text-center stc-mersync-sort" data-sort="count">Used</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stc-mersync-tbody">
+                            <tr><td colspan="5" class="stc-mersync-empty">Open to load sources…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="stc-mersync-bar">
+                    <span class="text-muted" id="stc-mersync-pageinfo"></span>
+                    <div id="stc-mersync-pagination"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-merchant-sync-rename" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rename Source</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" id="stc-mersync-rename-single-wrap">
+                    <span class="stc-mersync-label">Current name</span>
+                    <input type="text" class="form-control" id="stc-mersync-rename-old" readonly>
+                </div>
+                <div class="form-group" id="stc-mersync-rename-multi-wrap" style="display:none;">
+                    <span class="stc-mersync-label">Selected names</span>
+                    <div id="stc-mersync-rename-list" class="well well-sm" style="max-height:140px;overflow:auto;margin-bottom:0;"></div>
+                </div>
+                <input type="hidden" id="stc-mersync-rename-olds">
+                <div class="form-group">
+                    <span class="stc-mersync-label">New name</span>
+                    <input type="text" class="form-control" id="stc-mersync-rename-new" placeholder="Enter new source name">
+                    <small class="text-muted" id="stc-mersync-rename-hint"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="stc-mersync-rename-save">Rename all</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-merchant-sync-add" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Merchant</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <span class="stc-mersync-label">Merchant name</span>
+                    <input type="text" class="form-control" id="stc-mersync-add-name" placeholder="Enter merchant name">
+                </div>
+                <div class="form-group">
+                    <span class="stc-mersync-label">Merchant category</span>
+                    <select class="form-control" id="stc-mersync-add-category">
+                        <option value="">Select category</option>
+                        <option value="Manufacturer">Manufacturer</option>
+                        <option value="Retailer">Retailer</option>
+                        <option value="Wholesaler">Wholesaler</option>
+                        <option value="Distributor">Distributor</option>
+                        <option value="Dealer">Dealer</option>
+                        <option value="Supplier">Supplier</option>
+                        <option value="Trader">Trader</option>
+                        <option value="Service Provider">Service Provider</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="stc-mersync-add-save">Save</button>
             </div>
         </div>
     </div>

@@ -526,6 +526,322 @@ class ragnarMerchants extends tesseract{
 		}
 		return $odin;
 	}
+
+	private $stc_mer_names_cache = null;
+
+	private function stc_normalize_comparable_name($name){
+		$n = strtoupper(trim((string) $name));
+		$n = str_replace(array('&', '.', ',', '-', '/', '\\', "'", '"', '(', ')', '_'), ' ', $n);
+		$n = preg_replace('/\b(PVT|PRIVATE|LIMITED|LTD|LLP|CO|COMPANY)\b/', ' ', $n);
+		$n = preg_replace('/\s+/', ' ', $n);
+		return trim((string) $n);
+	}
+
+	private function stc_merchant_names_list(){
+		if($this->stc_mer_names_cache !== null){
+			return $this->stc_mer_names_cache;
+		}
+		$out = array();
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT TRIM(`stc_merchant_name`) AS n
+			FROM `stc_merchant`
+			WHERE `stc_merchant_name` IS NOT NULL
+			  AND TRIM(`stc_merchant_name`) <> ''
+		");
+		if($q){
+			while($row = mysqli_fetch_assoc($q)){
+				$orig = trim((string) $row['n']);
+				if($orig === '') continue;
+				$out[] = array(
+					'name' => $orig,
+					'norm' => $this->stc_normalize_comparable_name($orig),
+					'key' => strtoupper($orig)
+				);
+			}
+		}
+		$this->stc_mer_names_cache = $out;
+		return $out;
+	}
+
+	private function stc_similar_merchant_matches($source, $limit = 2){
+		$srcNorm = $this->stc_normalize_comparable_name($source);
+		if($srcNorm === '' || strlen($srcNorm) < 4){
+			return array();
+		}
+		$srcLen = strlen($srcNorm);
+		$scored = array();
+		foreach($this->stc_merchant_names_list() as $m){
+			$merNorm = $m['norm'];
+			if($merNorm === '') continue;
+			$pct = 0.0;
+			similar_text($srcNorm, $merNorm, $pct);
+			$merLen = strlen($merNorm);
+			$lev = ($srcLen <= 255 && $merLen <= 255) ? levenshtein($srcNorm, $merNorm) : null;
+			$contains = (strpos($merNorm, $srcNorm) !== false || strpos($srcNorm, $merNorm) !== false);
+			$maxLen = max($srcLen, $merLen);
+			$relLev = ($lev !== null && $maxLen > 0) ? ($lev / $maxLen) : 1;
+			$ok = $pct >= 72
+				|| ($lev !== null && $lev <= 3 && abs($srcLen - $merLen) <= 8)
+				|| ($contains && $pct >= 55 && min($srcLen, $merLen) >= 6)
+				|| ($relLev <= 0.2 && $pct >= 60);
+			if(!$ok) continue;
+			$score = $pct;
+			if($lev !== null) $score += max(0, 25 - $lev);
+			if($contains) $score += 12;
+			$scored[] = array('name' => $m['name'], 'pct' => (int) round($pct), 'score' => $score);
+		}
+		usort($scored, function($a, $b){
+			if($a['score'] == $b['score']) return 0;
+			return ($a['score'] > $b['score']) ? -1 : 1;
+		});
+		$top = array();
+		$seen = array();
+		foreach($scored as $row){
+			$key = strtoupper(trim($row['name']));
+			if(isset($seen[$key])) continue;
+			$seen[$key] = true;
+			$top[] = array('name' => $row['name'], 'pct' => $row['pct']);
+			if(count($top) >= $limit) break;
+		}
+		return $top;
+	}
+
+	private function stc_adhoc_source_row_payload($name, $count){
+		$matches = $this->stc_similar_merchant_matches($name, 2);
+		$similar = array();
+		foreach($matches as $m){
+			$similar[] = $m['name'].' ('.$m['pct'].'%)';
+		}
+		return array(
+			'source' => $name,
+			'count' => (int) $count,
+			'similar' => $matches,
+			'similar_text' => $similar,
+			'best' => isset($matches[0]['name']) ? $matches[0]['name'] : ''
+		);
+	}
+
+	public function stc_adhoc_source_sync_list($search, $page, $per_page, $sort = 'source', $dir = 'asc'){
+		$search = trim((string) $search);
+		$page = max(1, (int) $page);
+		$per_page = (int) $per_page;
+		if($per_page < 10) $per_page = 25;
+		if($per_page > 100) $per_page = 100;
+		$allowedSort = array('source' => 'source_name', 'count' => 'usage_count', 'similar' => 'similar');
+		if(!isset($allowedSort[$sort])) $sort = 'source';
+		$dir = strtolower((string) $dir) === 'desc' ? 'desc' : 'asc';
+		$offset = ($page - 1) * $per_page;
+
+		$where = "
+			A.`stc_purchase_product_adhoc_source` IS NOT NULL
+			AND TRIM(A.`stc_purchase_product_adhoc_source`) <> ''
+			AND NOT EXISTS (
+				SELECT 1 FROM `stc_merchant` M
+				WHERE UPPER(TRIM(M.`stc_merchant_name`)) = UPPER(TRIM(A.`stc_purchase_product_adhoc_source`))
+			)
+		";
+		if($search !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $this->stc_like_escape($search));
+			$where .= " AND TRIM(A.`stc_purchase_product_adhoc_source`) LIKE '%".$esc."%'";
+		}
+
+		$total = 0;
+		$cntq = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(DISTINCT TRIM(A.`stc_purchase_product_adhoc_source`)) AS c
+			FROM `stc_purchase_product_adhoc` A
+			WHERE ".$where."
+		");
+		if($cntq && ($crow = mysqli_fetch_assoc($cntq))){
+			$total = (int) $crow['c'];
+		}
+		$pages = max(1, (int) ceil($total / $per_page));
+		if($page > $pages) $page = $pages;
+		$offset = ($page - 1) * $per_page;
+
+		$rows = array();
+		if($sort === 'similar'){
+			$q = mysqli_query($this->stc_dbs, "
+				SELECT
+					TRIM(A.`stc_purchase_product_adhoc_source`) AS source_name,
+					COUNT(*) AS usage_count
+				FROM `stc_purchase_product_adhoc` A
+				WHERE ".$where."
+				GROUP BY TRIM(A.`stc_purchase_product_adhoc_source`)
+			");
+			$all = array();
+			if($q){
+				while($r = mysqli_fetch_assoc($q)){
+					$name = isset($r['source_name']) ? (string) $r['source_name'] : '';
+					$all[] = $this->stc_adhoc_source_row_payload($name, $r['usage_count']);
+				}
+			}
+			usort($all, function($a, $b) use ($dir){
+				$av = strtoupper((string) $a['best']);
+				$bv = strtoupper((string) $b['best']);
+				$aEmpty = ($av === '');
+				$bEmpty = ($bv === '');
+				if($aEmpty !== $bEmpty){
+					return $aEmpty ? 1 : -1;
+				}
+				$cmp = strcmp($av, $bv);
+				if($cmp === 0) $cmp = strcasecmp((string) $a['source'], (string) $b['source']);
+				return $dir === 'desc' ? -$cmp : $cmp;
+			});
+			$rows = array_slice($all, $offset, $per_page);
+		} else {
+			$orderCol = $allowedSort[$sort];
+			$q = mysqli_query($this->stc_dbs, "
+				SELECT
+					TRIM(A.`stc_purchase_product_adhoc_source`) AS source_name,
+					COUNT(*) AS usage_count
+				FROM `stc_purchase_product_adhoc` A
+				WHERE ".$where."
+				GROUP BY TRIM(A.`stc_purchase_product_adhoc_source`)
+				ORDER BY ".$orderCol." ".$dir.", source_name ASC
+				LIMIT ".(int)$offset.", ".(int)$per_page."
+			");
+			if($q){
+				while($r = mysqli_fetch_assoc($q)){
+					$name = isset($r['source_name']) ? (string) $r['source_name'] : '';
+					$rows[] = $this->stc_adhoc_source_row_payload($name, $r['usage_count']);
+				}
+			}
+		}
+
+		$from = $total === 0 ? 0 : (($page - 1) * $per_page) + 1;
+		$to = min($total, $page * $per_page);
+		return array(
+			'ok' => true,
+			'total' => $total,
+			'page' => $page,
+			'pages' => $pages,
+			'from' => $from,
+			'to' => $to,
+			'sort' => $sort,
+			'dir' => $dir,
+			'rows' => $rows,
+			'categories' => $this->stc_merchant_category_options()
+		);
+	}
+
+	public function stc_adhoc_source_rename($olds, $new){
+		$new = trim((string) $new);
+		if($new === ''){
+			return array('ok' => false, 'message' => 'New name cannot be empty.');
+		}
+		if(!is_array($olds)) $olds = array($olds);
+		$unique = array();
+		foreach($olds as $n){
+			$n = trim((string) $n);
+			if($n === '') continue;
+			$unique[$n] = $n;
+		}
+		$olds = array_values($unique);
+		if($olds === array()){
+			return array('ok' => false, 'message' => 'Select at least one source.');
+		}
+
+		$merchantKeys = array();
+		foreach($this->stc_merchant_names_list() as $m){
+			$merchantKeys[$m['key']] = true;
+		}
+
+		$skipped = array();
+		$toUpdate = array();
+		foreach($olds as $name){
+			$key = strtoupper($name);
+			if(isset($merchantKeys[$key])){
+				$skipped[] = $name;
+				continue;
+			}
+			if($name === $new) continue;
+			$toUpdate[] = $name;
+		}
+		if($toUpdate === array()){
+			return array(
+				'ok' => false,
+				'message' => $skipped !== array()
+					? 'Skipped — selected name(s) already exist in merchant master.'
+					: 'New name is the same as the current name.'
+			);
+		}
+
+		$updated = 0;
+		foreach($toUpdate as $old){
+			$escOld = mysqli_real_escape_string($this->stc_dbs, $old);
+			$escNew = mysqli_real_escape_string($this->stc_dbs, $new);
+			$uq = mysqli_query($this->stc_dbs, "
+				UPDATE `stc_purchase_product_adhoc`
+				SET `stc_purchase_product_adhoc_source`='".$escNew."'
+				WHERE TRIM(`stc_purchase_product_adhoc_source`)='".$escOld."'
+			");
+			if($uq) $updated += mysqli_affected_rows($this->stc_dbs);
+		}
+
+		$fromLabel = count($toUpdate) === 1 ? '"'.$toUpdate[0].'"' : count($toUpdate).' source names';
+		$msg = $updated.' record(s) renamed from '.$fromLabel.' to "'.$new.'".';
+		if($skipped !== array()){
+			$msg .= ' Skipped '.count($skipped).' name(s) already in merchant master.';
+		}
+		return array('ok' => true, 'message' => $msg, 'updated' => $updated, 'skipped' => $skipped);
+	}
+
+	public function stc_merchant_quick_add($name, $category){
+		$name = strtoupper(trim((string) $name));
+		$category = trim((string) $category);
+		$allowed = $this->stc_merchant_category_options();
+		if($name === ''){
+			return array('ok' => false, 'message' => 'Merchant name is required.');
+		}
+		if(!in_array($category, $allowed, true)){
+			return array('ok' => false, 'message' => 'Select a valid merchant category.');
+		}
+		$escName = mysqli_real_escape_string($this->stc_dbs, $name);
+		$chk = mysqli_query($this->stc_dbs, "
+			SELECT `stc_merchant_id` FROM `stc_merchant`
+			WHERE UPPER(TRIM(`stc_merchant_name`))='".$escName."'
+			LIMIT 1
+		");
+		if($chk && mysqli_num_rows($chk) > 0){
+			return array('ok' => false, 'message' => 'This merchant name already exists.');
+		}
+		$escCat = mysqli_real_escape_string($this->stc_dbs, $category);
+		$ins = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_merchant`(
+				`stc_merchant_name`,
+				`stc_merchant_address`,
+				`stc_merchant_city_id`,
+				`stc_merchant_state_id`,
+				`stc_merchant_contact_person`,
+				`stc_merchant_email`,
+				`stc_merchant_phone`,
+				`stc_merchant_pan`,
+				`stc_merchant_gstin`,
+				`stc_merchant_specially_known_for`,
+				`stc_merchant_category`,
+				`stc_merchant_image`,
+				`stc_merchant_found_by`
+			) VALUES (
+				'".$escName."',
+				'',
+				65,
+				16,
+				'',
+				'',
+				'',
+				'',
+				'',
+				'',
+				'".$escCat."',
+				NULL,
+				0
+			)
+		");
+		if($ins){
+			return array('ok' => true, 'message' => 'Merchant added.', 'id' => (int) mysqli_insert_id($this->stc_dbs));
+		}
+		return array('ok' => false, 'message' => 'Could not save merchant. Try again.');
+	}
 }
 
 #<------------------------------------------------------------------------------------------------------>
@@ -669,5 +985,57 @@ if(isset($_POST['stc_get_merchant_item'])){
 		$out=$objlokiout;
 	}
 	echo $out;
+}
+
+function stc_merchant_json_flags(){
+	$flags = JSON_UNESCAPED_UNICODE;
+	if(defined('JSON_INVALID_UTF8_SUBSTITUTE')){
+		$flags = $flags | JSON_INVALID_UTF8_SUBSTITUTE;
+	}
+	return $flags;
+}
+
+if(isset($_POST['stc_adhoc_source_sync_list'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$obj = new ragnarMerchants();
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$page = isset($_POST['page']) ? $_POST['page'] : 1;
+	$per_page = isset($_POST['per_page']) ? $_POST['per_page'] : 25;
+	$sort = isset($_POST['sort']) ? $_POST['sort'] : 'source';
+	$dir = isset($_POST['dir']) ? $_POST['dir'] : 'asc';
+	echo json_encode($obj->stc_adhoc_source_sync_list($search, $page, $per_page, $sort, $dir), stc_merchant_json_flags());
+	exit;
+}
+
+if(isset($_POST['stc_adhoc_source_rename'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$obj = new ragnarMerchants();
+	$olds = array();
+	if(isset($_POST['old_sources']) && is_array($_POST['old_sources'])){
+		$olds = $_POST['old_sources'];
+	}elseif(isset($_POST['old_source'])){
+		$olds = array($_POST['old_source']);
+	}
+	$new = isset($_POST['new_source']) ? $_POST['new_source'] : '';
+	echo json_encode($obj->stc_adhoc_source_rename($olds, $new), stc_merchant_json_flags());
+	exit;
+}
+
+if(isset($_POST['stc_merchant_quick_add'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$obj = new ragnarMerchants();
+	$name = isset($_POST['name']) ? $_POST['name'] : '';
+	$category = isset($_POST['category']) ? $_POST['category'] : '';
+	echo json_encode($obj->stc_merchant_quick_add($name, $category), stc_merchant_json_flags());
+	exit;
 }
 ?>
