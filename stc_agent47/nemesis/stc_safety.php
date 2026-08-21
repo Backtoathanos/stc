@@ -165,6 +165,60 @@ class prime extends tesseract{
 		}
 		return array('status' => false, 'message' => 'Tool not found');
 	}
+
+	private function stc_dso_esc($val){
+		return mysqli_real_escape_string($this->stc_dbs, (string)$val);
+	}
+
+	private function stc_dso_date($val){
+		$val = trim((string)$val);
+		if($val === '' || $val === '0000-00-00' || strpos($val, '0000-00-00') === 0){
+			return '';
+		}
+		$ts = strtotime($val);
+		return $ts ? date('Y-m-d', $ts) : '';
+	}
+
+	public function stc_call_dso_fields($id){
+		$id = (int)$id;
+		$q = mysqli_query($this->stc_dbs, "SELECT * FROM `stc_safety_dso` WHERE `id`='".$id."' LIMIT 1");
+		if($q && $r = mysqli_fetch_assoc($q)){
+			$r['observation_date'] = $this->stc_dso_date($r['observation_date'] ?? '');
+			$r['target_date'] = $this->stc_dso_date($r['target_date'] ?? '');
+			$r['closure_date'] = $this->stc_dso_date($r['closure_date'] ?? '');
+			return $r;
+		}
+		return array();
+	}
+
+	public function stc_update_dso($request){
+		$id = (int)($request['dso_id'] ?? 0);
+		if($id <= 0){
+			return 'error';
+		}
+		$obs = $this->stc_dso_date($request['observation_date'] ?? '');
+		$target = $this->stc_dso_date($request['target_date'] ?? '');
+		$closure = $this->stc_dso_date($request['closure_date'] ?? '');
+		$obsSql = $obs === '' ? 'NULL' : "'".$this->stc_dso_esc($obs)."'";
+		$targetSql = $target === '' ? 'NULL' : "'".$this->stc_dso_esc($target)."'";
+		$closureSql = $closure === '' ? 'NULL' : "'".$this->stc_dso_esc($closure)."'";
+		$q = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_safety_dso` SET
+				`observation_date`    = ".$obsSql.",
+				`area_location`       = '".$this->stc_dso_esc($request['area_location'] ?? '')."',
+				`observation_details` = '".$this->stc_dso_esc($request['observation_details'] ?? '')."',
+				`observation_type`    = '".$this->stc_dso_esc($request['observation_type'] ?? '')."',
+				`immediate_action`    = '".$this->stc_dso_esc($request['immediate_action'] ?? '')."',
+				`responsible_person`  = '".$this->stc_dso_esc($request['responsible_person'] ?? '')."',
+				`target_date`         = ".$targetSql.",
+				`closure_date`        = ".$closureSql.",
+				`compliance_status`   = '".$this->stc_dso_esc($request['compliance_status'] ?? '')."',
+				`verified_by`         = '".$this->stc_dso_esc($request['verified_by'] ?? '')."',
+				`reviewed_by`         = '".$this->stc_dso_esc($request['reviewed_by'] ?? '')."'
+			WHERE `id`='".$id."'
+		");
+		return $q ? 'success' : 'error';
+	}
 }
 
 // update save for tbm
@@ -303,5 +357,15 @@ if(isset($_POST['fetchToolsData'])){
 	$objsearchreq=new prime();
 	$opobjsearchreq=$objsearchreq->stc_call_tandtdata($search, $page, $pageSize);
 	echo json_encode($opobjsearchreq);
+}
+
+if(isset($_POST['stc_safety_calldsofields'])){
+	$objsearchreq = new prime();
+	echo json_encode($objsearchreq->stc_call_dso_fields($_POST['dso_id'] ?? 0));
+}
+
+if(isset($_POST['stc_safety_updatedso'])){
+	$objsearchreq = new prime();
+	echo $objsearchreq->stc_update_dso($_POST);
 }
 ?>

@@ -802,7 +802,7 @@ else {
                                                                 <th class="text-center">Compliance Status</th>
                                                                 <th class="text-center">Responsible Person</th>
                                                                 <th class="text-center">Created By</th>
-                                                                <th width="12%" class="text-center">Action</th>
+                                                                <th width="14%" class="text-center">Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="stc-safety-dso-res-table">
@@ -2227,6 +2227,102 @@ else {
                 dsoSupervisor = $('.safety-dso-filter-by-supervisorname').val();
                 dsoKeyword = $('.safety-dso-filter-by-keyword').val();
                 call_dso_agent(dsoMonth, dsoSupervisor, dsoKeyword, pg);
+            });
+
+            function dsoEmptyDate(val){
+                if(!val || val === '0000-00-00' || String(val).indexOf('0000-00-00') === 0){
+                    return '';
+                }
+                return String(val).substring(0, 10);
+            }
+
+            function reload_dso_agent(){
+                dsoMonth = $('.safety-dso-filter-by-month').val();
+                dsoSupervisor = $('.safety-dso-filter-by-supervisorname').val();
+                dsoKeyword = $('.safety-dso-filter-by-keyword').val();
+                call_dso_agent(dsoMonth, dsoSupervisor, dsoKeyword, window.dsoAgentPage);
+            }
+
+            function call_dso_fields(){
+                var dso_id = $('.stc-dso-no').val();
+                if(!dso_id){ return; }
+                $.ajax({
+                    url      : 'nemesis/stc_safety.php',
+                    method   : 'POST',
+                    dataType : 'JSON',
+                    data     : {stc_safety_calldsofields:1, dso_id:dso_id},
+                    success  : function(r){
+                        if(!r || !r.id){
+                            alert('Unable to load observation details.');
+                            return;
+                        }
+                        $('#stc-dso-observation-date').val(dsoEmptyDate(r.observation_date));
+                        $('#stc-dso-area-location').val(r.area_location || '');
+                        $('#stc-dso-observation-details').val(r.observation_details || '');
+                        $('#stc-dso-observation-type').val(r.observation_type || '');
+                        $('#stc-dso-immediate-action').val(r.immediate_action || '');
+                        $('#stc-dso-responsible-person').val(r.responsible_person || '');
+                        $('#stc-dso-target-date').val(dsoEmptyDate(r.target_date));
+                        $('#stc-dso-closure-date').val(dsoEmptyDate(r.closure_date));
+                        $('#stc-dso-compliance-status').val(r.compliance_status || 'Open');
+                        $('#stc-dso-verified-by').val(r.verified_by || '');
+                        $('#stc-dso-reviewed-by').val(r.reviewed_by || '');
+                    },
+                    error    : function(){
+                        alert('Unable to load observation details.');
+                    }
+                });
+            }
+
+            function save_dso(){
+                var dso_id = $('.stc-dso-no').val();
+                if(!dso_id){ return; }
+                $.ajax({
+                    url    : 'nemesis/stc_safety.php',
+                    method : 'POST',
+                    data   : {
+                        stc_safety_updatedso:1,
+                        dso_id:dso_id,
+                        observation_date:$('#stc-dso-observation-date').val(),
+                        area_location:$('#stc-dso-area-location').val(),
+                        observation_details:$('#stc-dso-observation-details').val(),
+                        observation_type:$('#stc-dso-observation-type').val(),
+                        immediate_action:$('#stc-dso-immediate-action').val(),
+                        responsible_person:$('#stc-dso-responsible-person').val(),
+                        target_date:$('#stc-dso-target-date').val(),
+                        closure_date:$('#stc-dso-closure-date').val(),
+                        compliance_status:$('#stc-dso-compliance-status').val(),
+                        verified_by:$('#stc-dso-verified-by').val(),
+                        reviewed_by:$('#stc-dso-reviewed-by').val()
+                    }
+                });
+            }
+
+            $('body').delegate('.stc-safetydso-edit', 'click', function(e){
+                e.preventDefault();
+                $('.stc-dso-no').val($(this).attr('id'));
+                $('.bd-dso-modal-lg').modal('show');
+                call_dso_fields();
+            });
+
+            $('body').delegate('.stc-dso-fields', 'focusout', function(){
+                save_dso();
+                reload_dso_agent();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            $('body').delegate('.stc-dso-dropdownfields', 'change', function(){
+                save_dso();
+                reload_dso_agent();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            $('body').delegate('.stc-dso-save-btn', 'click', function(){
+                save_dso();
+                reload_dso_agent();
+                $('.bd-dso-modal-lg').modal('hide');
             });
         });
     </script>
@@ -4807,6 +4903,93 @@ else {
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-dso-modal-lg" tabindex="-1" role="dialog" aria-labelledby="dsoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dsoModalLabel">Edit Daily Safety Observation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <label>* Fields are saved automatically when you switch</label>
+                                <input type="hidden" class="stc-dso-no">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Date *</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-observation-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Area/Location *</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-area-location" placeholder="Area/Location">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Observation Type *</h5>
+                                        <select class="form-control stc-dso-dropdownfields" id="stc-dso-observation-type">
+                                            <option value="">Select</option>
+                                            <option>Unsafe Act</option>
+                                            <option>Unsafe Condition</option>
+                                            <option>Safe Observation</option>
+                                            <option>Near Miss</option>
+                                            <option>Good Practice</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 mt-2">
+                                        <h5 class="card-title">Observation Details *</h5>
+                                        <textarea class="form-control stc-dso-fields" id="stc-dso-observation-details" rows="3" placeholder="Observation Details"></textarea>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 mt-2">
+                                        <h5 class="card-title">Immediate Action Taken *</h5>
+                                        <textarea class="form-control stc-dso-fields" id="stc-dso-immediate-action" rows="2" placeholder="Immediate Action Taken"></textarea>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Responsible Person *</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-responsible-person" placeholder="Responsible Person">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Target Date</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-target-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Closure Date</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-closure-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Compliance Status *</h5>
+                                        <select class="form-control stc-dso-dropdownfields" id="stc-dso-compliance-status">
+                                            <option>Open</option>
+                                            <option>In Progress</option>
+                                            <option>Closed</option>
+                                            <option>Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Verified By</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-verified-by" placeholder="Verified By">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Reviewed By</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-reviewed-by" placeholder="Reviewed By">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success stc-dso-save-btn">Save</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>

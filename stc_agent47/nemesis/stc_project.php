@@ -4640,6 +4640,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.htmlspecialchars($row['responsible_person']).'</td>
 						<td>'.htmlspecialchars($row['stc_cust_pro_supervisor_fullname'] ?? '').'</td>
 						<td class="text-center">
+							<a href="#" class="btn btn-primary btn-sm stc-safetydso-edit" id="'.(int)$row['id'].'" title="Edit"><i class="fa fa-edit"></i></a>
 							<a href="'.$website.'safety-dso-print-preview.php?from_date='.urlencode($obsDate).'&to_date='.urlencode($obsDate).'" target="_blank" class="btn btn-success btn-sm" title="Print"><i class="fa fa-print"></i></a>
 						</td>
 					</tr>
