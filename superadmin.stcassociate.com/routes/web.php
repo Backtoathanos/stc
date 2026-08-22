@@ -231,11 +231,33 @@ Route::group(['middleware' => 'superadmin'], function(){
     // for stc requisition
     Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);    
     Route::get('/branch/stc/requisitions/list', [RequisitionController::class, 'list']);
+    Route::get('/branch/stc/requisitions/get', [RequisitionController::class, 'get']);
+    Route::post('/branch/stc/requisitions/update', [RequisitionController::class, 'update']);
     Route::get('/branch/stc/requisitions/delete', [RequisitionController::class, 'delete']);
     Route::get('/branch/stc/requisitions/itemlist', [RequisitionController::class, 'itemlist']);
+    Route::get('/branch/stc/requisitions/itemget', [RequisitionController::class, 'itemget']);
+    Route::post('/branch/stc/requisitions/itemupdate', [RequisitionController::class, 'itemupdate']);
     Route::get('/branch/stc/requisitions/itemdelete', [RequisitionController::class, 'itemdelete']);
     Route::get('/branch/stc/requisitions/itemdislist', [RequisitionController::class, 'itemdislist']);
+    Route::get('/branch/stc/requisitions/itemdisget', [RequisitionController::class, 'itemdisget']);
+    Route::post('/branch/stc/requisitions/itemdisupdate', [RequisitionController::class, 'itemdisupdate']);
     Route::get('/branch/stc/requisitions/itemdisdelete', [RequisitionController::class, 'itemdisdelete']);
+    Route::get('/branch/stc/requisitions/combinerlist', [RequisitionController::class, 'combinerlist']);
+    Route::get('/branch/stc/requisitions/combinerget', [RequisitionController::class, 'combinerget']);
+    Route::post('/branch/stc/requisitions/combinerupdate', [RequisitionController::class, 'combinerupdate']);
+    Route::get('/branch/stc/requisitions/combinerdelete', [RequisitionController::class, 'combinerdelete']);
+    Route::get('/branch/stc/requisitions/combinerreqlist', [RequisitionController::class, 'combinerreqlist']);
+    Route::get('/branch/stc/requisitions/combinerreqget', [RequisitionController::class, 'combinerreqget']);
+    Route::post('/branch/stc/requisitions/combinerrequpdate', [RequisitionController::class, 'combinerrequpdate']);
+    Route::get('/branch/stc/requisitions/combinerreqdelete', [RequisitionController::class, 'combinerreqdelete']);
+    Route::get('/branch/stc/requisitions/itemloglist', [RequisitionController::class, 'itemloglist']);
+    Route::get('/branch/stc/requisitions/itemlogget', [RequisitionController::class, 'itemlogget']);
+    Route::post('/branch/stc/requisitions/itemlogupdate', [RequisitionController::class, 'itemlogupdate']);
+    Route::get('/branch/stc/requisitions/itemlogdelete', [RequisitionController::class, 'itemlogdelete']);
+    Route::get('/branch/stc/requisitions/recsuplist', [RequisitionController::class, 'recsuplist']);
+    Route::get('/branch/stc/requisitions/recsupget', [RequisitionController::class, 'recsupget']);
+    Route::post('/branch/stc/requisitions/recsupupdate', [RequisitionController::class, 'recsupupdate']);
+    Route::get('/branch/stc/requisitions/recsupdelete', [RequisitionController::class, 'recsupdelete']);
     
     // for stc std
     Route::get('/branch/stc/std', [STDController::class, 'show']);    
