@@ -914,6 +914,12 @@ include("kattegat/role_check.php");
           color: #888;
           padding: 28px 8px;
       }
+      #stc-mergst-tbody .stc-mergst-inp {
+          height: 30px;
+          padding: 2px 8px;
+          font-size: 13px;
+          min-width: 90px;
+      }
       .stc-poa-product-cell {
           min-width: 380px;
           max-width: 520px;
@@ -5119,10 +5125,68 @@ include("kattegat/role_check.php");
           var merGstPage = 1;
           var merGstSort = 'name';
           var merGstDir = 'asc';
+          var merGstCats = ['Manufacturer','Retailer','Wholesaler','Distributor','Dealer','Supplier','Trader','Service Provider','Others'];
 
           function merGstDash(v) {
             var s = $.trim(v == null ? '' : String(v));
             return s === '' ? '—' : merSyncEsc(s);
+          }
+
+          function merGstAttr(v) {
+            return merSyncEsc(v == null ? '' : String(v));
+          }
+
+          function merGstEncodeRow(row) {
+            return encodeURIComponent(JSON.stringify({
+              id: row.id,
+              stc_merchant_name: row.stc_merchant_name || '',
+              stc_merchant_email: row.stc_merchant_email || '',
+              stc_merchant_phone: row.stc_merchant_phone || '',
+              stc_merchant_gstin: row.stc_merchant_gstin || '',
+              stc_merchant_pan: row.stc_merchant_pan || '',
+              stc_merchant_category: row.stc_merchant_category || ''
+            }));
+          }
+
+          function merGstParseRow($el) {
+            var raw = $el.closest('tr').attr('data-row') || '';
+            try { return JSON.parse(decodeURIComponent(raw)); } catch (e) { return null; }
+          }
+
+          function merGstViewHtml(row) {
+            return '<td>' + merGstDash(row.stc_merchant_name) + '</td>'
+              + '<td>' + merGstDash(row.stc_merchant_email) + '</td>'
+              + '<td>' + merGstDash(row.stc_merchant_phone) + '</td>'
+              + '<td>' + merGstDash(row.stc_merchant_gstin) + '</td>'
+              + '<td>' + merGstDash(row.stc_merchant_pan) + '</td>'
+              + '<td>' + merGstDash(row.stc_merchant_category) + '</td>'
+              + '<td class="text-center nowrap">'
+              + '<button type="button" class="btn btn-primary btn-xs stc-mergst-edit-btn"><i class="fa fa-pencil"></i> Edit</button>'
+              + '</td>';
+          }
+
+          function merGstEditHtml(row) {
+            var catOpts = '<option value="">Select category</option>';
+            merGstCats.forEach(function(cat) {
+              catOpts += '<option value="' + merGstAttr(cat) + '"' + (row.stc_merchant_category === cat ? ' selected' : '') + '>' + merGstAttr(cat) + '</option>';
+            });
+            return '<td><input type="text" class="form-control input-sm stc-mergst-inp" data-field="name" value="' + merGstAttr(row.stc_merchant_name) + '"></td>'
+              + '<td><input type="text" class="form-control input-sm stc-mergst-inp" data-field="email" value="' + merGstAttr(row.stc_merchant_email) + '"></td>'
+              + '<td><input type="text" class="form-control input-sm stc-mergst-inp" data-field="phone" value="' + merGstAttr(row.stc_merchant_phone) + '"></td>'
+              + '<td><input type="text" class="form-control input-sm stc-mergst-inp" data-field="gstin" value="' + merGstAttr(row.stc_merchant_gstin) + '"></td>'
+              + '<td><input type="text" class="form-control input-sm stc-mergst-inp" data-field="pan" value="' + merGstAttr(row.stc_merchant_pan) + '"></td>'
+              + '<td><select class="form-control input-sm stc-mergst-inp" data-field="category">' + catOpts + '</select></td>'
+              + '<td class="text-center nowrap">'
+              + '<button type="button" class="btn btn-success btn-xs stc-mergst-save-btn"><i class="fa fa-floppy-o"></i> Save</button>'
+              + '</td>';
+          }
+
+          function merGstCancelEdit() {
+            $('#stc-mergst-tbody tr.is-editing').each(function() {
+              var row = merGstParseRow($(this));
+              if (!row) return;
+              $(this).removeClass('is-editing').html(merGstViewHtml(row));
+            });
           }
 
           function merGstUpdateSortUi() {
@@ -5132,7 +5196,7 @@ include("kattegat/role_check.php");
 
           function merGstLoad(page) {
             merGstPage = page || 1;
-            $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Loading…</td></tr>');
+            $('#stc-mergst-tbody').html('<tr><td colspan="7" class="stc-mersync-empty">Loading…</td></tr>');
             $.ajax({
               url: 'kattegat/ragnar_merchant.php',
               method: 'POST',
@@ -5147,27 +5211,21 @@ include("kattegat/role_check.php");
               },
               success: function(res) {
                 if (!res || res.ok !== true) {
-                  $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Could not load merchants.</td></tr>');
+                  $('#stc-mergst-tbody').html('<tr><td colspan="7" class="stc-mersync-empty">Could not load merchants.</td></tr>');
                   return;
                 }
+                if (res.categories && res.categories.length) merGstCats = res.categories;
                 merGstUpdateSortUi();
                 var rows = res.rows || [];
                 if (!rows.length) {
-                  $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">No merchants without GSTIN.</td></tr>');
+                  $('#stc-mergst-tbody').html('<tr><td colspan="7" class="stc-mersync-empty">No merchants without GSTIN.</td></tr>');
                   $('#stc-mergst-pageinfo').text('');
                   $('#stc-mergst-pagination').empty();
                   return;
                 }
                 var html = '';
                 rows.forEach(function(row) {
-                  html += '<tr>'
-                    + '<td>' + merGstDash(row.stc_merchant_name) + '</td>'
-                    + '<td>' + merGstDash(row.stc_merchant_email) + '</td>'
-                    + '<td>' + merGstDash(row.stc_merchant_phone) + '</td>'
-                    + '<td>' + merGstDash(row.stc_merchant_gstin) + '</td>'
-                    + '<td>' + merGstDash(row.stc_merchant_pan) + '</td>'
-                    + '<td>' + merGstDash(row.stc_merchant_category) + '</td>'
-                    + '</tr>';
+                  html += '<tr data-row="' + merGstEncodeRow(row) + '">' + merGstViewHtml(row) + '</tr>';
                 });
                 $('#stc-mergst-tbody').html(html);
                 $('#stc-mergst-pageinfo').text('Showing ' + res.from + '–' + res.to + ' of ' + res.total);
@@ -5178,7 +5236,7 @@ include("kattegat/role_check.php");
                 $('#stc-mergst-pagination').html(pg);
               },
               error: function() {
-                $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Could not load merchants.</td></tr>');
+                $('#stc-mergst-tbody').html('<tr><td colspan="7" class="stc-mersync-empty">Could not load merchants.</td></tr>');
               }
             });
           }
@@ -5203,6 +5261,56 @@ include("kattegat/role_check.php");
           });
           $('body').delegate('.stc-mergst-pg', 'click', function(){
             merGstLoad(parseInt($(this).attr('data-page'), 10) || 1);
+          });
+          $('body').delegate('.stc-mergst-edit-btn', 'click', function(){
+            var $tr = $(this).closest('tr');
+            var row = merGstParseRow($tr);
+            if (!row) { stcAlert('Could not load merchant.'); return; }
+            merGstCancelEdit();
+            $tr.addClass('is-editing').html(merGstEditHtml(row));
+            $tr.find('.stc-mergst-inp[data-field="name"]').focus();
+          });
+          $('body').delegate('.stc-mergst-save-btn', 'click', function(){
+            var $tr = $(this).closest('tr');
+            var row = merGstParseRow($tr);
+            if (!row) { stcAlert('Could not load merchant.'); return; }
+            var payload = {
+              stc_merchant_inline_update: 1,
+              id: row.id,
+              name: $.trim($tr.find('.stc-mergst-inp[data-field="name"]').val() || ''),
+              email: $.trim($tr.find('.stc-mergst-inp[data-field="email"]').val() || ''),
+              phone: $.trim($tr.find('.stc-mergst-inp[data-field="phone"]').val() || ''),
+              gstin: $.trim($tr.find('.stc-mergst-inp[data-field="gstin"]').val() || ''),
+              pan: $.trim($tr.find('.stc-mergst-inp[data-field="pan"]').val() || ''),
+              category: $.trim($tr.find('.stc-mergst-inp[data-field="category"]').val() || '')
+            };
+            if (!payload.name) { stcAlert('Merchant name is required.'); return; }
+            var $btn = $(this).prop('disabled', true);
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: payload,
+              success: function(res) {
+                if (res && res.ok) {
+                  stcAlert(res.message || 'Merchant updated.', 'success');
+                  merGstLoad(merGstPage);
+                } else {
+                  $btn.prop('disabled', false);
+                  stcAlert((res && res.message) || 'Could not save merchant.');
+                }
+              },
+              error: function() {
+                $btn.prop('disabled', false);
+                stcAlert('Could not save merchant.');
+              }
+            });
+          });
+          $('body').delegate('#stc-mergst-tbody .stc-mergst-inp', 'keydown', function(e){
+            if (e.which === 13) {
+              e.preventDefault();
+              $(this).closest('tr').find('.stc-mergst-save-btn').click();
+            }
           });
 
           
@@ -6393,10 +6501,11 @@ include("kattegat/role_check.php");
                                 <th class="stc-mergst-sort" data-sort="gstin">GSTIN</th>
                                 <th class="stc-mergst-sort" data-sort="pan">PAN</th>
                                 <th class="stc-mergst-sort" data-sort="category">Category</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="stc-mergst-tbody">
-                            <tr><td colspan="6" class="stc-mersync-empty">Open to load merchants…</td></tr>
+                            <tr><td colspan="7" class="stc-mersync-empty">Open to load merchants…</td></tr>
                         </tbody>
                     </table>
                 </div>
