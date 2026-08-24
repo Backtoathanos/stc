@@ -870,22 +870,26 @@ include("kattegat/role_check.php");
           white-space: nowrap;
           background: #f8f9fa;
       }
-      .stc-mersync-sort {
+      .stc-mersync-sort,
+      .stc-mergst-sort {
           cursor: pointer;
           user-select: none;
       }
-      .stc-mersync-sort:after {
+      .stc-mersync-sort:after,
+      .stc-mergst-sort:after {
           content: "\f0dc";
           font-family: FontAwesome;
           margin-left: 6px;
           opacity: .35;
           font-size: 12px;
       }
-      .stc-mersync-sort.is-asc:after {
+      .stc-mersync-sort.is-asc:after,
+      .stc-mergst-sort.is-asc:after {
           content: "\f0de";
           opacity: 1;
       }
-      .stc-mersync-sort.is-desc:after {
+      .stc-mersync-sort.is-desc:after,
+      .stc-mergst-sort.is-desc:after {
           content: "\f0dd";
           opacity: 1;
       }
@@ -1530,6 +1534,14 @@ include("kattegat/role_check.php");
                                             title="Sync Merchants"
                                             aria-label="Sync Merchants"
                                           ><i class="fa fa-user-plus" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-warning stc-poa-merchant-gst"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-merchant-gst"
+                                            href="javascript:void(0)"
+                                            title="Merchants without GSTIN"
+                                            aria-label="Merchants without GSTIN"
+                                          ><i class="fa fa-id-card-o" aria-hidden="true"></i></a>
                                         </div>
 
                                         <button
@@ -5104,6 +5116,95 @@ include("kattegat/role_check.php");
             });
           });
 
+          var merGstPage = 1;
+          var merGstSort = 'name';
+          var merGstDir = 'asc';
+
+          function merGstDash(v) {
+            var s = $.trim(v == null ? '' : String(v));
+            return s === '' ? '—' : merSyncEsc(s);
+          }
+
+          function merGstUpdateSortUi() {
+            $('.stc-mergst-sort').removeClass('is-asc is-desc');
+            $('.stc-mergst-sort[data-sort="' + merGstSort + '"]').addClass(merGstDir === 'desc' ? 'is-desc' : 'is-asc');
+          }
+
+          function merGstLoad(page) {
+            merGstPage = page || 1;
+            $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Loading…</td></tr>');
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: {
+                stc_merchant_missing_gst_list: 1,
+                search: $('#stc-mergst-search').val() || '',
+                page: merGstPage,
+                per_page: 25,
+                sort: merGstSort,
+                dir: merGstDir
+              },
+              success: function(res) {
+                if (!res || res.ok !== true) {
+                  $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Could not load merchants.</td></tr>');
+                  return;
+                }
+                merGstUpdateSortUi();
+                var rows = res.rows || [];
+                if (!rows.length) {
+                  $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">No merchants without GSTIN.</td></tr>');
+                  $('#stc-mergst-pageinfo').text('');
+                  $('#stc-mergst-pagination').empty();
+                  return;
+                }
+                var html = '';
+                rows.forEach(function(row) {
+                  html += '<tr>'
+                    + '<td>' + merGstDash(row.stc_merchant_name) + '</td>'
+                    + '<td>' + merGstDash(row.stc_merchant_email) + '</td>'
+                    + '<td>' + merGstDash(row.stc_merchant_phone) + '</td>'
+                    + '<td>' + merGstDash(row.stc_merchant_gstin) + '</td>'
+                    + '<td>' + merGstDash(row.stc_merchant_pan) + '</td>'
+                    + '<td>' + merGstDash(row.stc_merchant_category) + '</td>'
+                    + '</tr>';
+                });
+                $('#stc-mergst-tbody').html(html);
+                $('#stc-mergst-pageinfo').text('Showing ' + res.from + '–' + res.to + ' of ' + res.total);
+                var pg = '';
+                if (res.page > 1) pg += '<button type="button" class="btn btn-default btn-sm stc-mergst-pg" data-page="' + (res.page - 1) + '">Prev</button> ';
+                pg += '<span class="text-muted">Page ' + res.page + ' / ' + res.pages + '</span> ';
+                if (res.page < res.pages) pg += '<button type="button" class="btn btn-default btn-sm stc-mergst-pg" data-page="' + (res.page + 1) + '">Next</button>';
+                $('#stc-mergst-pagination').html(pg);
+              },
+              error: function() {
+                $('#stc-mergst-tbody').html('<tr><td colspan="6" class="stc-mersync-empty">Could not load merchants.</td></tr>');
+              }
+            });
+          }
+
+          $('.bd-modal-merchant-gst').on('shown.bs.modal', function(){
+            merGstLoad(1);
+          });
+          $('#stc-mergst-search-btn').on('click', function(){ merGstLoad(1); });
+          $('#stc-mergst-search').on('keydown', function(e){
+            if (e.which === 13) { e.preventDefault(); merGstLoad(1); }
+          });
+          $('body').delegate('.stc-mergst-sort', 'click', function(){
+            var sort = $(this).attr('data-sort') || 'name';
+            if (merGstSort === sort) {
+              merGstDir = merGstDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              merGstSort = sort;
+              merGstDir = 'asc';
+            }
+            merGstUpdateSortUi();
+            merGstLoad(1);
+          });
+          $('body').delegate('.stc-mergst-pg', 'click', function(){
+            merGstLoad(parseInt($(this).attr('data-page'), 10) || 1);
+          });
+
           
         });
 
@@ -6257,6 +6358,51 @@ include("kattegat/role_check.php");
                 <div class="stc-mersync-bar">
                     <span class="text-muted" id="stc-mersync-pageinfo"></span>
                     <div id="stc-mersync-pagination"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-merchant-gst" tabindex="-1" role="dialog" aria-labelledby="stcMerGstTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stcMerGstTitle">Merchants without GSTIN</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Merchants whose GSTIN is empty or not set. Search matches name, email, contact, PAN, and category.</p>
+                <div class="stc-mersync-bar">
+                    <div class="stc-mersync-search">
+                        <input type="text" class="form-control" id="stc-mergst-search" placeholder="Search merchant name, email, contact, PAN, category…">
+                        <button type="button" class="btn btn-success" id="stc-mergst-search-btn"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm stc-mersync-table">
+                        <thead>
+                            <tr>
+                                <th class="stc-mergst-sort is-asc" data-sort="name">Merchant name</th>
+                                <th class="stc-mergst-sort" data-sort="email">Email</th>
+                                <th class="stc-mergst-sort" data-sort="phone">Contact</th>
+                                <th class="stc-mergst-sort" data-sort="gstin">GSTIN</th>
+                                <th class="stc-mergst-sort" data-sort="pan">PAN</th>
+                                <th class="stc-mergst-sort" data-sort="category">Category</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stc-mergst-tbody">
+                            <tr><td colspan="6" class="stc-mersync-empty">Open to load merchants…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="stc-mersync-bar">
+                    <span class="text-muted" id="stc-mergst-pageinfo"></span>
+                    <div id="stc-mergst-pagination"></div>
                 </div>
             </div>
             <div class="modal-footer">

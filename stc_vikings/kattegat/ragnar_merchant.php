@@ -842,6 +842,99 @@ class ragnarMerchants extends tesseract{
 		}
 		return array('ok' => false, 'message' => 'Could not save merchant. Try again.');
 	}
+
+	private function stc_merchant_gst_missing_where(){
+		return "(
+			`stc_merchant_gstin` IS NULL
+			OR TRIM(`stc_merchant_gstin`) = ''
+			OR UPPER(TRIM(`stc_merchant_gstin`)) IN ('NA', 'N/A', '-', 'NIL', 'NULL')
+		)";
+	}
+
+	public function stc_merchant_missing_gst_list($search, $page, $per_page, $sort = 'name', $dir = 'asc'){
+		$search = trim((string) $search);
+		$page = max(1, (int) $page);
+		$per_page = (int) $per_page;
+		if($per_page < 10) $per_page = 25;
+		if($per_page > 100) $per_page = 100;
+		$allowedSort = array(
+			'name' => '`stc_merchant_name`',
+			'email' => '`stc_merchant_email`',
+			'phone' => '`stc_merchant_phone`',
+			'gstin' => '`stc_merchant_gstin`',
+			'pan' => '`stc_merchant_pan`',
+			'category' => '`stc_merchant_category`'
+		);
+		if(!isset($allowedSort[$sort])) $sort = 'name';
+		$dir = strtolower((string) $dir) === 'desc' ? 'desc' : 'asc';
+
+		$where = $this->stc_merchant_gst_missing_where();
+		if($search !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $this->stc_like_escape($search));
+			$where .= " AND (
+				`stc_merchant_name` LIKE '%".$esc."%'
+				OR `stc_merchant_email` LIKE '%".$esc."%'
+				OR `stc_merchant_phone` LIKE '%".$esc."%'
+				OR `stc_merchant_pan` LIKE '%".$esc."%'
+				OR `stc_merchant_gstin` LIKE '%".$esc."%'
+				OR `stc_merchant_category` LIKE '%".$esc."%'
+				OR `stc_merchant_contact_person` LIKE '%".$esc."%'
+			)";
+		}
+
+		$total = 0;
+		$cntq = mysqli_query($this->stc_dbs, "SELECT COUNT(*) AS c FROM `stc_merchant` WHERE ".$where);
+		if($cntq && ($crow = mysqli_fetch_assoc($cntq))){
+			$total = (int) $crow['c'];
+		}
+		$pages = max(1, (int) ceil(($total > 0 ? $total : 1) / $per_page));
+		if($total === 0) $pages = 1;
+		if($page > $pages) $page = $pages;
+		$offset = ($page - 1) * $per_page;
+
+		$rows = array();
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_merchant_id`,
+				`stc_merchant_name`,
+				`stc_merchant_email`,
+				`stc_merchant_phone`,
+				`stc_merchant_gstin`,
+				`stc_merchant_pan`,
+				`stc_merchant_category`
+			FROM `stc_merchant`
+			WHERE ".$where."
+			ORDER BY ".$allowedSort[$sort]." ".$dir.", `stc_merchant_name` ASC
+			LIMIT ".(int)$offset.", ".(int)$per_page."
+		");
+		if($q){
+			while($r = mysqli_fetch_assoc($q)){
+				$rows[] = array(
+					'id' => (int) $r['stc_merchant_id'],
+					'stc_merchant_name' => isset($r['stc_merchant_name']) ? (string) $r['stc_merchant_name'] : '',
+					'stc_merchant_email' => isset($r['stc_merchant_email']) ? (string) $r['stc_merchant_email'] : '',
+					'stc_merchant_phone' => isset($r['stc_merchant_phone']) ? (string) $r['stc_merchant_phone'] : '',
+					'stc_merchant_gstin' => isset($r['stc_merchant_gstin']) ? (string) $r['stc_merchant_gstin'] : '',
+					'stc_merchant_pan' => isset($r['stc_merchant_pan']) ? (string) $r['stc_merchant_pan'] : '',
+					'stc_merchant_category' => isset($r['stc_merchant_category']) ? (string) $r['stc_merchant_category'] : ''
+				);
+			}
+		}
+
+		$from = $total === 0 ? 0 : (($page - 1) * $per_page) + 1;
+		$to = min($total, $page * $per_page);
+		return array(
+			'ok' => true,
+			'total' => $total,
+			'page' => $page,
+			'pages' => $pages,
+			'from' => $from,
+			'to' => $to,
+			'sort' => $sort,
+			'dir' => $dir,
+			'rows' => $rows
+		);
+	}
 }
 
 #<------------------------------------------------------------------------------------------------------>
@@ -1036,6 +1129,21 @@ if(isset($_POST['stc_merchant_quick_add'])){
 	$name = isset($_POST['name']) ? $_POST['name'] : '';
 	$category = isset($_POST['category']) ? $_POST['category'] : '';
 	echo json_encode($obj->stc_merchant_quick_add($name, $category), stc_merchant_json_flags());
+	exit;
+}
+
+if(isset($_POST['stc_merchant_missing_gst_list'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$obj = new ragnarMerchants();
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$page = isset($_POST['page']) ? $_POST['page'] : 1;
+	$per_page = isset($_POST['per_page']) ? $_POST['per_page'] : 25;
+	$sort = isset($_POST['sort']) ? $_POST['sort'] : 'name';
+	$dir = isset($_POST['dir']) ? $_POST['dir'] : 'asc';
+	echo json_encode($obj->stc_merchant_missing_gst_list($search, $page, $per_page, $sort, $dir), stc_merchant_json_flags());
 	exit;
 }
 ?>
