@@ -160,11 +160,12 @@
         </button>
       </div>
       <div class="modal-body">
-        <p class="text-muted mb-2">Distinct adhoc source names that are not already in the merchant master. Matching merchant names are skipped. Rename updates every matching adhoc row.</p>
+        <p class="text-muted mb-2">Distinct adhoc source names that are not already in the merchant master. Matching merchant names are skipped. Rename updates every matching adhoc row. Insert selected creates merchant records using the source name only.</p>
         <div class="d-flex align-items-center justify-content-between flex-wrap mb-2">
           <span class="text-muted" id="adhoc-selected-count">0 selected</span>
           <div>
             <button type="button" class="btn btn-default btn-sm" id="adhoc-clear-selected-btn">Clear</button>
+            <button type="button" class="btn btn-success btn-sm" id="insert-selected-btn" disabled>Insert selected</button>
             <button type="button" class="btn btn-primary btn-sm" id="rename-selected-btn" disabled>Rename selected</button>
           </div>
         </div>
@@ -395,7 +396,7 @@
       function updateAdhocSelectedUi() {
         var n = selectedAdhocList().length;
         $('#adhoc-selected-count').text(n + ' selected');
-        $('#rename-selected-btn').prop('disabled', n < 1);
+        $('#rename-selected-btn, #insert-selected-btn').prop('disabled', n < 1);
         var $pageChecks = $('#adhoc-sources-table .adhoc-source-check');
         var pageCount = $pageChecks.length;
         var pageChecked = $pageChecks.filter(':checked').length;
@@ -539,6 +540,39 @@
           return { source: name, count: meta.count || 0, similar: meta.similar || '' };
         });
         openRenameModal(items);
+      });
+
+      function insertAdhocSourcesAsMerchants(names) {
+        names = names || [];
+        if (!names.length) {
+          swalSuccess('error', 'Select at least one source.');
+          return;
+        }
+        $.ajax({
+          type: 'post',
+          data: {
+            names: names,
+            _token: "{{ csrf_token() }}"
+          },
+          url: "{{ url('/master/merchant/adhoc-sources/insert') }}",
+          success: function(response) {
+            if (response.success == true) {
+              selectedAdhocSources = {};
+              reloadAdhocSourcesTable();
+              reloadTable();
+              swalSuccess('success', response.message || 'Merchants inserted.');
+            } else {
+              swalSuccess('error', response.message || 'Insert failed.');
+            }
+          },
+          error: function(xhr) {
+            swalSuccess('error', ajaxErrorMessage(xhr));
+          }
+        });
+      }
+
+      $('#insert-selected-btn').on('click', function(){
+        insertAdhocSourcesAsMerchants(selectedAdhocList());
       });
 
       $('body').delegate('.rename-source-btn', 'click', function(){

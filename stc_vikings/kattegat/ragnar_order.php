@@ -6379,7 +6379,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 						0
 					)
 				) AS balance_qty,
-				SUM(IFNULL(DI.`item_dispatch_qty`, 0)) AS item_dispatch_qty,
+				MAX(IFNULL(DI.`item_dispatch_qty`, 0)) AS item_dispatch_qty,
 				GROUP_CONCAT(
 					DISTINCT IF(RK.`stc_rack_name` IS NOT NULL AND RK.`stc_rack_name` <> '', RK.`stc_rack_name`, NULL)
 					ORDER BY RK.`stc_rack_name` SEPARATOR ', '

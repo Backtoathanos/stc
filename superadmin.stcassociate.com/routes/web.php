@@ -179,6 +179,7 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/master/merchant/delete', [MerchantController::class, 'delete']);
     Route::get('/master/merchant/adhoc-sources/list', [MerchantController::class, 'adhocSourcesList']);
     Route::post('/master/merchant/adhoc-sources/rename', [MerchantController::class, 'adhocSourceRename']);
+    Route::post('/master/merchant/adhoc-sources/insert', [MerchantController::class, 'adhocSourceInsert']);
 
     // for electronics branch
     Route::get('/branch/electronicsbranch', [branchElectronicsController::class, 'show']);  

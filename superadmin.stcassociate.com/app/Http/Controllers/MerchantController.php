@@ -688,4 +688,91 @@ class MerchantController extends Controller
             'skipped' => $skipped,
         ];
     }
+
+    public function adhocSourceInsert(Request $request)
+    {
+        $request->validate([
+            'names' => 'required|array|min:1',
+            'names.*' => 'string|max:255',
+        ]);
+
+        $unique = [];
+        foreach ((array) $request->input('names', []) as $name) {
+            $name = trim((string) $name);
+            if ($name === '') {
+                continue;
+            }
+            if (mb_strlen($name, 'UTF-8') > 255) {
+                $name = mb_substr($name, 0, 255, 'UTF-8');
+            }
+            $unique[mb_strtoupper($name, 'UTF-8')] = $name;
+        }
+        $names = array_values($unique);
+
+        if ($names === []) {
+            return [
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Select at least one source name.',
+            ];
+        }
+
+        $merchantKeys = $this->merchantNameKeys();
+        $skipped = [];
+        $toInsert = [];
+        foreach ($names as $name) {
+            $key = mb_strtoupper($name, 'UTF-8');
+            if (isset($merchantKeys[$key])) {
+                $skipped[] = $name;
+                continue;
+            }
+            $toInsert[] = $name;
+            $merchantKeys[$key] = true;
+        }
+
+        if ($toInsert === []) {
+            return [
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Selected name(s) already exist in merchant master.',
+                'skipped' => $skipped,
+            ];
+        }
+
+        $foundBy = (int) (Auth::id() ?: 0);
+        $inserted = 0;
+        DB::transaction(function () use ($toInsert, $foundBy, &$inserted) {
+            foreach ($toInsert as $name) {
+                Merchant::create([
+                    'stc_merchant_name' => $name,
+                    'stc_merchant_address' => '',
+                    'stc_merchant_city_id' => 65,
+                    'stc_merchant_state_id' => 16,
+                    'stc_merchant_contact_person' => '',
+                    'stc_merchant_email' => '',
+                    'stc_merchant_phone' => '',
+                    'stc_merchant_pan' => '',
+                    'stc_merchant_gstin' => '',
+                    'stc_merchant_specially_known_for' => '',
+                    'stc_merchant_category' => '',
+                    'stc_merchant_image' => null,
+                    'stc_merchant_found_by' => $foundBy,
+                ]);
+                $inserted++;
+            }
+        });
+
+        $message = $inserted . ' merchant(s) inserted.';
+        if ($skipped !== []) {
+            $message .= ' Skipped ' . count($skipped) . ' name(s) already in merchant master.';
+        }
+
+        return [
+            'status' => 'ok',
+            'success' => true,
+            'message' => $message,
+            'inserted' => $inserted,
+            'skipped' => $skipped,
+        ];
+    }
 }
