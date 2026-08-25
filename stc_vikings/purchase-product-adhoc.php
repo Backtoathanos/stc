@@ -61,16 +61,36 @@ include("kattegat/role_check.php");
           position: relative;
           display: inline-block;
           width: 100%;
+          z-index: 1;
+      }
+      .searchable-dropdown.is-open {
+          z-index: 80;
+      }
+      #itemsTable tr.item-row.is-dd-open {
+          position: relative;
+          z-index: 60;
+      }
+      #itemsTable tr.item-row.is-dd-open > td {
+          overflow: visible;
       }
 
       .dropdown-options {
           position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
           background-color: #fff;
           border: 1px solid #ddd;
           width: 100%;
-          max-height: 200px;
+          max-height: 220px;
           overflow-y: auto;
-          z-index: 1000;
+          z-index: 35000;
+          box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+      }
+      .dropdown-options.stc-poa-dd-float {
+          position: fixed !important;
+          right: auto;
+          margin: 0;
       }
 
       .dropdown-item {
@@ -710,6 +730,162 @@ include("kattegat/role_check.php");
           line-height: 1;
           box-sizing: border-box;
       }
+      .stc-poa-toolbar-actions .stc-poa-product-master {
+          color: #794c8a;
+          border: 1px solid #794c8a;
+          background: #fff;
+      }
+      .stc-poa-toolbar-actions .stc-poa-product-master:hover {
+          color: #fff;
+          background: #794c8a;
+          border-color: #794c8a;
+      }
+      .stc-poa-toolbar-actions .stc-poa-product-buy {
+          color: #117a65;
+          border: 1px solid #117a65;
+          background: #fff;
+      }
+      .stc-poa-toolbar-actions .stc-poa-product-buy:hover {
+          color: #fff;
+          background: #117a65;
+          border-color: #117a65;
+      }
+      .bd-modal-product-buy {
+          z-index: 30110;
+      }
+      .bd-modal-product-buy .modal-dialog {
+          width: 96%;
+          max-width: 1100px;
+          margin: 16px auto;
+      }
+      .stc-buyhist-search {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 14px;
+      }
+      .stc-buyhist-search .form-control {
+          flex: 1 1 auto;
+          height: 38px;
+          padding: 6px 12px !important;
+      }
+      .stc-buyhist-search .btn {
+          height: 38px;
+          padding: 0 16px;
+          white-space: nowrap;
+      }
+      .stc-buyhist-meta {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 10px 16px;
+          margin-bottom: 12px;
+          min-height: 28px;
+      }
+      .stc-buyhist-meta h6 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+          color: #1f2d3d;
+      }
+      .stc-buyhist-chip {
+          display: inline-block;
+          padding: 3px 10px;
+          border-radius: 12px;
+          background: #eaf7f3;
+          color: #117a65;
+          font-size: 12px;
+          font-weight: 600;
+      }
+      .stc-buyhist-grid {
+          display: flex;
+          gap: 14px;
+          align-items: stretch;
+      }
+      .stc-buyhist-col {
+          flex: 1 1 0;
+          min-width: 0;
+          border: 1px solid #e6ebf3;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #fff;
+      }
+      .stc-buyhist-col h6 {
+          margin: 0;
+          padding: 10px 12px;
+          background: #f4f7fb;
+          border-bottom: 1px solid #e6ebf3;
+          font-size: 13px;
+          font-weight: 700;
+          color: #2c3e50;
+      }
+      .stc-buyhist-col .table td {
+          vertical-align: middle;
+      }
+      .stc-buyhist-date {
+          white-space: nowrap;
+          color: #4a5568;
+          font-variant-numeric: tabular-nums;
+      }
+      .stc-buyhist-col .table th {
+          background: #fafbfc;
+          white-space: nowrap;
+          cursor: pointer;
+          user-select: none;
+      }
+      .stc-buyhist-col .table th:after {
+          content: "\f0dc";
+          font-family: FontAwesome;
+          margin-left: 6px;
+          opacity: .35;
+          font-size: 11px;
+      }
+      .stc-buyhist-col .table th.is-asc:after {
+          content: "\f0de";
+          opacity: 1;
+      }
+      .stc-buyhist-col .table th.is-desc:after {
+          content: "\f0dd";
+          opacity: 1;
+      }
+      .stc-buyhist-empty {
+          text-align: center;
+          color: #888;
+          padding: 28px 10px;
+      }
+      .stc-buyhist-cat {
+          display: inline-block;
+          padding: 1px 8px;
+          border-radius: 10px;
+          background: #eef3fd;
+          color: #3f6ad8;
+          font-size: 12px;
+          font-weight: 600;
+      }
+      @media (max-width: 767px) {
+          .stc-buyhist-grid {
+              flex-direction: column;
+          }
+      }
+      .bd-modal-product-master {
+          z-index: 30110;
+      }
+      .bd-modal-product-master .modal-dialog {
+          width: 96%;
+          max-width: 1400px;
+          margin: 16px auto;
+      }
+      .bd-modal-product-master .modal-body {
+          padding: 0;
+          height: 82vh;
+          background: #fff;
+      }
+      .bd-modal-product-master iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+          display: block;
+          background: #fff;
+      }
       .stc-poa-toolbar-btn {
           height: 38px;
           padding: 0 14px;
@@ -919,6 +1095,46 @@ include("kattegat/role_check.php");
           padding: 2px 8px;
           font-size: 13px;
           min-width: 90px;
+      }
+      .stc-mergst-tabs {
+          margin-bottom: 12px;
+      }
+      .stc-mergst-tab-content {
+          padding-top: 4px;
+      }
+      .bd-modal-merchant-gst .stc-mergst-add-field {
+          position: relative;
+          margin-bottom: 14px;
+      }
+      .bd-modal-merchant-gst .stc-mergst-add-field label,
+      .bd-modal-merchant-gst .stc-mergst-add-label {
+          position: relative !important;
+          left: auto !important;
+          top: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+          transform: none !important;
+          display: block !important;
+          width: auto !important;
+          height: auto !important;
+          margin: 0 0 6px !important;
+          padding: 0 !important;
+          font-size: 13px;
+          font-weight: 600;
+          color: #495057;
+          line-height: 1.3;
+          background: transparent !important;
+          pointer-events: auto;
+      }
+      .bd-modal-merchant-gst .stc-mergst-add-field .form-control {
+          display: block;
+          width: 100%;
+          height: 38px;
+          padding: 6px 12px !important;
+      }
+      .bd-modal-merchant-gst .stc-mergst-add-field textarea.form-control {
+          height: auto;
+          min-height: 62px;
       }
       .stc-poa-product-cell {
           min-width: 380px;
@@ -1548,6 +1764,22 @@ include("kattegat/role_check.php");
                                             title="Merchants without GSTIN"
                                             aria-label="Merchants without GSTIN"
                                           ><i class="fa fa-id-card-o" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn stc-poa-product-master"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-product-master"
+                                            href="javascript:void(0)"
+                                            title="Add / View Products"
+                                            aria-label="Add / View Products"
+                                          ><i class="fa fa-cube" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn stc-poa-product-buy"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-product-buy"
+                                            href="javascript:void(0)"
+                                            title="Product buy history"
+                                            aria-label="Product buy history"
+                                          ><i class="fa fa-search" aria-hidden="true"></i></a>
                                         </div>
 
                                         <button
@@ -2316,10 +2548,61 @@ include("kattegat/role_check.php");
             stcSyncPurchaseRowWidthPx();
           });
 
+          function stcSourceDdHide() {
+            $('.searchable-dropdown.is-open').removeClass('is-open');
+            $('#itemsTable tr.item-row.is-dd-open').removeClass('is-dd-open');
+            $('.dropdown-options').each(function () {
+              var $dd = $(this);
+              var $owner = $dd.data('owner');
+              $dd.hide().removeClass('stc-poa-dd-float').css({
+                position: '',
+                top: '',
+                left: '',
+                width: '',
+                zIndex: ''
+              });
+              if ($owner && $owner.length && !$owner.find('.dropdown-options').length) {
+                $owner.append($dd);
+              }
+              $dd.removeData('owner');
+            });
+          }
+
+          function stcSourceDdPin($container, $dd) {
+            var input = $container.find('.search-input').get(0);
+            if (!input) return;
+            var r = input.getBoundingClientRect();
+            $dd.addClass('stc-poa-dd-float').css({
+              position: 'fixed',
+              top: r.bottom + 'px',
+              left: r.left + 'px',
+              width: Math.max(r.width, 240) + 'px',
+              zIndex: 35000,
+              display: 'block'
+            });
+          }
+
+          function stcSourceDdShow($container, html) {
+            var $dd = $container.find('.dropdown-options');
+            if (!$dd.length) {
+              $dd = $('.dropdown-options').filter(function () {
+                return $(this).data('owner') && $(this).data('owner').is($container);
+              }).first();
+            }
+            if (!$dd.length) return;
+            stcSourceDdHide();
+            if (!html) return;
+            $container.addClass('is-open');
+            $container.closest('tr.item-row').addClass('is-dd-open');
+            $dd.data('owner', $container);
+            $('body').append($dd);
+            $dd.html(html);
+            stcSourceDdPin($container, $dd);
+          }
+
           // Handle input/focus for each search input
           $(document).on('input focus', '.search-input', function () {
               var $container = $(this).closest('.searchable-dropdown');
-              var $dropdown = $container.find('.dropdown-options');
               var $hiddenSelect = $container.find('select[name="sourcerack_value[]"]');
 
               var searchTerm = $(this).val().toUpperCase();
@@ -2345,15 +2628,20 @@ include("kattegat/role_check.php");
                   dropdownHTML += `<div class="dropdown-item" data-value="${option.value}">${option.text}</div>`;
               });
 
-              // Update dropdown
-              $dropdown.html(dropdownHTML).toggle(filteredOptions.length > 0 && searchTerm !== '');
+              if (filteredOptions.length > 0 && searchTerm !== '') {
+                stcSourceDdShow($container, dropdownHTML);
+              } else {
+                stcSourceDdHide();
+              }
           });
 
           // Handle click on dropdown items
-          $(document).on('click', '.dropdown-item', function () {
+          $(document).on('click', '.dropdown-options .dropdown-item', function () {
               var value = $(this).data('value');
               var text = $(this).text();
-              var $container = $(this).closest('.searchable-dropdown');
+              var $dd = $(this).closest('.dropdown-options');
+              var $container = $dd.data('owner') || $(this).closest('.searchable-dropdown');
+              if (!$container || !$container.length) return;
 
               // Update visible input field
               $container.find('.search-input').val(text);
@@ -2361,15 +2649,23 @@ include("kattegat/role_check.php");
               // Update hidden select value
               $container.find('select[name="sourcerack_value[]"]').val(value);
 
-              // Hide dropdown
-              $container.find('.dropdown-options').hide();
+              stcSourceDdHide();
           });
 
           // Hide dropdown when clicking outside
           $(document).on('click', function (e) {
-              if (!$(e.target).closest('.searchable-dropdown').length) {
-                  $('.dropdown-options').hide();
+              if (!$(e.target).closest('.searchable-dropdown, .dropdown-options').length) {
+                  stcSourceDdHide();
               }
+          });
+          $(window).on('resize scroll', function () {
+            var $dd = $('.dropdown-options.stc-poa-dd-float:visible');
+            if (!$dd.length) return;
+            var $owner = $dd.data('owner');
+            if ($owner && $owner.length) stcSourceDdPin($owner, $dd);
+          });
+          $('.stc-poa-create-table-frame').on('scroll', function () {
+            stcSourceDdHide();
           });
 
 
@@ -3175,9 +3471,11 @@ include("kattegat/role_check.php");
           function stcPoaReloadCreateForm() {
             stcConfirm('Reload form? Unsaved changes will be lost.', { title: 'Reload form' }).then(function(ok) {
               if (!ok) return;
+              stcSourceDdHide();
               var $template = $('.item-row:first').clone();
               $template.find('input, textarea').val('');
               $template.find('.itemname-autocomplete-list').hide().empty();
+              $template.find('.dropdown-options').hide().empty();
               $template.find('select[name="unit[]"]').val('NOS');
               $template.find('select[name="condition[]"]').val('Good');
               $template.find('select[name="destination[]"]').val('MANGO 17 NO STORE');
@@ -3324,9 +3622,11 @@ include("kattegat/role_check.php");
           
           // Add new row
           $('#addRow').click(function() {
+              stcSourceDdHide();
               var newRow = $('.item-row:first').clone();
               newRow.find('input, textarea').val('');
               newRow.find('.itemname-autocomplete-list').hide().empty();
+              newRow.find('.dropdown-options').hide().empty();
               $('#itemsTable tbody').append(newRow);
           });
           
@@ -5244,6 +5544,210 @@ include("kattegat/role_check.php");
           $('.bd-modal-merchant-gst').on('shown.bs.modal', function(){
             merGstLoad(1);
           });
+          var merGstLocLoaded = false;
+          function merGstLoadLocations() {
+            if (merGstLocLoaded) return;
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: { indialocation: 1 },
+              success: function(data) {
+                if (!data) return;
+                $('#stc-mergst-add-city').html(data[0] || '');
+                $('#stc-mergst-add-state').html(data[1] || '');
+                merGstLocLoaded = true;
+              }
+            });
+          }
+          $('a[href="#stc-mergst-tab-add"]').on('shown.bs.tab', function(){
+            merGstLoadLocations();
+          });
+          $('#stc-mergst-add-form').on('submit', function(e){
+            e.preventDefault();
+            var name = $.trim($('#stc-mergst-add-name').val() || '');
+            if (!name) {
+              stcAlert('Merchant name is required.');
+              $('#stc-mergst-add-name').focus();
+              return;
+            }
+            var $btn = $('#stc-mergst-add-save').prop('disabled', true);
+            $.ajax({
+              url: 'kattegat/ragnar_merchant.php',
+              method: 'POST',
+              dataType: 'json',
+              data: {
+                stc_merchant_add_optional: 1,
+                name: name,
+                address: $.trim($('#stc-mergst-add-address').val() || ''),
+                city_id: $('#stc-mergst-add-city').val() || 65,
+                state_id: $('#stc-mergst-add-state').val() || 16,
+                contact_person: $.trim($('#stc-mergst-add-person').val() || ''),
+                email: $.trim($('#stc-mergst-add-email').val() || ''),
+                phone: $.trim($('#stc-mergst-add-phone').val() || ''),
+                known_for: $.trim($('#stc-mergst-add-known').val() || ''),
+                pan: $.trim($('#stc-mergst-add-pan').val() || ''),
+                gstin: $.trim($('#stc-mergst-add-gstin').val() || ''),
+                category: $.trim($('#stc-mergst-add-category').val() || '')
+              },
+              success: function(res) {
+                $btn.prop('disabled', false);
+                if (res && res.ok) {
+                  stcAlert(res.message || 'Merchant added.', 'success');
+                  $('#stc-mergst-add-form')[0].reset();
+                  merGstLoad(1);
+                  if (typeof merSyncLoad === 'function') merSyncLoad(1);
+                  $('.bd-modal-merchant-gst a[href="#stc-mergst-tab-list"]').tab('show');
+                } else {
+                  stcAlert((res && res.message) || 'Could not add merchant.');
+                }
+              },
+              error: function() {
+                $btn.prop('disabled', false);
+                stcAlert('Could not add merchant.');
+              }
+            });
+          });
+          $('.bd-modal-product-master').on('shown.bs.modal', function(){
+            var $f = $('#stc-poa-product-iframe');
+            if (!$f.attr('src') || $f.attr('src') === 'about:blank') {
+              $f.attr('src', 'add-product.php?page=master&subpage=addproduct&embed=1');
+            }
+          });
+
+          var buyHistRows = [];
+          var buyHistSort = 'bought_on';
+          var buyHistDir = 'desc';
+
+          function buyHistEsc(s) {
+            return $('<div>').text(s == null ? '' : String(s)).html();
+          }
+          function buyHistDash(v) {
+            var s = $.trim(v == null ? '' : String(v));
+            return s === '' ? '—' : buyHistEsc(s);
+          }
+          function buyHistDate(v) {
+            var s = $.trim(v == null ? '' : String(v));
+            if (!s || s.indexOf('0000') === 0) return '—';
+            var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (m) return m[3] + '-' + m[2] + '-' + m[1];
+            return buyHistEsc(s);
+          }
+          function buyHistUpdateSortUi() {
+            $('.stc-buyhist-sort').removeClass('is-asc is-desc');
+            $('.stc-buyhist-sort[data-sort="' + buyHistSort + '"]').addClass(buyHistDir === 'desc' ? 'is-desc' : 'is-asc');
+          }
+          function buyHistRender() {
+            buyHistUpdateSortUi();
+            var rows = buyHistRows.slice();
+            rows.sort(function(a, b) {
+              var av = a[buyHistSort];
+              var bv = b[buyHistSort];
+              if (buyHistSort === 'rate') {
+                av = parseFloat(av) || 0;
+                bv = parseFloat(bv) || 0;
+                return buyHistDir === 'desc' ? bv - av : av - bv;
+              }
+              if (buyHistSort === 'bought_on') {
+                av = String(av == null ? '' : av);
+                bv = String(bv == null ? '' : bv);
+                if (av < bv) return buyHistDir === 'desc' ? 1 : -1;
+                if (av > bv) return buyHistDir === 'desc' ? -1 : 1;
+                return 0;
+              }
+              av = String(av == null ? '' : av).toUpperCase();
+              bv = String(bv == null ? '' : bv).toUpperCase();
+              if (av < bv) return buyHistDir === 'desc' ? 1 : -1;
+              if (av > bv) return buyHistDir === 'desc' ? -1 : 1;
+              return 0;
+            });
+            if (!rows.length) {
+              $('#stc-buyhist-merchant-body').html('<tr><td colspan="2" class="stc-buyhist-empty">No purchases found for this product.</td></tr>');
+              $('#stc-buyhist-rate-body').html('<tr><td colspan="3" class="stc-buyhist-empty">No rates found for this product.</td></tr>');
+              return;
+            }
+            var merHtml = '';
+            var rateHtml = '';
+            rows.forEach(function(row) {
+              var cat = $.trim(row.category || '');
+              merHtml += '<tr><td>' + buyHistDash(row.name) + '</td><td>' +
+                (cat ? '<span class="stc-buyhist-cat">' + buyHistEsc(cat) + '</span>' : '—') +
+                '</td></tr>';
+              rateHtml += '<tr><td class="text-right">' + buyHistEsc((parseFloat(row.rate) || 0).toFixed(2)) + '</td><td class="text-center">' + buyHistDash(row.unit) + '</td><td class="stc-buyhist-date">' + buyHistDate(row.bought_on) + '</td></tr>';
+            });
+            $('#stc-buyhist-merchant-body').html(merHtml);
+            $('#stc-buyhist-rate-body').html(rateHtml);
+          }
+          function buyHistSearch() {
+            var q = $.trim($('#stc-buyhist-search').val() || '');
+            var isId = /^\d+$/.test(q);
+            if (!q || (!isId && q.length < 2)) {
+              stcAlert('Search by product name or product ID.');
+              return;
+            }
+            $('#stc-buyhist-meta').html('<span class="text-muted">Searching…</span>');
+            $('#stc-buyhist-merchant-body').html('<tr><td colspan="2" class="stc-buyhist-empty">Loading…</td></tr>');
+            $('#stc-buyhist-rate-body').html('<tr><td colspan="3" class="stc-buyhist-empty">Loading…</td></tr>');
+            $.ajax({
+              url: 'kattegat/ragnar_purchase.php',
+              method: 'POST',
+              dataType: 'json',
+              data: { stc_product_buy_history: 1, search: q },
+              success: function(res) {
+                if (!res || res.ok !== true) {
+                  buyHistRows = [];
+                  $('#stc-buyhist-meta').html('<span class="text-muted">' + buyHistEsc((res && res.message) || 'Could not search.') + '</span>');
+                  $('#stc-buyhist-merchant-body').html('<tr><td colspan="2" class="stc-buyhist-empty">No results yet.</td></tr>');
+                  $('#stc-buyhist-rate-body').html('<tr><td colspan="3" class="stc-buyhist-empty">No results yet.</td></tr>');
+                  return;
+                }
+                buyHistSort = 'bought_on';
+                buyHistDir = 'desc';
+                buyHistRows = (res.rows || []).filter(function(row) {
+                  var name = $.trim(row && row.name ? row.name : '').toUpperCase();
+                  return name !== '' && name !== '-' && name !== '--' && name !== 'NA' && name !== 'N/A' && name !== 'NULL' && name !== 'NIL';
+                });
+                var vendorSeen = {};
+                buyHistRows = buyHistRows.filter(function(row) {
+                  var key = $.trim(row.name || '').toUpperCase();
+                  if (!vendorSeen[key]) vendorSeen[key] = 0;
+                  if (vendorSeen[key] >= 3) return false;
+                  vendorSeen[key]++;
+                  return true;
+                });
+                var title = res.product_label ? buyHistEsc(res.product_label) : buyHistEsc(q);
+                $('#stc-buyhist-meta').html(
+                  '<h6>' + title + '</h6>' +
+                  '<span class="stc-buyhist-chip">Bought ' + (res.times_bought || 0) + ' time' + ((res.times_bought || 0) === 1 ? '' : 's') + '</span>' +
+                  '<span class="stc-buyhist-chip">' + (res.merchant_count || 0) + ' merchant' + ((res.merchant_count || 0) === 1 ? '' : 's') + '</span>'
+                );
+                buyHistRender();
+              },
+              error: function() {
+                buyHistRows = [];
+                $('#stc-buyhist-meta').html('<span class="text-muted">Could not search.</span>');
+                $('#stc-buyhist-merchant-body').html('<tr><td colspan="2" class="stc-buyhist-empty">Could not search.</td></tr>');
+                $('#stc-buyhist-rate-body').html('<tr><td colspan="3" class="stc-buyhist-empty">Could not search.</td></tr>');
+              }
+            });
+          }
+          $('.bd-modal-product-buy').on('shown.bs.modal', function(){
+            $('#stc-buyhist-search').focus();
+          });
+          $('#stc-buyhist-search-btn').on('click', function(){ buyHistSearch(); });
+          $('#stc-buyhist-search').on('keydown', function(e){
+            if (e.which === 13) { e.preventDefault(); buyHistSearch(); }
+          });
+          $('body').delegate('.stc-buyhist-sort', 'click', function(){
+            var sort = $(this).attr('data-sort') || 'name';
+            if (buyHistSort === sort) {
+              buyHistDir = buyHistDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              buyHistSort = sort;
+              buyHistDir = (sort === 'bought_on') ? 'desc' : 'asc';
+            }
+            buyHistRender();
+          });
           $('#stc-mergst-search-btn').on('click', function(){ merGstLoad(1); });
           $('#stc-mergst-search').on('keydown', function(e){
             if (e.which === 13) { e.preventDefault(); merGstLoad(1); }
@@ -6478,40 +6982,217 @@ include("kattegat/role_check.php");
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="stcMerGstTitle">Merchants without GSTIN</h5>
+                <h5 class="modal-title" id="stcMerGstTitle">Merchants</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p class="text-muted">Merchants whose GSTIN is empty or not set. Search matches name, email, contact, PAN, and category.</p>
-                <div class="stc-mersync-bar">
-                    <div class="stc-mersync-search">
-                        <input type="text" class="form-control" id="stc-mergst-search" placeholder="Search merchant name, email, contact, PAN, category…">
-                        <button type="button" class="btn btn-success" id="stc-mergst-search-btn"><i class="fa fa-search"></i></button>
+                <ul class="nav nav-tabs stc-mergst-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#stc-mergst-tab-list" role="tab">Without GSTIN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#stc-mergst-tab-add" role="tab">Add Merchant</a>
+                    </li>
+                </ul>
+                <div class="tab-content stc-mergst-tab-content">
+                    <div class="tab-pane fade show active" id="stc-mergst-tab-list" role="tabpanel">
+                        <p class="text-muted">Merchants whose GSTIN is empty or not set. Search matches name, email, contact, PAN, and category.</p>
+                        <div class="stc-mersync-bar">
+                            <div class="stc-mersync-search">
+                                <input type="text" class="form-control" id="stc-mergst-search" placeholder="Search merchant name, email, contact, PAN, category…">
+                                <button type="button" class="btn btn-success" id="stc-mergst-search-btn"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm stc-mersync-table">
+                                <thead>
+                                    <tr>
+                                        <th class="stc-mergst-sort is-asc" data-sort="name">Merchant name</th>
+                                        <th class="stc-mergst-sort" data-sort="email">Email</th>
+                                        <th class="stc-mergst-sort" data-sort="phone">Contact</th>
+                                        <th class="stc-mergst-sort" data-sort="gstin">GSTIN</th>
+                                        <th class="stc-mergst-sort" data-sort="pan">PAN</th>
+                                        <th class="stc-mergst-sort" data-sort="category">Category</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stc-mergst-tbody">
+                                    <tr><td colspan="7" class="stc-mersync-empty">Open to load merchants…</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="stc-mersync-bar">
+                            <span class="text-muted" id="stc-mergst-pageinfo"></span>
+                            <div id="stc-mergst-pagination"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="stc-mergst-tab-add" role="tabpanel">
+                        <p class="text-muted">Same fields as Add Merchant. Only <strong>Merchant name</strong> is required.</p>
+                        <form id="stc-mergst-add-form" autocomplete="off">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Merchant Name <span class="text-danger">*</span></span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-name" name="name" placeholder="Enter Merchant Name">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Category</span>
+                                        <select class="form-control" id="stc-mergst-add-category" name="category">
+                                            <option value="">Select Category</option>
+                                            <option value="Manufacturer">Manufacturer</option>
+                                            <option value="Retailer">Retailer</option>
+                                            <option value="Wholesaler">Wholesaler</option>
+                                            <option value="Distributor">Distributor</option>
+                                            <option value="Dealer">Dealer</option>
+                                            <option value="Supplier">Supplier</option>
+                                            <option value="Trader">Trader</option>
+                                            <option value="Service Provider">Service Provider</option>
+                                            <option value="Others">Others</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Merchant Address</span>
+                                        <textarea class="form-control" id="stc-mergst-add-address" name="address" rows="2" placeholder="Enter Merchant Address"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Merchant City</span>
+                                        <select class="form-control" id="stc-mergst-add-city" name="city_id"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Merchant State</span>
+                                        <select class="form-control" id="stc-mergst-add-state" name="state_id"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Contact Person</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-person" name="contact_person" placeholder="Enter Merchant Contact Person">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Contact Number</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-phone" name="phone" placeholder="Enter Merchant Contact Number">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Email</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-email" name="email" placeholder="Enter Merchant Email">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">Specially Known For</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-known" name="known_for" placeholder="Enter Merchant Specially Known For">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">GSTIN</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-gstin" name="gstin" placeholder="Enter Merchant GSTIN">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stc-mergst-add-field">
+                                        <span class="stc-mergst-add-label">PAN</span>
+                                        <input type="text" class="form-control" id="stc-mergst-add-pan" name="pan" placeholder="Enter Merchant PAN">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-primary btn-block" id="stc-mergst-add-save">Add Merchant Now</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm stc-mersync-table">
-                        <thead>
-                            <tr>
-                                <th class="stc-mergst-sort is-asc" data-sort="name">Merchant name</th>
-                                <th class="stc-mergst-sort" data-sort="email">Email</th>
-                                <th class="stc-mergst-sort" data-sort="phone">Contact</th>
-                                <th class="stc-mergst-sort" data-sort="gstin">GSTIN</th>
-                                <th class="stc-mergst-sort" data-sort="pan">PAN</th>
-                                <th class="stc-mergst-sort" data-sort="category">Category</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stc-mergst-tbody">
-                            <tr><td colspan="7" class="stc-mersync-empty">Open to load merchants…</td></tr>
-                        </tbody>
-                    </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-product-master" tabindex="-1" role="dialog" aria-labelledby="stcPoaProductMasterTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stcPoaProductMasterTitle">Add / View Products</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe
+                    id="stc-poa-product-iframe"
+                    title="Add / View Products"
+                    src="about:blank"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-product-buy" tabindex="-1" role="dialog" aria-labelledby="stcPoaProductBuyTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stcPoaProductBuyTitle">Product buy history</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="stc-buyhist-search">
+                    <input type="text" class="form-control" id="stc-buyhist-search" placeholder="Search product name or product ID…">
+                    <button type="button" class="btn btn-success" id="stc-buyhist-search-btn"><i class="fa fa-search"></i> Search</button>
                 </div>
-                <div class="stc-mersync-bar">
-                    <span class="text-muted" id="stc-mergst-pageinfo"></span>
-                    <div id="stc-mergst-pagination"></div>
+                <div class="stc-buyhist-meta" id="stc-buyhist-meta">
+                    <span class="text-muted">Search by product name or product ID to see merchants and purchase rates.</span>
+                </div>
+                <div class="stc-buyhist-grid">
+                    <div class="stc-buyhist-col">
+                        <h6>Merchants</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="stc-buyhist-sort" data-sort="name">Name</th>
+                                        <th class="stc-buyhist-sort" data-sort="category">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stc-buyhist-merchant-body">
+                                    <tr><td colspan="2" class="stc-buyhist-empty">No results yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="stc-buyhist-col">
+                        <h6>Rates</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="stc-buyhist-sort" data-sort="rate">Rate</th>
+                                        <th class="stc-buyhist-sort" data-sort="unit">Unit</th>
+                                        <th class="stc-buyhist-sort is-desc" data-sort="bought_on">Date of buying</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stc-buyhist-rate-body">
+                                    <tr><td colspan="3" class="stc-buyhist-empty">No results yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

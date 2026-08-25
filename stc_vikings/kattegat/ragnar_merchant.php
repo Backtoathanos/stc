@@ -843,6 +843,110 @@ class ragnarMerchants extends tesseract{
 		return array('ok' => false, 'message' => 'Could not save merchant. Try again.');
 	}
 
+	public function stc_merchant_add_optional($name, $address, $city_id, $state_id, $contact_person, $email, $phone, $known_for, $pan, $gstin, $category){
+		$name = strtoupper(trim((string) $name));
+		$address = strtoupper(trim((string) $address));
+		$contact_person = trim((string) $contact_person);
+		$email = trim((string) $email);
+		$phone = trim((string) $phone);
+		$known_for = trim((string) $known_for);
+		$pan = strtoupper(trim((string) $pan));
+		$gstin = strtoupper(trim((string) $gstin));
+		$category = trim((string) $category);
+		$city_id = (int) $city_id;
+		$state_id = (int) $state_id;
+		if($city_id < 1) $city_id = 65;
+		if($state_id < 1) $state_id = 16;
+
+		if($name === ''){
+			return array('ok' => false, 'message' => 'Merchant name is required.');
+		}
+		if(strlen($name) > 255){
+			return array('ok' => false, 'message' => 'Merchant name is too long.');
+		}
+		$allowed = $this->stc_merchant_category_options();
+		if($category === 'NA') $category = '';
+		if($category !== '' && !in_array($category, $allowed, true)){
+			return array('ok' => false, 'message' => 'Select a valid merchant category.');
+		}
+
+		$escName = mysqli_real_escape_string($this->stc_dbs, $name);
+		$nameQ = mysqli_query($this->stc_dbs, "
+			SELECT `stc_merchant_id` FROM `stc_merchant`
+			WHERE UPPER(TRIM(`stc_merchant_name`))='".$escName."'
+			LIMIT 1
+		");
+		if($nameQ && mysqli_num_rows($nameQ) > 0){
+			return array('ok' => false, 'message' => 'This merchant name already exists.');
+		}
+
+		if(!$this->stc_merchant_gst_is_missing($gstin)){
+			$escGst = mysqli_real_escape_string($this->stc_dbs, $gstin);
+			$gstQ = mysqli_query($this->stc_dbs, "
+				SELECT `stc_merchant_id` FROM `stc_merchant`
+				WHERE UPPER(TRIM(`stc_merchant_gstin`))='".$escGst."'
+				LIMIT 1
+			");
+			if($gstQ && mysqli_num_rows($gstQ) > 0){
+				return array('ok' => false, 'message' => 'This GSTIN already exists on another merchant.');
+			}
+		}
+
+		$panKey = strtoupper($pan);
+		if($pan !== '' && !in_array($panKey, array('NA', 'N/A', '-', 'NIL', 'NULL'), true)){
+			$escPan = mysqli_real_escape_string($this->stc_dbs, $pan);
+			$panQ = mysqli_query($this->stc_dbs, "
+				SELECT `stc_merchant_id` FROM `stc_merchant`
+				WHERE UPPER(TRIM(`stc_merchant_pan`))='".$escPan."'
+				LIMIT 1
+			");
+			if($panQ && mysqli_num_rows($panQ) > 0){
+				return array('ok' => false, 'message' => 'This PAN already exists on another merchant.');
+			}
+		}
+
+		$ins = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_merchant`(
+				`stc_merchant_name`,
+				`stc_merchant_address`,
+				`stc_merchant_city_id`,
+				`stc_merchant_state_id`,
+				`stc_merchant_contact_person`,
+				`stc_merchant_email`,
+				`stc_merchant_phone`,
+				`stc_merchant_pan`,
+				`stc_merchant_gstin`,
+				`stc_merchant_specially_known_for`,
+				`stc_merchant_category`,
+				`stc_merchant_image`,
+				`stc_merchant_found_by`
+			) VALUES (
+				'".$escName."',
+				'".mysqli_real_escape_string($this->stc_dbs, $address)."',
+				".(int)$city_id.",
+				".(int)$state_id.",
+				'".mysqli_real_escape_string($this->stc_dbs, $contact_person)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $email)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $phone)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pan)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $gstin)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $known_for)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $category)."',
+				NULL,
+				0
+			)
+		");
+		if($ins){
+			return array(
+				'ok' => true,
+				'message' => 'Merchant added.',
+				'id' => (int) mysqli_insert_id($this->stc_dbs),
+				'still_missing_gst' => $this->stc_merchant_gst_is_missing($gstin) ? 1 : 0
+			);
+		}
+		return array('ok' => false, 'message' => 'Could not save merchant. Try again.');
+	}
+
 	private function stc_merchant_gst_missing_where(){
 		return "(
 			`stc_merchant_gstin` IS NULL
@@ -1260,6 +1364,27 @@ if(isset($_POST['stc_merchant_inline_update'])){
 	$pan = isset($_POST['pan']) ? $_POST['pan'] : '';
 	$category = isset($_POST['category']) ? $_POST['category'] : '';
 	echo json_encode($obj->stc_merchant_inline_update($id, $name, $email, $phone, $gstin, $pan, $category), stc_merchant_json_flags());
+	exit;
+}
+
+if(isset($_POST['stc_merchant_add_optional'])){
+	while(ob_get_level() > 0){
+		ob_end_clean();
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	$obj = new ragnarMerchants();
+	$name = isset($_POST['name']) ? $_POST['name'] : '';
+	$address = isset($_POST['address']) ? $_POST['address'] : '';
+	$city_id = isset($_POST['city_id']) ? $_POST['city_id'] : 65;
+	$state_id = isset($_POST['state_id']) ? $_POST['state_id'] : 16;
+	$contact_person = isset($_POST['contact_person']) ? $_POST['contact_person'] : '';
+	$email = isset($_POST['email']) ? $_POST['email'] : '';
+	$phone = isset($_POST['phone']) ? $_POST['phone'] : '';
+	$known_for = isset($_POST['known_for']) ? $_POST['known_for'] : '';
+	$pan = isset($_POST['pan']) ? $_POST['pan'] : '';
+	$gstin = isset($_POST['gstin']) ? $_POST['gstin'] : '';
+	$category = isset($_POST['category']) ? $_POST['category'] : '';
+	echo json_encode($obj->stc_merchant_add_optional($name, $address, $city_id, $state_id, $contact_person, $email, $phone, $known_for, $pan, $gstin, $category), stc_merchant_json_flags());
 	exit;
 }
 ?>

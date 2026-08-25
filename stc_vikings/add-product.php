@@ -5,6 +5,7 @@ require_once 'kattegat/auth_helper.php';
 // Check authentication using the new hybrid system
 STCAuthHelper::checkAuth();$page_code=301;
 include("kattegat/role_check.php");
+$stc_embed = isset($_GET['embed']) && (string) $_GET['embed'] === '1';
 ?> 
 <!doctype html>
 <html lang="en">
@@ -333,13 +334,29 @@ include("kattegat/role_check.php");
                 min-width: 0;
             }
         }
+        body.stc-embed {
+            background: #fff;
+        }
+        body.stc-embed .stc-embed-app,
+        body.stc-embed .stc-embed-app .app-main,
+        body.stc-embed .stc-embed-app .app-main__outer {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        body.stc-embed .stc-embed-app .app-main__outer {
+            padding-left: 0 !important;
+            padding-top: 0 !important;
+        }
+        body.stc-embed .stc-embed-app .app-main__inner {
+            padding: 10px 12px 16px !important;
+        }
     </style>
 </head>
-<body>
-    <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
-        <?php include_once("header-nav.php");?>
+<body<?php echo !empty($stc_embed) ? ' class="stc-embed"' : ''; ?>>
+    <div class="app-container app-theme-white body-tabs-shadow<?php echo !empty($stc_embed) ? ' stc-embed-app' : ' fixed-sidebar fixed-header'; ?>">
+        <?php if (empty($stc_embed)) { include_once("header-nav.php"); } ?>
         <div class="app-main">
-            <?php include_once("sidebar-nav.php");?>                   
+            <?php if (empty($stc_embed)) { include_once("sidebar-nav.php"); } ?>
             <div class="app-main__outer">
                     <div class="app-main__inner"> 
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
