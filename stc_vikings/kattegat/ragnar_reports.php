@@ -3415,12 +3415,22 @@ class ragnarReportsViewgroceriesPurchaseSaleReports extends tesseract{
 }
 
 class ragnarReportsViewSchoolCanteenReports extends tesseract{
+   private function stc_canteen_school_filter($school){
+      return " AND IFNULL(`stc_school_canteen_school`,'')='".mysqli_real_escape_string($this->stc_dbs, $school === null ? '' : $school)."'";
+   }
+
+   private function stc_canteen_school_label($school){
+      $school = trim((string)$school);
+      return $school !== '' ? htmlspecialchars($school) : '-';
+   }
+
    // call canteen
    public function stc_school_call_canteen($bjornebegdate, $bjorneenddate){
       $odin='';
       $odin_get_req_qry=mysqli_query($this->stc_dbs, "
          SELECT DISTINCT
-             `stc_school_canteen_date`
+             `stc_school_canteen_date`,
+             `stc_school_canteen_school`
          FROM
              `stc_school_canteen`
          WHERE 
@@ -3461,6 +3471,8 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
             $staff=0;
             $guest=0;
             $total=0;
+            $school=$req_row['stc_school_canteen_school'];
+            $schoolFilter=$this->stc_canteen_school_filter($school);
 
             $odin_getstudentqry=mysqli_query($this->stc_dbs, "
                SELECT
@@ -3471,6 +3483,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
                   DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
                AND 
                   `stc_school_canteen_serve_type`='student'
+               ".$schoolFilter."
                ORDER BY DATE(`stc_school_canteen_date`) DESC
             ");
 
@@ -3487,6 +3500,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
                   DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
                AND 
                   `stc_school_canteen_serve_type`='teacher'
+               ".$schoolFilter."
                ORDER BY DATE(`stc_school_canteen_date`) DESC
             ");
 
@@ -3503,6 +3517,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
                   DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
                AND 
                   `stc_school_canteen_serve_type`='staff'
+               ".$schoolFilter."
                ORDER BY DATE(`stc_school_canteen_date`) DESC
             ");
 
@@ -3519,6 +3534,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
                   DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
                AND 
                   `stc_school_canteen_serve_type`='guest'
+               ".$schoolFilter."
                ORDER BY DATE(`stc_school_canteen_date`) DESC
             ");
 
@@ -3535,11 +3551,12 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
             $odin.='
                <tr>
                   <td class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_canteen_date'])).'</td>
+                  <td class="text-center">'.$this->stc_canteen_school_label($school).'</td>
                   <td class="text-right">'.number_format($student, 2).'</td>
                   <td class="text-right">'.number_format($teacher, 2).'</td>
                   <td class="text-right">'.number_format($staff, 2).'</td>
                   <td class="text-right">'.number_format($guest, 2).'</td>
-                  <td class="text-right"><a href="#" class="stc-school-showdeep-req" id="'.$req_row['stc_school_canteen_date'].'">'.number_format($total, 2).'</a></td>
+                  <td class="text-right"><a href="#" class="stc-school-showdeep-req" id="'.$req_row['stc_school_canteen_date'].'" data-school="'.htmlspecialchars($school === null ? '' : $school).'">'.number_format($total, 2).'</a></td>
                </tr>
             ';
 
@@ -3553,6 +3570,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
                    `stc_school_canteen`
                WHERE
                    DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+                   ".$schoolFilter."
             ");
             foreach($odin_getqry as $odin_getrow){
                if($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
@@ -3592,7 +3610,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
          }
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-center">Total</td>
+               <td class="text-center" colspan="2">Total</td>
                <td class="text-right">'.number_format($maxstudent, 2).' NOS</td>
                <td class="text-right">'.number_format($maxteacher, 2).' NOS</td>
                <td class="text-right">'.number_format($maxstaff, 2).' NOS</td>
@@ -3603,7 +3621,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
 
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-center">Total Breakfast</td>
+               <td class="text-center" colspan="2">Total Breakfast</td>
                <td class="text-right">'.number_format($studtotbreakfast, 2).' NOS</td>
                <td class="text-right">'.number_format($teachertotbreakfast, 2).' NOS</td>
                <td class="text-right">'.number_format($stafftotbreakfast, 2).' NOS</td>
@@ -3613,7 +3631,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
          ';
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-center">Total Lunch</td>
+               <td class="text-center" colspan="2">Total Lunch</td>
                <td class="text-right">'.number_format($studtotlunch, 2).' NOS</td>
                <td class="text-right">'.number_format($teachertotlunch, 2).' NOS</td>
                <td class="text-right">'.number_format($stafftotlunch, 2).' NOS</td>
@@ -3623,7 +3641,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
          ';
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-center">Total Evening Snacks</td>
+               <td class="text-center" colspan="2">Total Evening Snacks</td>
                <td class="text-right">'.number_format($studtoteveningsnacks, 2).' NOS</td>
                <td class="text-right">'.number_format($teachertoteveningsnacks, 2).' NOS</td>
                <td class="text-right">'.number_format($stafftoteveningsnacks, 2).' NOS</td>
@@ -3633,7 +3651,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
          ';
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-center">Total Dinner</td>
+               <td class="text-center" colspan="2">Total Dinner</td>
                <td class="text-right">'.number_format($studtotdinner, 2).' NOS</td>
                <td class="text-right">'.number_format($teachertotdinner, 2).' NOS</td>
                <td class="text-right">'.number_format($stafftotdinner, 2).' NOS</td>
@@ -3644,7 +3662,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
       }else{
          $odin.='
             <tr>
-               <td colspan="6" class="text-center">No Records Found!!!</td>
+               <td colspan="7" class="text-center">No Records Found!!!</td>
             </tr>
          ';
       }
@@ -3652,7 +3670,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
    }
 
    // search by date
-   public function stc_search_by_date($search){
+   public function stc_search_by_date($search, $school=''){
       $odin='';
       $stbf=0;
       $stlunch=0;
@@ -3674,6 +3692,11 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
       $gses=0;
       $gsdinner=0;
 
+      $schoolFilter='';
+      if($school !== '' && $school !== null){
+         $schoolFilter=$this->stc_canteen_school_filter($school);
+      }
+
       $odin_getqry=mysqli_query($this->stc_dbs, "
          SELECT
              `stc_school_canteen_serve_type`,
@@ -3683,6 +3706,7 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
              `stc_school_canteen`
          WHERE
              DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $search)."'
+             ".$schoolFilter."
       ");
       foreach($odin_getqry as $odin_getrow){
          if($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
@@ -4903,8 +4927,9 @@ if(isset($_POST['stc_find_school_canteen_reports'])){
 // call by date
 if(isset($_POST['stc_call_by_date'])){ 
    $search=$_POST['req_date'];
+   $school=isset($_POST['req_school']) ? $_POST['req_school'] : '';
    $valkyrie=new ragnarReportsViewSchoolCanteenReports();
-   $lokiheck=$valkyrie->stc_search_by_date($search);
+   $lokiheck=$valkyrie->stc_search_by_date($search, $school);
    echo $lokiheck;
 }
 

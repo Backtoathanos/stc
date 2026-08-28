@@ -436,6 +436,25 @@ if($_SESSION['stc_school_user_for']==2){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
+                                      >School
+                                    </h5>
+                                    <select
+                                      name="stcschoolcanteenserschool"
+                                      class="form-control validate stcschoolcanteenserschool"
+                                      required
+                                    >
+                                      <option value="">Select School</option>
+                                      <option value="SIS">SIS</option>
+                                      <option value="SMS">SMS</option>
+                                      <option value="SGMS">SGMS</option>
+                                      <option value="SHS">SHS</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
                                       >Serve Date
                                     </h5>
                                       <?php 
@@ -934,15 +953,21 @@ if($_SESSION['stc_school_user_for']==2){
         // save canteen to db
         $(document).on('click', '#stcschoolcanteenserjit', function(e){
           e.preventDefault();
+          var stcschoolcanteenserschool    = $('.stcschoolcanteenserschool').val();
           var stcschoolcanteenserdate       = $('.stcschoolcanteenserdate').val();
           var stcschoolcanteensertype       = $('.stcschoolcanteensertype').val();
           var stcschoolcanteensertime       = $('.stcschoolcanteensertime').val();
           var stcschoolcanteenserqty        = $('.stcschoolcanteenserqty').val();
           var stcschoolcanteenserremarks    = $('.stcschoolcanteenserremarks').val();
+          if(stcschoolcanteenserschool==''){
+            alert('Please select a school.');
+            return;
+          }
           $.ajax({  
             url       : "../vanaheim/canteen-raised.php",
             method    : "POST",  
             data      : {
+              stcschoolcanteenserschool:stcschoolcanteenserschool,
               stcschoolcanteenserdate:stcschoolcanteenserdate,
               stcschoolcanteensertype:stcschoolcanteensertype,
               stcschoolcanteensertime:stcschoolcanteensertime,
@@ -1005,12 +1030,14 @@ if($_SESSION['stc_school_user_for']==2){
         $('body').delegate('.stc-school-showdeep-req', 'click', function(e){
           e.preventDefault();
           var req_date=$(this).attr("id");
+          var req_school=$(this).attr("data-school") || '';
           $.ajax({  
             url       : "../vanaheim/canteen-raised.php",
             method    : "POST",  
             data      : {
               stc_call_by_date : 1,
-              req_date:req_date
+              req_date:req_date,
+              req_school:req_school
             },
             // dataType: `JSON`,
             success   : function(response_canteen){

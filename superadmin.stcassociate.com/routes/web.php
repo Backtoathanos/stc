@@ -210,6 +210,7 @@ Route::group(['middleware' => 'superadmin'], function(){
     // for school canteen
     Route::get('/branch/school/canteen', [SchoolController::class, 'canteenshow']);    
     Route::get('/branch/school/canteen/list', [SchoolController::class, 'canteenlist']);
+    Route::post('/branch/school/canteen/edit', [SchoolController::class, 'canteenupdate']);
     Route::get('/branch/school/canteen/delete', [SchoolController::class, 'canteendelete']);
     
     // for stc requisition

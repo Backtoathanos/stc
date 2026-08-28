@@ -331,6 +331,7 @@ class SchoolController extends Controller
         $totalRecordswithFilter = BranchSchoolCanteen::select('count(*) as allcount')->where('stc_school_canteen_serve_type', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school.stc_school_user_fullName', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_date', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_school', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_serve_time', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_serve_quantity', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_remarks', 'like', '%' .$searchValue . '%')
@@ -341,6 +342,7 @@ class SchoolController extends Controller
         ->where('stc_school_canteen.stc_school_canteen_serve_type', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school.stc_school_user_fullName', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_date', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_school', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_serve_time', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_serve_quantity', 'like', '%' .$searchValue . '%')
         ->orwhere('stc_school_canteen.stc_school_canteen_remarks', 'like', '%' .$searchValue . '%')
@@ -355,6 +357,7 @@ class SchoolController extends Controller
         foreach($records as $record){
             $id = $record->stc_school_canteen_id;
             $date = $record->stc_school_canteen_date;
+            $school = $record->stc_school_canteen_school;
             $stc_school_canteen_serve_type = $record->stc_school_canteen_serve_type;
             $stc_school_canteen_serve_time = $record->stc_school_canteen_serve_time;
             $stc_school_canteen_serve_quantity = $record->stc_school_canteen_serve_quantity;
@@ -363,12 +366,16 @@ class SchoolController extends Controller
 
             // $stc_product_id = '<span id="display-stc_product_id'.$id.'">'.$id.'</span>';
             $date = '<span id="display-date'.$id.'" value="'.date('Y-m-d', strtotime($date)).'">'.date('d-m-Y H:i:s', strtotime($date)).'</span>';
+            $schoolDisplay = $school ? $school : '-';
+            $schoolHtml = '<span id="display-school'.$id.'" data-school="'.htmlspecialchars($school ?: '', ENT_QUOTES).'">'.$schoolDisplay.'</span>';
             $actionData = '
+                <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-canteen-btn" data-toggle="modal" data-target="#edit-modal" id="'.$id.'"><i class="fas fa-edit" title="Edit"></i></a>
                 <a href="javascript:void(0)" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
             '; 
             $data_arr[] = array(
                 "stc_school_canteen_id" => $id,
                 "stc_school_canteen_date" => $date,
+                "stc_school_canteen_school" => $schoolHtml,
                 "stc_school_canteen_serve_type" => $stc_school_canteen_serve_type,
                 "stc_school_canteen_serve_time" => $stc_school_canteen_serve_time,
                 "stc_school_canteen_serve_quantity" => number_format($stc_school_canteen_serve_quantity, 2),
@@ -386,6 +393,35 @@ class SchoolController extends Controller
         );
 
         return json_encode($response);
+    }
+
+    function canteenupdate(Request $request){
+        $allowed = ['SIS', 'SMS', 'SGMS', 'SHS'];
+        if (!in_array($request->school, $allowed, true)) {
+            return [
+                'status'=>'ok',
+                'success'=>false,
+                'message'=>'Please select a valid school.'
+            ];
+        }
+        $edit = BranchSchoolCanteen::where('stc_school_canteen_id', $request->id)->update([
+            'stc_school_canteen_school' => $request->school
+        ]);
+        if($edit !== false){
+            $response = [
+                'status'=>'ok',
+                'success'=>true,
+                'message'=>'Record updated succesfully!'
+            ];
+            return $response;
+        }else{
+            $response = [
+                'status'=>'ok',
+                'success'=>false,
+                'message'=>'Record updated failed!'
+            ];
+            return $response;
+        }
     }
 
     // delete through ajax

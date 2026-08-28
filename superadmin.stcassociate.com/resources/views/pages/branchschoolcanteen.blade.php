@@ -70,6 +70,7 @@
                         <tr>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
+                            <th class="text-center"><b>School</b></th>
                             <th class="text-center"><b>Type</b></th>
                             <th class="text-center"><b>Time</b></th>
                             <th class="text-center"><b>Quantity</b></th>
@@ -84,6 +85,7 @@
                         <tr>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
+                            <th class="text-center"><b>School</b></th>
                             <th class="text-center"><b>Type</b></th>
                             <th class="text-center"><b>Time</b></th>
                             <th class="text-center"><b>Quantity</b></th>
@@ -140,6 +142,7 @@
           columns: [
                 { data: 'stc_school_canteen_id' },
                 { data: 'stc_school_canteen_date' },
+                { data: 'stc_school_canteen_school' },
                 { data: 'stc_school_canteen_serve_type' },
                 { data: 'stc_school_canteen_serve_time' },
                 { data: 'stc_school_canteen_serve_quantity' },
@@ -149,16 +152,53 @@
           ],
           columnDefs: [
             { "targets": 0, "className": "text-center", width : '4%'},
-            { "targets": 1, "className": "text-right", width : '10%' },
+            { "targets": 1, "className": "text-center", width : '10%' },
             { "targets": 2, "className": "text-center", },
-            { "targets": 3, "className": "text-right", },
-            { "targets": 4, "className": "text-right", },
+            { "targets": 3, "className": "text-center", },
+            { "targets": 4, "className": "text-center", },
             { "targets": 5, "className": "text-right", },
-            { "targets": 6, "className": "text-right", },
-            { orderable: false, targets: 7 },
+            { "targets": 6, "className": "text-left", },
+            { "targets": 7, "className": "text-center", },
+            { orderable: false, targets: 8 },
           ]
         });
       }
+
+      // display for edit modal
+      $('body').delegate('.edit-canteen-btn','click', function(){
+        var edit_id = $(this).attr('id');
+        var school = $('#display-school'+edit_id).attr('data-school');
+        $('#edit_id').val(edit_id);
+        $('#edit-school').val(school);
+      });
+
+      // save edited school from modal
+      $('body').delegate('.edit-schoolmc-btn','click', function(){
+        var id = $('#edit_id').val();
+        var school = $('#edit-school').val();
+        $.ajax({
+            type: 'post',
+            data: {
+                id: id,
+                school: school,
+                _token: "{{ csrf_token() }}"
+            },
+            url: "{{ url('/branch/school/canteen/edit') }}",
+            success: function(response) {
+              if(response.success==true){
+                $('.close-btn').click();
+                swalSuccess('success', 'Record updated.');
+                if ( $.fn.DataTable.isDataTable('#example1') ) {
+                  $('#example1').DataTable().destroy();
+                }
+                dataTableAct="active";
+                getSchoolMonthlyClosing(dataTableAct);
+              }else{
+                swalSuccess('error', response.message);
+              }
+            }
+        });
+      });
 
       // delete function
       $('.delete-schoolmc-btn').on('click', function(e){
@@ -237,10 +277,10 @@
 
 <!-- edit modal -->
 <div class="modal fade" id="edit-modal">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Edit Monthly Closing</h4>
+        <h4 class="modal-title">Edit Canteen School</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -248,25 +288,24 @@
       <div class="modal-body">
         <div class="card-body">
           <div class="form-group">
-            <label for="name">Date</label>
-            <input type="date" class="form-control" id="edit-date" name="edit-date">
-          </div>
-          <div class="form-group">
-            <label for="name">Monthly Closing Value</label>
-            <input type="number" class="form-control" id="edit-value" name="edit-value" value="" placeholder="Enter monthly closing value">
+            <label for="edit-school">School</label>
+            <select class="form-control" id="edit-school" name="edit-school">
+              <option value="">Select School</option>
+              <option value="SIS">SIS</option>
+              <option value="SMS">SMS</option>
+              <option value="SGMS">SGMS</option>
+              <option value="SHS">SHS</option>
+            </select>
           </div>
         </div>
-        <!-- /.card-body -->
         <input type="hidden" id="edit_id">
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default close-btn" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger edit-schoolmc-btn">Save</button>
+        <button type="button" class="btn btn-primary edit-schoolmc-btn">Save</button>
       </div>
     </div>
-    <!-- /.modal-content -->
   </div>
-  <!-- /.modal-dialog -->
 </div>
 
 <!-- add modal -->

@@ -9,6 +9,15 @@ class BranchSchoolCanteen extends Model
     protected $table = 'stc_school_canteen';
     public $timestamps = false;
     protected $primaryKey = 'stc_school_canteen_id';
+    protected $fillable = [
+        'stc_school_canteen_date',
+        'stc_school_canteen_school',
+        'stc_school_canteen_serve_type',
+        'stc_school_canteen_serve_time',
+        'stc_school_canteen_serve_quantity',
+        'stc_school_canteen_remarks',
+        'stc_school_canteen_created_by'
+    ];
     
 
     static public function getSchool(){

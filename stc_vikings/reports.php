@@ -993,6 +993,7 @@ STCAuthHelper::checkAuth();?>
                                             <thead>
                                                 <tr>
                                                     <th class="text-center">Date</th>
+                                                    <th class="text-center">School</th>
                                                     <th class="text-center">Student</th>
                                                     <th class="text-center">Teacher</th>
                                                     <th class="text-center">Staff</th>
@@ -2416,12 +2417,14 @@ STCAuthHelper::checkAuth();?>
             $('body').delegate('.stc-school-showdeep-req', 'click', function(e){
                 e.preventDefault();
                 var req_date=$(this).attr("id");
+                var req_school=$(this).attr("data-school") || '';
                 $.ajax({  
                     url     : "kattegat/ragnar_reports.php",
                     method    : "POST",  
                     data      : {
                         stc_call_by_date : 1,
-                        req_date:req_date
+                        req_date:req_date,
+                        req_school:req_school
                     },
                     // dataType: `JSON`,
                     success   : function(response_canteen){
