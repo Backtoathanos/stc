@@ -177,9 +177,15 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/master/merchant/create', [MerchantController::class, 'create']);
     Route::post('/master/merchant/edit', [MerchantController::class, 'update']);
     Route::get('/master/merchant/delete', [MerchantController::class, 'delete']);
+    Route::post('/master/merchant/import', [MerchantController::class, 'importExcel']);
+    Route::get('/master/merchant/import/template', [MerchantController::class, 'downloadTemplate']);
     Route::get('/master/merchant/adhoc-sources/list', [MerchantController::class, 'adhocSourcesList']);
     Route::post('/master/merchant/adhoc-sources/rename', [MerchantController::class, 'adhocSourceRename']);
     Route::post('/master/merchant/adhoc-sources/insert', [MerchantController::class, 'adhocSourceInsert']);
+    Route::get('/master/merchant/duplicates/list', [MerchantController::class, 'duplicatesList']);
+    Route::get('/master/merchant/duplicates/adhoc-uses', [MerchantController::class, 'duplicatesAdhocUses']);
+    Route::post('/master/merchant/duplicates/sync', [MerchantController::class, 'duplicatesSync']);
+    Route::post('/master/merchant/duplicates/delete', [MerchantController::class, 'duplicatesDelete']);
 
     // for electronics branch
     Route::get('/branch/electronicsbranch', [branchElectronicsController::class, 'show']);  

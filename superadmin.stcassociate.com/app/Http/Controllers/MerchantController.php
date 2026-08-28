@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\City;
 use App\Merchant;
+use App\MerchantDuplicateFinder;
+use App\MerchantExcelImporter;
 use App\State;
 
 class MerchantController extends Controller
@@ -774,5 +776,376 @@ class MerchantController extends Controller
             'inserted' => $inserted,
             'skipped' => $skipped,
         ];
+    }
+
+    public function duplicatesList(Request $request)
+    {
+        @set_time_limit(120);
+        $minPct = (int) $request->get('min_pct', 50);
+        $groups = (new MerchantDuplicateFinder())->groups($minPct);
+
+        return response()->json([
+            'status' => 'ok',
+            'success' => true,
+            'count' => count($groups),
+            'groups' => $groups,
+        ]);
+    }
+
+    public function duplicatesAdhocUses(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:stc_merchant,stc_merchant_id',
+            'type' => 'nullable|in:adhoc,po,trading',
+        ]);
+
+        $type = (string) $request->get('type', 'adhoc');
+        $merchant = Merchant::find((int) $request->id);
+        $name = trim((string) ($merchant->stc_merchant_name ?? ''));
+        $id = (int) $merchant->stc_merchant_id;
+        $limit = 300;
+
+        if ($type === 'po') {
+            $base = DB::table('stc_purchase_product')
+                ->where('stc_purchase_product_merchant_id', $id);
+            $total = (int) (clone $base)->count();
+            $records = (clone $base)
+                ->select(
+                    'stc_purchase_product_id',
+                    'stc_purchase_product_order_date',
+                    'stc_purchase_product_basic_value',
+                    'stc_purchase_product_status',
+                    'stc_purchase_product_req_no'
+                )
+                ->orderByDesc('stc_purchase_product_id')
+                ->limit($limit)
+                ->get();
+            $rows = [];
+            foreach ($records as $r) {
+                $rows[] = [
+                    'id' => (int) $r->stc_purchase_product_id,
+                    'date' => (string) ($r->stc_purchase_product_order_date ?? ''),
+                    'value' => (float) $r->stc_purchase_product_basic_value,
+                    'status' => (string) ($r->stc_purchase_product_status ?? ''),
+                    'ref' => (string) ($r->stc_purchase_product_req_no ?? ''),
+                ];
+            }
+
+            return response()->json([
+                'status' => 'ok',
+                'success' => true,
+                'type' => 'po',
+                'name' => $name,
+                'total' => $total,
+                'shown' => count($rows),
+                'rows' => $rows,
+            ]);
+        }
+
+        if ($type === 'trading') {
+            $base = DB::table('stc_trading_purchase')
+                ->where('stc_trading_purchase_purchaser_id', $id);
+            $total = (int) (clone $base)->count();
+            $records = (clone $base)
+                ->select(
+                    'stc_trading_purchase_id',
+                    'stc_trading_purchase_date',
+                    'stc_trading_purchase_refrence_no',
+                    'stc_trading_purchase_refrence_date',
+                    'stc_trading_purchase_remarks'
+                )
+                ->orderByDesc('stc_trading_purchase_id')
+                ->limit($limit)
+                ->get();
+            $rows = [];
+            foreach ($records as $r) {
+                $rows[] = [
+                    'id' => (int) $r->stc_trading_purchase_id,
+                    'date' => (string) ($r->stc_trading_purchase_date ?? ''),
+                    'ref' => (string) ($r->stc_trading_purchase_refrence_no ?? ''),
+                    'ref_date' => (string) ($r->stc_trading_purchase_refrence_date ?? ''),
+                    'remarks' => (string) ($r->stc_trading_purchase_remarks ?? ''),
+                ];
+            }
+
+            return response()->json([
+                'status' => 'ok',
+                'success' => true,
+                'type' => 'trading',
+                'name' => $name,
+                'total' => $total,
+                'shown' => count($rows),
+                'rows' => $rows,
+            ]);
+        }
+
+        if ($name === '') {
+            return response()->json([
+                'status' => 'ok',
+                'success' => true,
+                'type' => 'adhoc',
+                'name' => $name,
+                'total' => 0,
+                'shown' => 0,
+                'rows' => [],
+            ]);
+        }
+
+        $base = DB::table('stc_purchase_product_adhoc as A')
+            ->leftJoin('stc_product as P', 'P.stc_product_id', '=', 'A.stc_purchase_product_adhoc_productid')
+            ->whereRaw('UPPER(TRIM(A.stc_purchase_product_adhoc_source)) = ?', [mb_strtoupper($name, 'UTF-8')]);
+
+        $total = (int) (clone $base)->count();
+        $records = (clone $base)
+            ->select(
+                'A.stc_purchase_product_adhoc_id',
+                'A.stc_purchase_product_adhoc_itemdesc',
+                'A.stc_purchase_product_adhoc_qty',
+                'A.stc_purchase_product_adhoc_prate',
+                'A.stc_purchase_product_adhoc_rate',
+                'A.stc_purchase_product_adhoc_unit',
+                'A.stc_purchase_product_adhoc_destination',
+                'A.stc_purchase_product_adhoc_recievedby',
+                'A.stc_purchase_product_adhoc_status',
+                'A.stc_purchase_product_adhoc_created_date',
+                'P.stc_product_name'
+            )
+            ->orderByDesc('A.stc_purchase_product_adhoc_id')
+            ->limit($limit)
+            ->get();
+
+        $rows = [];
+        foreach ($records as $r) {
+            $item = trim((string) ($r->stc_product_name ?? ''));
+            if ($item === '') {
+                $item = trim((string) ($r->stc_purchase_product_adhoc_itemdesc ?? ''));
+            }
+            $rows[] = [
+                'id' => (int) $r->stc_purchase_product_adhoc_id,
+                'item' => $item,
+                'qty' => (float) $r->stc_purchase_product_adhoc_qty,
+                'rate' => (float) $r->stc_purchase_product_adhoc_prate,
+                'unit' => (string) ($r->stc_purchase_product_adhoc_unit ?? ''),
+                'destination' => (string) ($r->stc_purchase_product_adhoc_destination ?? ''),
+                'received_by' => (string) ($r->stc_purchase_product_adhoc_recievedby ?? ''),
+                'status' => (string) ($r->stc_purchase_product_adhoc_status ?? ''),
+                'date' => (string) ($r->stc_purchase_product_adhoc_created_date ?? ''),
+            ];
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'success' => true,
+            'type' => 'adhoc',
+            'name' => $name,
+            'total' => $total,
+            'shown' => count($rows),
+            'rows' => $rows,
+        ]);
+    }
+
+    public function duplicatesSync(Request $request)
+    {
+        $request->validate([
+            'keep_id' => 'required|integer|exists:stc_merchant,stc_merchant_id',
+            'from_id' => 'required|integer|exists:stc_merchant,stc_merchant_id',
+        ]);
+
+        $keepId = (int) $request->keep_id;
+        $fromId = (int) $request->from_id;
+        if ($keepId === $fromId) {
+            return [
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Choose a different merchant to sync from.',
+            ];
+        }
+
+        $keep = Merchant::find($keepId);
+        $from = Merchant::find($fromId);
+        $finder = new MerchantDuplicateFinder();
+        $fill = $finder->emptyFieldsFrom($keep, $from);
+        $knownFor = $finder->concatenateKnownFor($keep, $from);
+        if ($knownFor !== null) {
+            $fill['stc_merchant_specially_known_for'] = $knownFor;
+        }
+        $filled = count($fill);
+        $adhoc = 0;
+        $po = 0;
+        $trading = 0;
+
+        DB::transaction(function () use ($keepId, $fromId, $fill, $from, $keep, &$adhoc, &$po, &$trading) {
+            if ($fill !== []) {
+                Merchant::where('stc_merchant_id', $keepId)->update($fill);
+            }
+            $adhoc = $this->remapAdhocSource(
+                (string) $from->stc_merchant_name,
+                (string) $keep->stc_merchant_name
+            );
+            $po = (int) DB::table('stc_purchase_product')
+                ->where('stc_purchase_product_merchant_id', $fromId)
+                ->update(['stc_purchase_product_merchant_id' => $keepId]);
+            $trading = (int) DB::table('stc_trading_purchase')
+                ->where('stc_trading_purchase_purchaser_id', $fromId)
+                ->update(['stc_trading_purchase_purchaser_id' => $keepId]);
+        });
+
+        $message = 'Synced "' . $from->stc_merchant_name . '" into "' . $keep->stc_merchant_name . '".';
+        $message .= ' ' . $filled . ' field(s) updated.';
+        $message .= ' Adhoc ' . $adhoc . ', PO ' . $po . ', trading ' . $trading . ' row(s) moved.';
+
+        return [
+            'status' => 'ok',
+            'success' => true,
+            'message' => $message,
+            'filled' => $filled,
+            'adhoc' => $adhoc,
+            'po' => $po,
+            'trading' => $trading,
+        ];
+    }
+
+    public function duplicatesDelete(Request $request)
+    {
+        $request->validate([
+            'keep_id' => 'required|integer|exists:stc_merchant,stc_merchant_id',
+            'delete_id' => 'required|integer|exists:stc_merchant,stc_merchant_id',
+        ]);
+
+        $keepId = (int) $request->keep_id;
+        $deleteId = (int) $request->delete_id;
+        if ($keepId === $deleteId) {
+            return [
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Cannot delete the keep merchant. Pick another row as Keep first.',
+            ];
+        }
+
+        $keep = Merchant::find($keepId);
+        $dup = Merchant::find($deleteId);
+        $finder = new MerchantDuplicateFinder();
+        $fill = $finder->emptyFieldsFrom($keep, $dup);
+        $adhoc = 0;
+
+        DB::transaction(function () use ($keepId, $deleteId, $fill, $dup, $keep, &$adhoc) {
+            if ($fill !== []) {
+                Merchant::where('stc_merchant_id', $keepId)->update($fill);
+            }
+            $adhoc = $this->remapAdhocSource(
+                (string) $dup->stc_merchant_name,
+                (string) $keep->stc_merchant_name
+            );
+            Merchant::destroy($deleteId);
+        });
+
+        $message = 'Deleted "' . $dup->stc_merchant_name . '" (#' . $deleteId . ').';
+        if ($fill !== []) {
+            $message .= ' Filled ' . count($fill) . ' empty field(s) on the keep merchant first.';
+        }
+        $message .= ' ' . $adhoc . ' adhoc source row(s) renamed to "' . $keep->stc_merchant_name . '".';
+
+        return [
+            'status' => 'ok',
+            'success' => true,
+            'message' => $message,
+            'adhoc' => $adhoc,
+        ];
+    }
+
+    protected function remapAdhocSource(string $fromName, string $toName): int
+    {
+        $fromName = trim($fromName);
+        $toName = trim($toName);
+        if ($fromName === '' || $toName === '') {
+            return 0;
+        }
+        if (mb_strtoupper($fromName, 'UTF-8') === mb_strtoupper($toName, 'UTF-8')) {
+            return 0;
+        }
+
+        return (int) DB::table('stc_purchase_product_adhoc')
+            ->whereRaw('TRIM(stc_purchase_product_adhoc_source) = ?', [$fromName])
+            ->update(['stc_purchase_product_adhoc_source' => $toName]);
+    }
+
+    public function importExcel(Request $request)
+    {
+        if (!$request->hasFile('file')) {
+            return response()->json([
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Please choose an Excel file.',
+            ], 422);
+        }
+
+        $file = $request->file('file');
+        if (!$file || !$file->isValid()) {
+            return response()->json([
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'The Excel file did not upload correctly. Try a smaller .xlsx file.',
+            ], 422);
+        }
+
+        if ($file->getSize() > 20 * 1024 * 1024) {
+            return response()->json([
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'File is larger than 20 MB.',
+            ], 422);
+        }
+
+        $ext = strtolower((string) $file->getClientOriginalExtension());
+        if (!in_array($ext, ['xlsx', 'xls', 'csv'], true)) {
+            return response()->json([
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Please upload an Excel file (.xlsx, .xls or .csv).',
+            ], 422);
+        }
+
+        @set_time_limit(180);
+
+        try {
+            $result = (new MerchantExcelImporter())->import($file);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'ok',
+                'success' => false,
+                'message' => 'Could not read the Excel file: ' . $e->getMessage(),
+            ], 422);
+        }
+
+        $inserted = (int) $result['inserted'];
+        $updated = (int) $result['updated'];
+        $skipped = (int) $result['skipped'];
+        $errors = $result['errors'];
+        $ok = ($inserted + $updated) > 0;
+
+        $message = $inserted . ' inserted, ' . $updated . ' updated, ' . $skipped . ' skipped.';
+        if ($errors !== []) {
+            $message .= ' ' . count($errors) . ' row warning(s).';
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'success' => $ok || $errors === [],
+            'message' => $message,
+            'inserted' => $inserted,
+            'updated' => $updated,
+            'skipped' => $skipped,
+            'errors' => array_slice($errors, 0, 50),
+        ]);
+    }
+
+    public function downloadTemplate()
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'stc_merchant_');
+        (new MerchantExcelImporter())->writeTemplate($tmp);
+
+        return response()->download($tmp, 'merchant-upload-template.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 }

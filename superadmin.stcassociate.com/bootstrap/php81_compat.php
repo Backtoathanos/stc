@@ -13,3 +13,22 @@ set_error_handler(static function ($severity, $message, $file, $line) {
 
     return false;
 });
+
+// PHP 8.1+ adds $_FILES[*]['full_path']. Old Symfony FileBag only accepts
+// error/name/size/tmp_name/type, so Laravel then treats the filename string
+// as an uploaded file and throws createFromBase() TypeError.
+if (!empty($_FILES) && is_array($_FILES)) {
+    $stripUploadFullPath = static function (&$node) use (&$stripUploadFullPath) {
+        if (!is_array($node)) {
+            return;
+        }
+        unset($node['full_path']);
+        foreach ($node as &$child) {
+            if (is_array($child)) {
+                $stripUploadFullPath($child);
+            }
+        }
+        unset($child);
+    };
+    $stripUploadFullPath($_FILES);
+}
