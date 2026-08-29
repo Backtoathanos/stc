@@ -20,6 +20,58 @@
       .fade:not(.show) {
         opacity: 10;
       }
+      .bd-powertools-modal-lg .modal-dialog {
+        max-width: 96%;
+      }
+      .bd-powertools-modal-lg .pt-entry-panel {
+        background: #f7f8fa;
+        border: 1px solid #e3e6ea;
+        border-radius: 6px;
+        padding: 14px 16px 16px;
+        margin-bottom: 14px;
+      }
+      .bd-powertools-modal-lg .pt-entry-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px 14px;
+        align-items: end;
+      }
+      .bd-powertools-modal-lg .pt-entry-panel .form-group {
+        margin-bottom: 0;
+      }
+      .bd-powertools-modal-lg .pt-entry-panel label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.3;
+        min-height: 34px;
+        margin-bottom: 6px;
+      }
+      .bd-powertools-modal-lg .pt-entry-panel .btn {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (max-width: 991px) {
+        .bd-powertools-modal-lg .pt-entry-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 575px) {
+        .bd-powertools-modal-lg .pt-entry-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .bd-powertools-modal-lg .table th,
+      .bd-powertools-modal-lg .table td {
+        font-size: 12px;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+      .bd-powertools-modal-lg .table {
+        min-width: 980px;
+      }
     </style>
 </head>
 <body>
@@ -5216,79 +5268,68 @@
                     </div>
                 </div>
                 <hr>
-                <h6><strong>Add Tool Entry</strong></h6>
-                <div class="row">
-                    <div class="col-md-3 col-sm-6">
+                <div class="pt-entry-panel">
+                    <h6 class="mb-3"><strong>Add Tool Entry</strong></h6>
+                    <div class="pt-entry-grid">
                         <div class="form-group">
                             <label>Name / Type / Make</label>
-                            <input type="text" class="form-control" id="stc-pt-item-name" placeholder="Name/Type/Make">
+                            <input type="text" class="form-control" id="stc-pt-item-name" placeholder="Name / Type / Make">
                         </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
                         <div class="form-group">
                             <label>Serial No.</label>
                             <input type="text" class="form-control" id="stc-pt-item-serial" placeholder="Serial No.">
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
                         <div class="form-group">
                             <label>3 Core Cable &amp; Plug</label>
                             <select class="form-control" id="stc-pt-item-3core">
-                                <option value="OK">OK</option>
+                                <option value="OK" selected>OK</option>
+                                <option value="N/A">N/A</option>
                                 <option value="Not OK">Not OK</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
                         <div class="form-group">
                             <label>Insulation</label>
                             <select class="form-control" id="stc-pt-item-insulation">
-                                <option value="OK">OK</option>
+                                <option value="OK" selected>OK</option>
+                                <option value="N/A">N/A</option>
                                 <option value="Not OK">Not OK</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
                         <div class="form-group">
                             <label>Earthing Conn.</label>
                             <select class="form-control" id="stc-pt-item-earthing">
-                                <option value="OK">OK</option>
+                                <option value="OK" selected>OK</option>
+                                <option value="N/A">N/A</option>
                                 <option value="Not OK">Not OK</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
                         <div class="form-group">
                             <label>Handle</label>
                             <select class="form-control" id="stc-pt-item-handle">
-                                <option value="OK">OK</option>
+                                <option value="OK" selected>OK</option>
+                                <option value="N/A">N/A</option>
                                 <option value="Not OK">Not OK</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
                         <div class="form-group">
                             <label>Safe To Work</label>
                             <select class="form-control" id="stc-pt-item-safetowork">
-                                <option value="Yes">Yes</option>
+                                <option value="Yes" selected>Yes</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-6">
                         <div class="form-group">
                             <label>SUPR/ENGR Name</label>
                             <input type="text" class="form-control" id="stc-pt-item-suprname" placeholder="Name">
                         </div>
-                    </div>
-                    <div class="col-md-1 col-sm-6">
                         <div class="form-group">
-                            <label>Sign/Date</label>
-                            <input type="text" class="form-control" id="stc-pt-item-signdate" placeholder="Sign/Date">
+                            <label>Sign / Date</label>
+                            <input type="text" class="form-control" id="stc-pt-item-signdate" placeholder="Sign / Date">
                         </div>
-                    </div>
-                    <div class="col-md-12 col-sm-12 mt-1 mb-2">
-                        <a href="javascript:void(0)" class="btn btn-success" id="stc-pt-item-addbtn"><i class="fa fa-plus"></i> Add Row</a>
+                        <div class="form-group">
+                            <label>Action</label>
+                            <a href="javascript:void(0)" class="btn btn-success btn-block" id="stc-pt-item-addbtn"><i class="fa fa-plus"></i> Add Row</a>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
