@@ -656,6 +656,33 @@
         reloadAdhocSourcesTable();
       }
 
+      function removeDupMemberRow($card, merchantId) {
+        merchantId = parseInt(merchantId, 10);
+        var $row = $card.find('tbody tr[data-id="' + merchantId + '"]');
+        $row.remove();
+        var gi = $card.attr('data-group');
+        var members = dupMembersByGroup[gi] || dupMembersByGroup[String(gi)] || [];
+        members = members.filter(function(m){ return parseInt(m.id, 10) !== merchantId; });
+        dupMembersByGroup[gi] = members;
+        dupMembersByGroup[String(gi)] = members;
+        var idx = parseInt(gi, 10);
+        if (!isNaN(idx) && dupGroupsCache[idx] && dupGroupsCache[idx].members) {
+          dupGroupsCache[idx].members = dupGroupsCache[idx].members.filter(function(m){
+            return parseInt(m.id, 10) !== merchantId;
+          });
+          dupGroupsCache[idx].size = dupGroupsCache[idx].members.length;
+        }
+        var left = $card.find('tbody tr').length;
+        if (left < 2) {
+          $card.remove();
+          var shown = $('#dup-groups .dup-group-card').length;
+          $('#dup-count-label').text(shown + ' group(s)');
+          $('#dup-empty').toggleClass('d-none', shown !== 0);
+        } else {
+          $card.find('.card-header strong').first().text('Group of ' + left);
+        }
+      }
+
       $('a[data-toggle="pill"][href="#tab-duplicates"]').on('shown.bs.tab', function () {
         loadDuplicates(false);
       });
@@ -853,7 +880,6 @@
             if (response.success) {
               $('#dup-sync-modal').modal('hide');
               swalSuccess('success', response.message || 'Synced.');
-              afterDupChange();
             } else {
               swalSuccess('error', response.message || 'Sync failed.');
             }
@@ -886,7 +912,7 @@
             success: function(response) {
               if (response.success) {
                 swalSuccess('success', response.message || 'Deleted.');
-                afterDupChange();
+                removeDupMemberRow($card, fromId);
               } else {
                 swalSuccess('error', response.message || 'Delete failed.');
               }
