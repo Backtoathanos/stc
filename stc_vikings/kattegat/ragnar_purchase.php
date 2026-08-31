@@ -4037,36 +4037,16 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 	public function stc_product_buy_history($search){
 		$search = trim((string) $search);
-		$isId = ctype_digit($search);
-		if((!$isId && strlen($search) < 2) || ($isId && $search === '')){
+		if(!ctype_digit($search) || (int) $search <= 0){
 			return array(
 				'ok' => false,
-				'message' => 'Search by product name or product ID.',
+				'message' => 'Enter a product ID.',
 				'times_bought' => 0,
 				'merchant_count' => 0,
 				'rows' => array()
 			);
 		}
-		$like = mysqli_real_escape_string(
-			$this->stc_dbs,
-			str_replace(array('\\', '%', '_'), array('\\\\', '\\%', '\\_'), $search)
-		);
-		$id = $isId ? (int) $search : 0;
-		$adhocMatch = "
-				A.`stc_purchase_product_adhoc_itemdesc` LIKE '%".$like."%'
-				OR P.`stc_product_name` LIKE '%".$like."%'
-		";
-		$poMatch = "P.`stc_product_name` LIKE '%".$like."%'";
-		if($isId){
-			$adhocMatch .= "
-				OR A.`stc_purchase_product_adhoc_productid` = ".$id."
-				OR P.`stc_product_id` = ".$id."
-			";
-			$poMatch .= "
-				OR P.`stc_product_id` = ".$id."
-				OR I.`stc_purchase_product_items_product_id` = ".$id."
-			";
-		}
+		$id = (int) $search;
 		$rows = array();
 
 		$adhocQ = mysqli_query($this->stc_dbs, "
@@ -4084,9 +4064,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				ON P.`stc_product_id` = A.`stc_purchase_product_adhoc_productid`
 			LEFT JOIN `stc_merchant` M
 				ON UPPER(TRIM(M.`stc_merchant_name`)) = UPPER(TRIM(A.`stc_purchase_product_adhoc_source`))
-			WHERE (
-				".$adhocMatch."
-			)
+			WHERE A.`stc_purchase_product_adhoc_productid` = ".$id."
 			AND TRIM(COALESCE(A.`stc_purchase_product_adhoc_source`, '')) <> ''
 			AND UPPER(TRIM(A.`stc_purchase_product_adhoc_source`)) NOT IN ('-', '--', 'NA', 'N/A', 'NULL', 'NIL')
 			ORDER BY A.`stc_purchase_product_adhoc_created_date` DESC
@@ -4124,9 +4102,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				ON PP.`stc_purchase_product_id` = I.`stc_purchase_product_items_order_id`
 			INNER JOIN `stc_merchant` M
 				ON M.`stc_merchant_id` = PP.`stc_purchase_product_merchant_id`
-			WHERE (
-				".$poMatch."
-			)
+			WHERE I.`stc_purchase_product_items_product_id` = ".$id."
 			AND TRIM(COALESCE(M.`stc_merchant_name`, '')) <> ''
 			AND UPPER(TRIM(M.`stc_merchant_name`)) NOT IN ('-', '--', 'NA', 'N/A', 'NULL', 'NIL')
 			ORDER BY PP.`stc_purchase_product_order_date` DESC
@@ -4163,9 +4139,18 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$named[] = $row;
 		}
 
+		$seenRate = array();
+		$uniqueRates = array();
+		foreach($named as $row){
+			$rateKey = strtoupper($row['name']).'|'.number_format((float) $row['rate'], 2, '.', '').'|'.strtoupper($row['unit']);
+			if(isset($seenRate[$rateKey])) continue;
+			$seenRate[$rateKey] = true;
+			$uniqueRates[] = $row;
+		}
+
 		$perVendor = array();
 		$filtered = array();
-		foreach($named as $row){
+		foreach($uniqueRates as $row){
 			$key = strtoupper($row['name']);
 			if(!isset($perVendor[$key])) $perVendor[$key] = 0;
 			if($perVendor[$key] >= 3) continue;
@@ -4175,26 +4160,18 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$rows = $filtered;
 
 		$merchants = array();
-		$products = array();
-		$productIds = array();
+		$productLabel = '';
 		foreach($rows as $row){
 			$key = strtoupper($row['name']);
 			if($key !== '') $merchants[$key] = true;
-			if($row['product_name'] !== '') $products[$row['product_name']] = true;
-			if(!empty($row['product_id'])) $productIds[(int) $row['product_id']] = true;
+			if($productLabel === '' && $row['product_name'] !== ''){
+				$productLabel = $row['product_name'];
+			}
 		}
-		$productNames = array_keys($products);
-		$idList = array_keys($productIds);
-		$productLabel = '';
-		if(count($productNames) === 1){
-			$productLabel = $productNames[0];
-		}elseif(count($productNames) > 1){
-			$productLabel = $productNames[0].' + '.(count($productNames) - 1).' more';
-		}
-		if($productLabel !== '' && count($idList) === 1){
-			$productLabel .= ' (ID '.$idList[0].')';
-		}elseif($productLabel === '' && count($idList) === 1){
-			$productLabel = 'Product ID '.$idList[0];
+		if($productLabel !== ''){
+			$productLabel .= ' (ID '.$id.')';
+		}else{
+			$productLabel = 'Product ID '.$id;
 		}
 
 		return array(

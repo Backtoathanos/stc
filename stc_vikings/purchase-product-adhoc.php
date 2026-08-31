@@ -5680,9 +5680,8 @@ include("kattegat/role_check.php");
           }
           function buyHistSearch() {
             var q = $.trim($('#stc-buyhist-search').val() || '');
-            var isId = /^\d+$/.test(q);
-            if (!q || (!isId && q.length < 2)) {
-              stcAlert('Search by product name or product ID.');
+            if (!/^\d+$/.test(q) || parseInt(q, 10) <= 0) {
+              stcAlert('Enter a product ID.');
               return;
             }
             $('#stc-buyhist-meta').html('<span class="text-muted">Searching…</span>');
@@ -5707,6 +5706,20 @@ include("kattegat/role_check.php");
                   var name = $.trim(row && row.name ? row.name : '').toUpperCase();
                   return name !== '' && name !== '-' && name !== '--' && name !== 'NA' && name !== 'N/A' && name !== 'NULL' && name !== 'NIL';
                 });
+                buyHistRows.sort(function(a, b) {
+                  var av = String(a.bought_on == null ? '' : a.bought_on);
+                  var bv = String(b.bought_on == null ? '' : b.bought_on);
+                  if (av < bv) return 1;
+                  if (av > bv) return -1;
+                  return 0;
+                });
+                var seenRate = {};
+                buyHistRows = buyHistRows.filter(function(row) {
+                  var key = $.trim(row.name || '').toUpperCase() + '|' + (parseFloat(row.rate) || 0).toFixed(2) + '|' + $.trim(row.unit || '').toUpperCase();
+                  if (seenRate[key]) return false;
+                  seenRate[key] = true;
+                  return true;
+                });
                 var vendorSeen = {};
                 buyHistRows = buyHistRows.filter(function(row) {
                   var key = $.trim(row.name || '').toUpperCase();
@@ -5715,7 +5728,7 @@ include("kattegat/role_check.php");
                   vendorSeen[key]++;
                   return true;
                 });
-                var title = res.product_label ? buyHistEsc(res.product_label) : buyHistEsc(q);
+                var title = res.product_label ? buyHistEsc(res.product_label) : ('Product ID ' + buyHistEsc(q));
                 $('#stc-buyhist-meta').html(
                   '<h6>' + title + '</h6>' +
                   '<span class="stc-buyhist-chip">Bought ' + (res.times_bought || 0) + ' time' + ((res.times_bought || 0) === 1 ? '' : 's') + '</span>' +
@@ -7153,11 +7166,11 @@ include("kattegat/role_check.php");
             </div>
             <div class="modal-body">
                 <div class="stc-buyhist-search">
-                    <input type="text" class="form-control" id="stc-buyhist-search" placeholder="Search product name or product ID…">
+                    <input type="text" class="form-control" id="stc-buyhist-search" placeholder="Enter product ID…" inputmode="numeric" autocomplete="off">
                     <button type="button" class="btn btn-success" id="stc-buyhist-search-btn"><i class="fa fa-search"></i> Search</button>
                 </div>
                 <div class="stc-buyhist-meta" id="stc-buyhist-meta">
-                    <span class="text-muted">Search by product name or product ID to see merchants and purchase rates.</span>
+                    <span class="text-muted">Enter a product ID to see merchants and purchase rates.</span>
                 </div>
                 <div class="stc-buyhist-grid">
                     <div class="stc-buyhist-col">
