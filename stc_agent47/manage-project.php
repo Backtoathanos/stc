@@ -1363,13 +1363,55 @@ include_once("../MCU/db.php");
             $('body').delegate('.stc-project-edit-ret', 'click', function(e){
                 e.preventDefault();
                 var pro_id=$(this).attr("id");
-                var pro_title=$('#stc-ag-edittitle'+pro_id).val();
-                var pro_ref=$('#stc-ag-editrefre'+pro_id).val();
-                var pro_address=$('#stc-ag-editaddress'+pro_id).val();
                 $('#stc-ag-ed-project-id').val(pro_id);
-                $('#stc-ag-ed-project-name').val(pro_title);
-                $('#stc-ag-ed-project-refr').val(pro_ref);
-                $('#stc-ag-ed-job-details').val(pro_address);
+                $('#stc-ag-ed-project-name').prop('readonly', false).removeAttr('title');
+                $('#stc-ag-ed-project-name-lock').hide();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_ag_rproject_edit_call:1,
+                        pro_id:pro_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(res){
+                        if(!res || res==='NA' || !res.stc_cust_project_id){
+                            alert('Project not found.');
+                            return;
+                        }
+                        var custId=res.stc_cust_project_cust_id;
+                        if(custId && $('#stc-ag-ed-project-cust option[value="'+custId+'"]').length===0){
+                            var custName=res.stc_customer_name ? res.stc_customer_name : ('Customer #'+custId);
+                            $('#stc-ag-ed-project-cust').append($('<option>', { value: custId, text: custName }));
+                        }
+                        var supQty=res.stc_cust_project_supervis_qty;
+                        if(supQty && $('#stc-ag-ed-project-supqty option[value="'+supQty+'"]').length===0){
+                            $('#stc-ag-ed-project-supqty').append($('<option>', { value: supQty, text: supQty }));
+                        }
+                        $('#stc-ag-ed-project-cust').val(custId);
+                        $('#stc-ag-ed-project-name').val(res.stc_cust_project_title);
+                        var titleLocked=parseInt(res.title_locked, 10)===1;
+                        $('#stc-ag-ed-project-name').prop('readonly', titleLocked);
+                        if(titleLocked){
+                            $('#stc-ag-ed-project-name').attr('title', 'Project name cannot be changed because it is already in use.');
+                            $('#stc-ag-ed-project-name-lock').show();
+                        }else{
+                            $('#stc-ag-ed-project-name').removeAttr('title');
+                            $('#stc-ag-ed-project-name-lock').hide();
+                        }
+                        $('#stc-ag-ed-project-refr').val(res.stc_cust_project_refr);
+                        $('#stc-ag-ed-project-type').val(String(res.stc_cust_project_type || '').toLowerCase());
+                        $('#stc-ag-ed-job-details').val(res.stc_cust_project_address);
+                        $('#stc-ag-ed-project-city').val(res.stc_cust_project_city_id);
+                        $('#stc-ag-ed-project-state').val(res.stc_cust_project_state_id);
+                        $('#stc-ag-ed-project-resperson').val(res.stc_cust_project_responsive_person);
+                        $('#stc-ag-ed-project-supqty').val(supQty);
+                        $('#stc-ag-ed-project-begdate').val(res.stc_cust_project_beg_date);
+                        $('#stc-ag-ed-project-enddate').val(res.stc_cust_project_end_date);
+                        $('#stc-ag-ed-project-begbudget').val(res.stc_cust_project_beg_budget);
+                        $('#stc-ag-ed-project-status').val(String(res.stc_cust_project_status));
+                    }
+                });
             });
 
             // call ahu modal show
@@ -1412,32 +1454,94 @@ include_once("../MCU/db.php");
                 });                
             });
 
+            function stcAgEdClearReqMsg($el){
+                $el.closest('.form-group').find('.stc-ag-ed-req-msg').remove();
+            }
+            function stcAgEdShowReqMsg($el){
+                stcAgEdClearReqMsg($el);
+                $el.closest('.form-group').append('<small class="text-danger stc-ag-ed-req-msg">This field is required.</small>');
+            }
+            $(document).on('input change', '.bd-projectedit-modal-lg .form-control', function(){
+                if($.trim($(this).val())!==''){
+                    stcAgEdClearReqMsg($(this));
+                }
+            });
+
             // save edit project details
             $('body').delegate('.stc-ag-ed-project-save', 'click', function(e){
                 e.preventDefault();
+                var $btn=$(this);
                 var pro_id=$('#stc-ag-ed-project-id').val();
-                var pro_title=$('#stc-ag-ed-project-name').val();
-                var pro_refr=$('#stc-ag-ed-project-refr').val();
-                var pro_details=$('#stc-ag-ed-job-details').val();
+                var pro_cust=$('#stc-ag-ed-project-cust').val();
+                var pro_title=$.trim($('#stc-ag-ed-project-name').val());
+                var pro_refr=$.trim($('#stc-ag-ed-project-refr').val());
+                var pro_type=$('#stc-ag-ed-project-type').val();
+                var pro_details=$.trim($('#stc-ag-ed-job-details').val());
+                var pro_city=$('#stc-ag-ed-project-city').val();
+                var pro_state=$('#stc-ag-ed-project-state').val();
+                var pro_resperson=$.trim($('#stc-ag-ed-project-resperson').val());
+                var pro_supqty=$('#stc-ag-ed-project-supqty').val();
+                var pro_begdate=$('#stc-ag-ed-project-begdate').val();
+                var pro_enddate=$('#stc-ag-ed-project-enddate').val();
+                var pro_begbudget=$.trim($('#stc-ag-ed-project-begbudget').val());
+                var pro_status=$('#stc-ag-ed-project-status').val();
+                var requiredFields=[
+                    {el:'#stc-ag-ed-project-cust', val:pro_cust},
+                    {el:'#stc-ag-ed-project-name', val:pro_title},
+                    {el:'#stc-ag-ed-project-type', val:pro_type},
+                    {el:'#stc-ag-ed-job-details', val:pro_details},
+                    {el:'#stc-ag-ed-project-city', val:pro_city},
+                    {el:'#stc-ag-ed-project-state', val:pro_state},
+                    {el:'#stc-ag-ed-project-resperson', val:pro_resperson},
+                    {el:'#stc-ag-ed-project-begdate', val:pro_begdate},
+                    {el:'#stc-ag-ed-project-enddate', val:pro_enddate},
+                    {el:'#stc-ag-ed-project-begbudget', val:pro_begbudget},
+                    {el:'#stc-ag-ed-project-status', val:pro_status}
+                ];
+                $('.bd-projectedit-modal-lg .stc-ag-ed-req-msg').remove();
+                var firstEmpty=null;
+                $.each(requiredFields, function(_, field){
+                    if(field.val==='' || field.val===null){
+                        stcAgEdShowReqMsg($(field.el));
+                        if(!firstEmpty){
+                            firstEmpty=$(field.el);
+                        }
+                    }
+                });
+                if(firstEmpty){
+                    firstEmpty.focus();
+                    return;
+                }
+                $btn.prop('disabled', true);
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
                     data        : {
                         stc_ag_rproject_edit:1,
                         pro_id:pro_id,
+                        pro_cust:pro_cust,
                         pro_title:pro_title,
                         pro_refr:pro_refr,
-                        pro_details:pro_details
+                        pro_type:pro_type,
+                        pro_details:pro_details,
+                        pro_city:pro_city,
+                        pro_state:pro_state,
+                        pro_resperson:pro_resperson,
+                        pro_supqty:pro_supqty,
+                        pro_begdate:pro_begdate,
+                        pro_enddate:pro_enddate,
+                        pro_begbudget:pro_begbudget,
+                        pro_status:pro_status
                     },
-                    // dataType    : "JSON",
                     success     : function(res_data){
-                        // console.log(res_data);
-                        var reponse=res_data.trim();
+                        var reponse=$.trim(res_data);
+                        alert(reponse);
                         if(reponse=="Details Edited Successfully."){
-                            alert(reponse);
-                        }else{
-                            alert(reponse);
+                            location.reload();
                         }
+                    },
+                    complete    : function(){
+                        $btn.prop('disabled', false);
                     }
                 });
             });
@@ -2529,23 +2633,142 @@ include_once("../MCU/db.php");
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title" align="center">Project Details Edit</h5>
                                     </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Customer name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="hidden" id="stc-ag-ed-project-id">
+                                            <select class="form-control" id="stc-ag-ed-project-cust">
+                                                <option value="">Please Select Customer</option>
+                                                <?php
+                                                    $ed_cust_qry=mysqli_query($con, "
+                                                        SELECT `stc_customer_id`,`stc_customer_name` FROM `stc_customer`
+                                                        INNER JOIN `stc_agent_requested_customer`
+                                                        ON `stc_customer_id`=`stc_agent_requested_customer_cust_id`
+                                                        WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+                                                        ORDER BY `stc_customer_name` ASC
+                                                    ");
+                                                    if($ed_cust_qry){
+                                                        foreach($ed_cust_qry as $ed_cust_row){
+                                                            echo '<option value="'.htmlspecialchars((string)$ed_cust_row['stc_customer_id'], ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars((string)$ed_cust_row['stc_customer_name'], ENT_QUOTES, 'UTF-8').'</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6 col-sm-12 col-xl-6">
                                         <h5 class="card-title">Project Name</h5>
                                         <div class="position-relative form-group">
-                                            <input type="hidden" id="stc-ag-ed-project-id">
-                                            <input type="text" class="form-control" id="stc-ag-ed-project-name" Placeholder="Enter Project Name">
+                                            <input type="text" class="form-control" id="stc-ag-ed-project-name" placeholder="Enter Project Name">
+                                            <small id="stc-ag-ed-project-name-lock" class="text-muted" style="display:none;">Project name cannot be changed because it is already used in requisition, status down list, or employee attendance.</small>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-12 col-xl-6">
                                         <h5 class="card-title">Project Reference No</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-ag-ed-project-refr" Placeholder="Enter Project Reference No">
+                                            <input type="text" class="form-control" id="stc-ag-ed-project-refr" placeholder="Enter Project Reference No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Type</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-ag-ed-project-type">
+                                                <option value="">Please Select Type</option>
+                                                <option value="project">Project</option>
+                                                <option value="service">Service</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Status</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-ag-ed-project-status">
+                                                <option value="1">Active</option>
+                                                <option value="0">Off</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Project Address</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-ag-ed-job-details" placeholder="Enter Project Address"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">City</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-ag-ed-project-city">
+                                                <option value="">Please Select City</option>
+                                                <?php
+                                                    $ed_city_qry=mysqli_query($con, "
+                                                        SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
+                                                    ");
+                                                    if($ed_city_qry){
+                                                        foreach($ed_city_qry as $ed_city_row){
+                                                            echo '<option value="'.htmlspecialchars((string)$ed_city_row['stc_city_id'], ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars((string)$ed_city_row['stc_city_name'], ENT_QUOTES, 'UTF-8').'</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">State</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-ag-ed-project-state">
+                                                <option value="">Please Select State</option>
+                                                <?php
+                                                    $ed_state_qry=mysqli_query($con, "
+                                                        SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
+                                                    ");
+                                                    if($ed_state_qry){
+                                                        foreach($ed_state_qry as $ed_state_row){
+                                                            echo '<option value="'.htmlspecialchars((string)$ed_state_row['stc_state_id'], ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars((string)$ed_state_row['stc_state_name'], ENT_QUOTES, 'UTF-8').'</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Responsible person</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-ag-ed-project-resperson" placeholder="Enter responsible person name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Supervisor Quantity</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-ag-ed-project-supqty">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Project beginning date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control" id="stc-ag-ed-project-begdate">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Project ending date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control" id="stc-ag-ed-project-enddate">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Beginning budget</h5>
+                                        <div class="position-relative form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" id="stc-ag-ed-project-begbudget" placeholder="Enter project beginning budget">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">

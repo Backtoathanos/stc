@@ -353,16 +353,89 @@ class pirates_project extends tesseract{
 		return $blackpearl;
 	}
 
+	// project name is locked if used in requisition, status down list, or employee attendance
+	public function stc_project_title_is_locked($pro_id){
+		$id=mysqli_real_escape_string($this->stc_dbs, $pro_id);
+		$checks=array(
+			"SELECT `stc_cust_super_requisition_list_id` FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_project_id`='".$id."' LIMIT 1",
+			"SELECT `stc_status_down_list_id` FROM `stc_status_down_list` WHERE `stc_status_down_list_location`='".$id."' LIMIT 1",
+			"SELECT `stc_cust_pro_attend_supervise_id` FROM `stc_cust_pro_attend_supervise` WHERE `stc_cust_pro_attend_supervise_pro_id`='".$id."' LIMIT 1",
+			"SELECT ee.`id` FROM `stc_epermit_enrollment` ee LEFT JOIN `stc_status_down_list_department` d ON ee.`dep_id`=d.`stc_status_down_list_department_id` WHERE ee.`location`='".$id."' OR d.`stc_status_down_list_department_loc_id`='".$id."' LIMIT 1"
+		);
+		foreach($checks as $sql){
+			$qry=mysqli_query($this->stc_dbs, $sql);
+			if($qry && mysqli_num_rows($qry)>0){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// get one project for edit
+	public function stc_get_project_for_edit($pro_id){
+		$blackpearl='NA';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_project`.*,
+				`stc_customer`.`stc_customer_name`
+			FROM
+				`stc_cust_project`
+			LEFT JOIN
+				`stc_customer`
+			ON
+				`stc_customer`.`stc_customer_id`=`stc_cust_project`.`stc_cust_project_cust_id`
+			WHERE
+				`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'
+			LIMIT 1
+		");
+		if($blackpearl_qry && mysqli_num_rows($blackpearl_qry)>0){
+			$row=mysqli_fetch_assoc($blackpearl_qry);
+			foreach(array('stc_cust_project_beg_date', 'stc_cust_project_end_date') as $datecol){
+				$d=isset($row[$datecol]) ? $row[$datecol] : '';
+				if($d=='' || $d=='0000-00-00' || $d=='0000-00-00 00:00:00'){
+					$row[$datecol]='';
+				}else{
+					$row[$datecol]=date('Y-m-d', strtotime($d));
+				}
+			}
+			$row['title_locked']=$this->stc_project_title_is_locked($pro_id) ? 1 : 0;
+			$blackpearl=$row;
+		}
+		return $blackpearl;
+	}
+
 	// edit project details
-	public function stc_edit_project_details($pro_id, $pro_title, $pro_refr, $pro_details){		
+	public function stc_edit_project_details($pro_id, $pro_cust, $pro_title, $pro_refr, $pro_type, $pro_address, $pro_city, $pro_state, $pro_resperson, $pro_supqty, $pro_begdate, $pro_enddate, $pro_begbudget, $pro_status){		
 		$blackpearl='';
+		if($this->stc_project_title_is_locked($pro_id)){
+			$keep_title_qry=mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_project_title`
+				FROM `stc_cust_project`
+				WHERE `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'
+				LIMIT 1
+			");
+			if($keep_title_qry && mysqli_num_rows($keep_title_qry)>0){
+				$keep_title_row=mysqli_fetch_assoc($keep_title_qry);
+				$pro_title=$keep_title_row['stc_cust_project_title'];
+			}
+		}
 		$blackpearl_qry=mysqli_query($this->stc_dbs, "
 			UPDATE
 				`stc_cust_project`
 			SET
+				`stc_cust_project_cust_id` = '".mysqli_real_escape_string($this->stc_dbs, $pro_cust)."',
 				`stc_cust_project_title` = '".mysqli_real_escape_string($this->stc_dbs, $pro_title)."',
 				`stc_cust_project_refr` = '".mysqli_real_escape_string($this->stc_dbs, $pro_refr)."',
-				`stc_cust_project_address` = '".mysqli_real_escape_string($this->stc_dbs, $pro_details)."'
+				`stc_cust_project_type` = '".mysqli_real_escape_string($this->stc_dbs, $pro_type)."',
+				`stc_cust_project_address` = '".mysqli_real_escape_string($this->stc_dbs, $pro_address)."',
+				`stc_cust_project_city_id` = '".mysqli_real_escape_string($this->stc_dbs, $pro_city)."',
+				`stc_cust_project_state_id` = '".mysqli_real_escape_string($this->stc_dbs, $pro_state)."',
+				`stc_cust_project_responsive_person` = '".mysqli_real_escape_string($this->stc_dbs, $pro_resperson)."',
+				`stc_cust_project_supervis_qty` = '".mysqli_real_escape_string($this->stc_dbs, $pro_supqty)."',
+				`stc_cust_project_beg_date` = '".mysqli_real_escape_string($this->stc_dbs, $pro_begdate)."',
+				`stc_cust_project_end_date` = '".mysqli_real_escape_string($this->stc_dbs, $pro_enddate)."',
+				`stc_cust_project_beg_budget` = '".mysqli_real_escape_string($this->stc_dbs, $pro_begbudget)."',
+				`stc_cust_project_status` = '".mysqli_real_escape_string($this->stc_dbs, $pro_status)."'
 			WHERE
 				`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'
 		");
@@ -5250,16 +5323,39 @@ if(isset($_POST['stc_ag_rproject_pump_details_call'])){
 	// echo $opobjcrproj;
 }
 
+// get project for edit
+if(isset($_POST['stc_ag_rproject_edit_call'])){
+	$pro_id=isset($_POST['pro_id']) ? $_POST['pro_id'] : 0;
+	$objcrproj=new pirates_project();
+	$opobjcrproj=$objcrproj->stc_get_project_for_edit($pro_id);
+	echo json_encode($opobjcrproj);
+}
+
 // edit project details
 if(isset($_POST['stc_ag_rproject_edit'])){
-	$pro_id=$_POST['pro_id'];
-	$pro_title=$_POST['pro_title'];
-	$pro_refr=$_POST['pro_refr'];
-	$pro_details=$_POST['pro_details'];
-	$objcrproj=new pirates_project();
-	$opobjcrproj=$objcrproj->stc_edit_project_details($pro_id, $pro_title, $pro_refr, $pro_details);
-	// echo json_encode($opobjcrproj);
-	echo $opobjcrproj;
+	$pro_id=isset($_POST['pro_id']) ? $_POST['pro_id'] : '';
+	$pro_cust=isset($_POST['pro_cust']) ? $_POST['pro_cust'] : '';
+	$pro_title=isset($_POST['pro_title']) ? $_POST['pro_title'] : '';
+	$pro_refr=isset($_POST['pro_refr']) ? $_POST['pro_refr'] : '';
+	$pro_type=isset($_POST['pro_type']) ? $_POST['pro_type'] : '';
+	$pro_address=isset($_POST['pro_details']) ? $_POST['pro_details'] : (isset($_POST['pro_address']) ? $_POST['pro_address'] : '');
+	$pro_city=isset($_POST['pro_city']) ? $_POST['pro_city'] : '';
+	$pro_state=isset($_POST['pro_state']) ? $_POST['pro_state'] : '';
+	$pro_resperson=isset($_POST['pro_resperson']) ? $_POST['pro_resperson'] : '';
+	$pro_supqty=isset($_POST['pro_supqty']) ? $_POST['pro_supqty'] : '';
+	$pro_begdate=isset($_POST['pro_begdate']) && $_POST['pro_begdate']!='' ? date("Y-m-d", strtotime($_POST['pro_begdate'])) : '';
+	$pro_enddate=isset($_POST['pro_enddate']) && $_POST['pro_enddate']!='' ? date("Y-m-d", strtotime($_POST['pro_enddate'])) : '';
+	$pro_begbudget=isset($_POST['pro_begbudget']) ? $_POST['pro_begbudget'] : '';
+	$pro_status=isset($_POST['pro_status']) ? $_POST['pro_status'] : '';
+	if(empty($_SESSION['stc_agent_id'])){
+		echo 'reload';
+	}elseif($pro_id==='' || $pro_cust==='' || $pro_title==='' || $pro_type==='' || $pro_address==='' || $pro_city==='' || $pro_state==='' || $pro_resperson==='' || $pro_begdate==='' || $pro_enddate==='' || $pro_begbudget==='' || $pro_status===''){
+		echo 'Please fill all required project fields.';
+	}else{
+		$objcrproj=new pirates_project();
+		$opobjcrproj=$objcrproj->stc_edit_project_details($pro_id, $pro_cust, $pro_title, $pro_refr, $pro_type, $pro_address, $pro_city, $pro_state, $pro_resperson, $pro_supqty, $pro_begdate, $pro_enddate, $pro_begbudget, $pro_status);
+		echo $opobjcrproj;
+	}
 }
 
 // call dept details
