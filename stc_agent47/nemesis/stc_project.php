@@ -2321,6 +2321,14 @@ class pirates_project extends tesseract{
 
 	// Paginated order list for order-management.php
 	public function stc_order_list_paginated($page = 1, $per_page = 15, $agent_id = 0, $agent_role = 0, $search = '', $sort_col = 'req_date', $sort_dir = 'DESC') {
+		$chk = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list` LIKE 'stc_cust_super_requisition_list_order_number'");
+		if ($chk && mysqli_num_rows($chk) == 0) {
+			mysqli_query($this->stc_dbs, "
+				ALTER TABLE `stc_cust_super_requisition_list`
+				ADD `stc_cust_super_requisition_list_order_number` VARCHAR(100) NOT NULL DEFAULT ''
+				AFTER `stc_cust_super_requisition_list_project_id`
+			");
+		}
 		$page       = max(1, (int)$page);
 		$per_page   = max(5, min(100, (int)$per_page));
 		$offset     = ($page - 1) * $per_page;
@@ -2330,6 +2338,7 @@ class pirates_project extends tesseract{
 		$sort_dir   = strtoupper($sort_dir) === 'ASC' ? 'ASC' : 'DESC';
 		$sort_map   = [
 			'req_date'        => 'DATE(`stc_cust_super_requisition_list_date`)',
+			'order_number'    => '`stc_cust_super_requisition_list_order_number`',
 			'project_title'   => '`stc_cust_project_title`',
 			'supervisor_name' => '`stc_cust_pro_supervisor_fullname`',
 			'item_title'      => '`stc_cust_super_requisition_list_items_title`',
@@ -2354,6 +2363,7 @@ class pirates_project extends tesseract{
 					OR `stc_cust_pro_supervisor_fullname` LIKE '%{$search}%'
 					OR `stc_cust_super_requisition_list_items_title` LIKE '%{$search}%'
 					OR `stc_cust_super_requisition_items_type` LIKE '%{$search}%'
+					OR `stc_cust_super_requisition_list_order_number` LIKE '%{$search}%'
 				)";
 		}
 
@@ -2394,6 +2404,7 @@ class pirates_project extends tesseract{
 			SELECT DISTINCT
 				`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` as list_id,
 				`stc_cust_super_requisition_list_date`,
+				`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_order_number` as order_number,
 				`stc_cust_project_title`,
 				`stc_cust_pro_supervisor_fullname`,
 				`stc_cust_super_requisition_list_status`,
@@ -2423,6 +2434,7 @@ class pirates_project extends tesseract{
 					'sl'              => $sl,
 					'list_id'         => $r['list_id'],
 					'req_date'        => date('d-m-Y h:i a', strtotime($r['stc_cust_super_requisition_list_date'])),
+					'order_number'    => isset($r['order_number']) ? trim((string) $r['order_number']) : '',
 					'project_title'   => $r['stc_cust_project_title'],
 					'supervisor_name' => $r['stc_cust_pro_supervisor_fullname'],
 					'req_status'      => $req_status,
@@ -2451,6 +2463,35 @@ class pirates_project extends tesseract{
 			'sort_dir'    => $sort_dir,
 			'rows'        => $rows,
 		];
+	}
+
+	public function stc_update_requisition_order_number($list_id, $order_number){
+		$list_id = (int) $list_id;
+		$order_number = substr(trim((string) $order_number), 0, 100);
+		if ($list_id <= 0) {
+			return array('ok' => false, 'message' => 'Invalid requisition.');
+		}
+		if ($order_number === '') {
+			return array('ok' => false, 'message' => 'Order Number is required.');
+		}
+		$chk = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list` LIKE 'stc_cust_super_requisition_list_order_number'");
+		if ($chk && mysqli_num_rows($chk) == 0) {
+			mysqli_query($this->stc_dbs, "
+				ALTER TABLE `stc_cust_super_requisition_list`
+				ADD `stc_cust_super_requisition_list_order_number` VARCHAR(100) NOT NULL DEFAULT ''
+				AFTER `stc_cust_super_requisition_list_project_id`
+			");
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list`
+			SET `stc_cust_super_requisition_list_order_number`='".mysqli_real_escape_string($this->stc_dbs, $order_number)."'
+			WHERE `stc_cust_super_requisition_list_id`='".$list_id."'
+			LIMIT 1
+		");
+		if ($q) {
+			return array('ok' => true, 'message' => 'Order number saved.', 'order_number' => $order_number);
+		}
+		return array('ok' => false, 'message' => 'Could not save order number.');
 	}
 
 }
@@ -6570,6 +6611,20 @@ if (isset($_POST['get_order_list'])) {
 		header('Content-Type: application/json');
 		echo json_encode($result);
 	}
+}
+
+if (isset($_POST['stc_update_order_number'])) {
+	if (empty($_SESSION['stc_agent_id'])) {
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(array('ok' => false, 'message' => 'Session expired'));
+	} else {
+		$list_id = isset($_POST['list_id']) ? (int) $_POST['list_id'] : 0;
+		$order_number = isset($_POST['order_number']) ? $_POST['order_number'] : '';
+		$obj = new pirates_project();
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($obj->stc_update_requisition_order_number($list_id, $order_number));
+	}
+	exit;
 }
 
 ?>

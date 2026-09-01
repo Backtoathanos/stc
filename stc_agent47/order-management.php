@@ -183,7 +183,7 @@ include_once("../MCU/db.php");
                                                     <div class="row">
                                                         <div class="col-md-12" style="margin-bottom:10px;">
                                                             <div class="input-group">
-                                                                <input type="text" id="stc-order-search" placeholder="Search by project, supervisor, item or type..." class="form-control" style="border-radius:4px 0 0 4px;">
+                                                                <input type="text" id="stc-order-search" placeholder="Search by order number, project, supervisor, item or type..." class="form-control" style="border-radius:4px 0 0 4px;">
                                                                 <span class="input-group-btn">
                                                                     <button class="btn btn-primary" type="button" id="stc-order-search-btn" style="border-radius:0;"><i class="fas fa-search"></i> Search</button>
                                                                     <button class="btn btn-secondary" type="button" id="stc-order-reset-btn" style="border-radius:0 4px 4px 0;"><i class="fas fa-times"></i> Reset</button>
@@ -203,6 +203,7 @@ include_once("../MCU/db.php");
                                                                     <th class="text-center" style="width:38px;"><input type="checkbox" id="stc-ord-check-all" title="Select all on this page" style="width:16px;height:16px;cursor:pointer;"></th>
                                                                     <th class="text-center">Sl No</th>
                                                                     <th class="text-center stc-ord-sortable" data-col="req_date" style="cursor:pointer;white-space:nowrap;">Requisition Date <span class="stc-ord-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span><br><span style="font-size:10px;font-weight:normal;color:#777;">&amp; No</span></th>
+                                                                    <th class="text-center stc-ord-sortable" data-col="order_number" style="cursor:pointer;white-space:nowrap;">Order Number <span class="stc-ord-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span></th>
                                                                     <th class="text-center stc-ord-sortable" data-col="project_title" style="cursor:pointer;white-space:nowrap;">Requisition For <span class="stc-ord-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span></th>
                                                                     <th class="text-center stc-ord-sortable" data-col="supervisor_name" style="cursor:pointer;white-space:nowrap;">Requisition From <span class="stc-ord-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span></th>
                                                                     <th class="text-center stc-ord-sortable" data-col="item_title" style="cursor:pointer;white-space:nowrap;">Item Desc <span class="stc-ord-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span></th>
@@ -218,7 +219,7 @@ include_once("../MCU/db.php");
                                                                 </thead>
                                                                 <tbody id="stc-order-tbody">
                                                                     <tr id="stc-order-loader">
-                                                                        <td colspan="15" class="text-center" style="padding:20px;">
+                                                                        <td colspan="16" class="text-center" style="padding:20px;">
                                                                             <i class="fas fa-spinner fa-spin"></i> Loading...
                                                                         </td>
                                                                     </tr>
@@ -303,7 +304,7 @@ include_once("../MCU/db.php");
         function stcLoadOrderList(page) {
             stcOrderCurrentPage = page;
             var $tbody = $('#stc-order-tbody');
-            $tbody.html('<tr id="stc-order-loader"><td colspan="15" class="text-center" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
+            $tbody.html('<tr id="stc-order-loader"><td colspan="16" class="text-center" style="padding:20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
             $('#stc-order-pagination').html('');
 
             $.ajax({
@@ -316,7 +317,7 @@ include_once("../MCU/db.php");
                     $('#stc-ord-check-all').prop('checked', false);
                     stcOrdUpdateBulkBar();
                     if (!res.success || !res.rows || res.rows.length === 0) {
-                        $tbody.html('<tr><td colspan="15" class="text-center"><b>No Requisition Found!!!</b></td></tr>');
+                        $tbody.html('<tr><td colspan="16" class="text-center"><b>No Requisition Found!!!</b></td></tr>');
                         return;
                     }
                     $.each(res.rows, function(i, r) {
@@ -341,6 +342,10 @@ include_once("../MCU/db.php");
                             +     ' data-req-date="'+stcOrdEscAttr(r.req_date)+'"></td>'
                             + '<td class="text-center">'+r.sl+'</td>'
                             + '<td>'+r.list_id+' <br> '+stcOrdEsc(r.req_date)+'</td>'
+                            + '<td><input type="text" class="form-control stc-ord-orderno" maxlength="100" placeholder="Order number"'
+                            +     ' data-list-id="'+r.list_id+'"'
+                            +     ' value="'+stcOrdEscAttr(r.order_number || '')+'"'
+                            +     ' style="min-width:120px;padding:4px 6px;"></td>'
                             + '<td>'+stcOrdEsc(r.project_title)+'</td>'
                             + '<td>'+stcOrdEsc(r.supervisor_name)+'</td>'
                             + '<td><a href="#" class="stc-req-item-name-open-edit"'
@@ -369,7 +374,7 @@ include_once("../MCU/db.php");
                         .html(res.sort_dir === 'ASC' ? '&#8593;' : '&#8595;').css('color','#333');
                 },
                 error: function() {
-                    $tbody.html('<tr><td colspan="15" class="text-center text-danger">Error loading data. Please refresh.</td></tr>');
+                    $tbody.html('<tr><td colspan="16" class="text-center text-danger">Error loading data. Please refresh.</td></tr>');
                 }
             });
         }
@@ -506,6 +511,58 @@ include_once("../MCU/db.php");
                     stcOrderSortDir = 'ASC';
                 }
                 stcLoadOrderList(1);
+            });
+
+            $(document).on('focus', '.stc-ord-orderno', function(){
+                $(this).data('orig', $.trim($(this).val() || ''));
+            });
+            function stcSaveOrderNumber($inp) {
+                var listId = parseInt($inp.attr('data-list-id'), 10) || 0;
+                var val = $.trim($inp.val() || '');
+                var orig = $inp.data('orig');
+                if (orig === undefined) orig = '';
+                if (listId <= 0) return;
+                if (val === orig) return;
+                if (val === '') {
+                    Swal.fire({ icon: 'warning', title: 'Order Number Required', text: 'Please enter an order number.' });
+                    $inp.val(orig).focus();
+                    return;
+                }
+                if (val.length > 100) {
+                    Swal.fire({ icon: 'warning', title: 'Order Number Too Long', text: 'Order number must be 100 characters or less.' });
+                    $inp.focus();
+                    return;
+                }
+                $inp.prop('disabled', true);
+                $.ajax({
+                    url: 'nemesis/stc_project.php',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: { stc_update_order_number: 1, list_id: listId, order_number: val },
+                    success: function(res) {
+                        $inp.prop('disabled', false);
+                        if (res && res.ok) {
+                            $inp.data('orig', val).css('border-color', '#2ecc71');
+                            setTimeout(function(){ $inp.css('border-color', ''); }, 1200);
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Not Saved', text: (res && res.message) ? res.message : 'Could not save order number.' });
+                            $inp.val(orig);
+                        }
+                    },
+                    error: function() {
+                        $inp.prop('disabled', false).val(orig);
+                        Swal.fire({ icon: 'error', title: 'Not Saved', text: 'Could not save order number.' });
+                    }
+                });
+            }
+            $(document).on('blur', '.stc-ord-orderno', function(){
+                stcSaveOrderNumber($(this));
+            });
+            $(document).on('keydown', '.stc-ord-orderno', function(e){
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $(this).blur();
+                }
             });
 
             /* Select-all checkbox */
@@ -700,10 +757,23 @@ include_once("../MCU/db.php");
                 var itemqty=$('.stc-sup-appr-qty'+item_id).val();
                 var itemreqqty=$('.stc-sup-req-qty'+item_id).val();
                 var itemstatus=1;
+                var $row = $('#stc-req-tr-'+item_id);
+                var orderNo = $.trim($row.find('.stc-ord-orderno').val() || '');
+                if(orderNo === ''){
+                    Swal.fire({ icon: 'warning', title: 'Order Number Required', text: 'Please enter an order number before approving.' });
+                    $row.find('.stc-ord-orderno').focus();
+                    return;
+                }
+                if(orderNo.length > 100){
+                    Swal.fire({ icon: 'warning', title: 'Order Number Too Long', text: 'Order number must be 100 characters or less.' });
+                    $row.find('.stc-ord-orderno').focus();
+                    return;
+                }
                 if(!((parseFloat(itemqty) > 0) && (parseFloat(itemreqqty) >= parseFloat(itemqty)))){
                     Swal.fire({ icon: 'warning', title: 'Invalid Quantity', text: 'Please enter a valid approved quantity that does not exceed the requested quantity.' });
                     return;
                 }
+                var listId = $row.find('.stc-ord-orderno').attr('data-list-id');
                 Swal.fire({
                     icon: 'question',
                     title: 'Confirm Approval',
@@ -717,19 +787,27 @@ include_once("../MCU/db.php");
                         $.ajax({
                             url : "nemesis/stc_project.php",
                             method : "POST",
-                            data : {
-                                stc_addtopurchase:1,
-                                item_id:item_id,
-                                itemqty:itemqty,
-                                itemstatus:itemstatus
-                            },
-                            success : function(requisition){
-                                if(requisition.trim()=="success"){
-                                    Swal.fire({ icon: 'success', title: 'Approved!', text: 'Requisition approved successfully. Procurement has been notified.', timer: 3000, timerProgressBar: true });
-                                    $('#stc-req-tr-'+item_id).fadeOut(500);
-                                }else{
-                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please check and try again.' });
-                                }
+                            dataType : "json",
+                            data : { stc_update_order_number: 1, list_id: listId, order_number: orderNo },
+                            complete : function(){
+                                $.ajax({
+                                    url : "nemesis/stc_project.php",
+                                    method : "POST",
+                                    data : {
+                                        stc_addtopurchase:1,
+                                        item_id:item_id,
+                                        itemqty:itemqty,
+                                        itemstatus:itemstatus
+                                    },
+                                    success : function(requisition){
+                                        if(requisition.trim()=="success"){
+                                            Swal.fire({ icon: 'success', title: 'Approved!', text: 'Requisition approved successfully. Procurement has been notified.', timer: 3000, timerProgressBar: true });
+                                            $('#stc-req-tr-'+item_id).fadeOut(500);
+                                        }else{
+                                            Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please check and try again.' });
+                                        }
+                                    }
+                                });
                             }
                         });
                     }
