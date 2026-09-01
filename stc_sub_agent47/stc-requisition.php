@@ -357,6 +357,15 @@
                     $('#load_cust_sup_site').after('<span class="text-validation text-danger">Select Site</span>');
                     validated = false;
                 }
+
+                var orderNumber = $.trim($('#stc-sup-order-number').val() || '');
+                if (orderNumber == "") {
+                    $('#stc-sup-order-number').after('<span class="text-validation text-danger">Enter Order Number</span>');
+                    validated = false;
+                } else if (orderNumber.length > 100) {
+                    $('#stc-sup-order-number').after('<span class="text-validation text-danger">Order Number must be 100 characters or less</span>');
+                    validated = false;
+                }
                 
                 // Validate each item card
                 $('.item-card').each(function(index) {
@@ -464,6 +473,8 @@
                 firstCard.find('select').val('NA');
                 firstCard.find('.stc-sup-priority').val('1');
                 firstCard.find('.desc-suggestion-box').hide().empty();
+                
+                $('#stc-sup-order-number').val('');
                 
                 // Reset site selection if needed
                 // $('#load_cust_sup_site').val('NA');
@@ -681,6 +692,10 @@
                                         <select class="form-control load_cust_agents" id="load_cust_sup_site" name="load_cust_sup_site">
                                             <option>No Customers Found!!!</option>
                                         </select> 
+                                    </div>
+                                    <div class="form-group">
+                                        <h5 class="card-title">Order Number</h5>
+                                        <input type="text" class="form-control" id="stc-sup-order-number" name="stc-sup-order-number" placeholder="Enter Order Number" maxlength="100" required>
                                     </div>
                                     
                                     <div class="items-container mt-4">

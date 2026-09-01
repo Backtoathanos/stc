@@ -193,15 +193,25 @@ class transformers extends tesseract{
 }
 
 class witcher_supervisor extends tesseract{
-	public function stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno){
+	public function stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno, $order_number){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
+		$order_number=substr(trim((string) $order_number), 0, 100);
+		$chk=mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list` LIKE 'stc_cust_super_requisition_list_order_number'");
+		if($chk && mysqli_num_rows($chk)==0){
+			mysqli_query($this->stc_dbs, "
+				ALTER TABLE `stc_cust_super_requisition_list`
+				ADD `stc_cust_super_requisition_list_order_number` VARCHAR(100) NOT NULL DEFAULT ''
+				AFTER `stc_cust_super_requisition_list_project_id`
+			");
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list`(
 				`stc_cust_super_requisition_list_date`, 
 				`stc_cust_super_requisition_list_sdlid`, 
 				`stc_cust_super_requisition_list_super_id`, 
-				`stc_cust_super_requisition_list_project_id`, 
+				`stc_cust_super_requisition_list_project_id`,
+				`stc_cust_super_requisition_list_order_number`,
 				`stc_cust_super_requisition_list_status`, 
 				`stc_cust_super_requisition_list_approved_by`
 			) VALUES (
@@ -209,6 +219,7 @@ class witcher_supervisor extends tesseract{
 				'".$sdlno."',
 				'".$_SESSION['stc_agent_sub_id']."',
 				'".$site."',
+				'".mysqli_real_escape_string($this->stc_dbs, $order_number)."',
 				'1',
 				'0'
 			)
@@ -357,6 +368,14 @@ class witcher_supervisor extends tesseract{
 	}
 
 	public function stc_search_requisitions($supreqfromdate, $supreqtodate, $project_id='', $status_filter='', $page=1, $per_page=25){ 
+		$chk=mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list` LIKE 'stc_cust_super_requisition_list_order_number'");
+		if($chk && mysqli_num_rows($chk)==0){
+			mysqli_query($this->stc_dbs, "
+				ALTER TABLE `stc_cust_super_requisition_list`
+				ADD `stc_cust_super_requisition_list_order_number` VARCHAR(100) NOT NULL DEFAULT ''
+				AFTER `stc_cust_super_requisition_list_project_id`
+			");
+		}
 		$project_sql='';
 		if($project_id!=='' && $project_id!=='NA' && ctype_digit((string)$project_id)){
 			$project_sql=" AND L.`stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."' ";
@@ -399,6 +418,7 @@ class witcher_supervisor extends tesseract{
 				    <th class="text-center">Req No.</th>
 				    <th class="text-center">Req Date.</th>
 				    <th class="text-center">Req Site Name.</th>
+				    <th class="text-center">Order Number</th>
 				    <th class="text-center">Material Desc</th>
 				    <th class="text-center">Unit</th>
 				    <th class="text-center">Order Qty</th>
@@ -421,6 +441,7 @@ class witcher_supervisor extends tesseract{
 				L.`stc_cust_super_requisition_list_id` as list_id,
 				L.`stc_cust_super_requisition_list_date`,
 				`stc_cust_project_title`,
+				L.`stc_cust_super_requisition_list_order_number`,
 				`stc_cust_super_requisition_list_items_title`,
 				`stc_cust_super_requisition_list_items_unit`,
 				`stc_cust_super_requisition_list_items_reqqty`,
@@ -587,6 +608,7 @@ class witcher_supervisor extends tesseract{
 						<td class="text-center">'.$requisitioni_row['list_id'].'</td>
 						<td class="text-center">'.date('d-m-Y', strtotime($requisitioni_row['stc_cust_super_requisition_list_date'])).'</td>
 						<td>'.$requisitioni_row['stc_cust_project_title'].'</td>
+						<td>'.htmlspecialchars($requisitioni_row['stc_cust_super_requisition_list_order_number'] ?? '').'</td>
 						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_title'].'</td>
 						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_unit'].'</td>
 						<td class="text-right">'.number_format($requisitioni_row['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
@@ -607,7 +629,7 @@ class witcher_supervisor extends tesseract{
 		}else{
 			$requisition_table.='
 				<tr>
-					<td colspan="17" class="text-center">No record found.</td>
+					<td colspan="18" class="text-center">No record found.</td>
 				</tr>
 			';
 		}
@@ -1559,6 +1581,7 @@ if(isset($_POST['stc-sup-hit'])) {
     $out = '';
     $site = $_POST['load_cust_sup_site'];
     $sdlno = $_POST['stc-sup-sdlnumber'];
+    $order_number = isset($_POST['stc-sup-order-number']) ? trim($_POST['stc-sup-order-number']) : '';
     
     // Initialize arrays with posted data or empty arrays if not set
     $descriptions = $_POST['stc-sup-desc'] ?? [];
@@ -1572,6 +1595,8 @@ if(isset($_POST['stc-sup-hit'])) {
 
     if(empty($_SESSION['stc_agent_sub_id'])) {
         $out = "logout";
+    } elseif($order_number === '' || strlen($order_number) > 100) {
+        $out = "Order Number is required (max 100 characters).";
     } else {
         // Validate we have the same number of items for each field
         $itemCount = count($descriptions);
@@ -1597,7 +1622,7 @@ if(isset($_POST['stc-sup-hit'])) {
                     continue;
                 }
                 
-                $result = $bumblebee->stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno);
+                $result = $bumblebee->stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno, $order_number);
                 
                 if($result == "success") {
                     $successCount++;
