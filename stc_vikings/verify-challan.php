@@ -31,25 +31,36 @@ function stc_challan_is_wo_code($s){
 }
 
 function stc_challan_site_label($sitename, $prLocation){
-  $sitename = trim((string) $sitename);
-  $prLocation = trim((string) $prLocation);
-  if($prLocation === '' || $prLocation === '-'){
-    $combined = $sitename;
-  }elseif(strcasecmp($sitename, $prLocation) === 0){
-    $combined = $sitename;
-  }elseif($sitename !== '' && stripos($prLocation, $sitename) !== false){
-    $combined = $prLocation;
-  }elseif($prLocation !== '' && stripos($sitename, $prLocation) !== false){
-    $combined = $sitename;
-  }else{
-    $combined = trim($sitename.' ('.$prLocation.')');
+  $sitename = trim(preg_replace('/\s+/', ' ', (string) $sitename));
+  $prLocation = trim(preg_replace('/\s+/', ' ', (string) $prLocation));
+  if($sitename === ''){
+    return ($prLocation === '' || $prLocation === '-') ? '' : $prLocation;
   }
-  $combined = trim(preg_replace('/\s+/', ' ', $combined));
-  $last = stc_challan_last_bracket($combined);
+  if($prLocation === '' || $prLocation === '-' || strcasecmp($sitename, $prLocation) === 0){
+    return $sitename;
+  }
+  if(stripos($sitename, $prLocation) !== false){
+    return $sitename;
+  }
+  return $sitename.' ('.$prLocation.')';
+}
+
+function stc_challan_combination_label($sitename, $prLocation){
+  $sitename = trim(preg_replace('/\s+/', ' ', (string) $sitename));
+  $prLocation = trim(preg_replace('/\s+/', ' ', (string) $prLocation));
+  $source = ($prLocation !== '' && $prLocation !== '-') ? $prLocation : $sitename;
+  if($source === '') return '';
+  $last = stc_challan_last_bracket($source);
   if($last !== '' && !stc_challan_is_wo_code($last)){
     return $last;
   }
-  return $combined;
+  if($prLocation === '' || $prLocation === '-'){
+    $fromSite = stc_challan_last_bracket($sitename);
+    if($fromSite !== '' && !stc_challan_is_wo_code($fromSite)){
+      return $fromSite;
+    }
+  }
+  return $source;
 }
 
 $date = '';
@@ -126,20 +137,17 @@ $siteListQ = mysqli_query($con, "
 ");
 if($siteListQ){
   while($sr = mysqli_fetch_assoc($siteListQ)){
-    $label = stc_challan_site_label($sr['sitename'] ?? '', $sr['pr_location'] ?? '');
+    $label = stc_challan_combination_label($sr['sitename'] ?? '', $sr['pr_location'] ?? '');
     if($label === '') continue;
-    $soOrder = trim((string) ($sr['order_number'] ?? ''));
-    $key = strtoupper($soOrder).'|'.strtoupper($label);
+    $key = strtoupper($label);
     if(isset($siteSeen[$key])) continue;
     $siteSeen[$key] = true;
     $site_options[] = array(
-      'order_number' => $soOrder,
       'sitename' => $label
     );
   }
   usort($site_options, function($a, $b){
-    $c = strcasecmp($a['order_number'], $b['order_number']);
-    return $c !== 0 ? $c : strcasecmp($a['sitename'], $b['sitename']);
+    return strcasecmp($a['sitename'], $b['sitename']);
   });
 }
 
@@ -306,13 +314,11 @@ $selected_site_title = $site_label;
         </button>
         <input type="hidden" class="vsite" value="<?php echo htmlspecialchars($site_label); ?>">
         <ul class="stc-dd-menu">
-          <li data-value="" data-order="" class="<?php echo $site_label === '' ? 'is-active' : ''; ?>">All Sites</li>
+          <li data-value="" class="<?php echo $site_label === '' ? 'is-active' : ''; ?>">All Sites</li>
           <?php foreach($site_options as $so){
-            $soOrder = trim((string) ($so['order_number'] ?? ''));
             $soName = $so['sitename'];
           ?>
-            <li data-value="<?php echo htmlspecialchars($soName); ?>" data-order="<?php echo htmlspecialchars($soOrder); ?>" class="<?php echo ($site_label === $soName && ($order_number === '' || $order_number === $soOrder)) ? 'is-active' : ''; ?>">
-              <?php if($soOrder !== ''){ ?><span class="stc-dd-ord"><?php echo htmlspecialchars($soOrder); ?></span><?php } ?>
+            <li data-value="<?php echo htmlspecialchars($soName); ?>" class="<?php echo ($site_label === $soName) ? 'is-active' : ''; ?>">
               <?php echo htmlspecialchars($soName); ?>
             </li>
           <?php } ?>
@@ -407,7 +413,8 @@ $selected_site_title = $site_label;
                       $reqFrom .= '<br>'.$row['req_from_contact'];
                     }
                     $displaySite = stc_challan_site_label($row['sitename'], $row['pr_location']);
-                    if($site_label !== '' && strcasecmp($displaySite, $site_label) !== 0){
+                    $combinationName = stc_challan_combination_label($row['sitename'], $row['pr_location']);
+                    if($site_label !== '' && strcasecmp($combinationName, $site_label) !== 0){
                       continue;
                     }
                     $sl++;
@@ -479,8 +486,7 @@ $selected_site_title = $site_label;
         });
         $('#stc-dd-site .stc-dd-menu li').on('click', function(){
           var siteLabel = $(this).attr('data-value') || '';
-          var orderNo = $(this).attr('data-order') || $('.vorder-number').val() || '';
-          if (!siteLabel) orderNo = $('.vorder-number').val() || '';
+          var orderNo = $('.vorder-number').val() || '';
           window.location.href = challanFilterUrl(orderNo, siteLabel);
         });
         $('.filterbydate').on('click', function(){
