@@ -261,10 +261,42 @@ $selected_site_title = $site_label;
         margin-right: 8px;
         font-weight: 700;
       }
+      #stcCustomerFormatModal .modal-dialog {
+        max-width: 980px;
+        width: 96vw;
+        margin: 1.2vh auto;
+      }
+      #stcCustomerFormatModal .modal-content {
+        height: 96vh;
+        display: flex;
+        flex-direction: column;
+      }
+      #stcCustomerFormatModal .modal-header {
+        flex: 0 0 auto;
+        padding: 8px 12px;
+        background: #f8f9fa;
+      }
+      #stcCustomerFormatModal .modal-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      #stcCustomerFormatModal .modal-body {
+        flex: 1 1 auto;
+        padding: 0;
+        overflow: hidden;
+        background: #d8dde3;
+      }
+      #stcCustomerFormatModal iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+      }
       @media print {
         body{ margin: 0 !important; }
         .hidden-print { visibility: hidden; }
         .tm-footer { visibility: hidden; }
+        #stcCustomerFormatModal, .modal-backdrop { display: none !important; }
         .tm-mt-big{ margin-top: 0 !important; }
         .tm-mb-big{ margin-bottom: 0 !important; }
         .invoice{ margin-top: -5px !important; }
@@ -296,6 +328,9 @@ $selected_site_title = $site_label;
 
   <body>
     <div class="text-right hidden-print" style="margin:10px;">
+      <a href="#" class="btn btn-success" id="stc-customer-format-btn" title="View customer format challan" style="margin-right:6px;">
+        <i class="fas fa-file-alt"></i> Customer Format
+      </a>
       <div class="stc-dd" id="stc-dd-order">
         <button type="button" class="btn stc-dd-toggle" title="Order Number">
           <?php echo $order_number !== '' ? htmlspecialchars($order_number) : 'All Order Numbers'; ?>
@@ -453,8 +488,30 @@ $selected_site_title = $site_label;
       </div>
     </div>
 
+    <div class="modal fade" id="stcCustomerFormatModal" tabindex="-1" role="dialog" aria-labelledby="stcCustomerFormatModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="stcCustomerFormatModalLabel">Customer Format Challan</h5>
+            <div>
+              <button type="button" class="btn btn-danger btn-sm" id="stc-customer-format-pdf">Export to PDF</button>
+              <button type="button" class="btn btn-success btn-sm" id="stc-customer-format-excel" style="margin-left:6px;">Export to Excel</button>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin:0 0 0 8px;">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+          <div class="modal-body">
+            <iframe id="stc-customer-format-frame" src="about:blank" title="Customer Format Challan"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <?php include "../stc_symbiote/footer.php";?>
+    <script src="assets/vendor/bootstrap/js/popper.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script>
       $(document).ready(function(){
         $('#printInvoice').click(function(){
@@ -491,6 +548,47 @@ $selected_site_title = $site_label;
         });
         $('.filterbydate').on('click', function(){
           window.location.href = challanFilterUrl();
+        });
+        $('#stc-customer-format-btn').on('click', function(e){
+          e.preventDefault();
+          var url = challanFilterUrl().replace('verify-challan.php', 'verify-challan-customer.php');
+          url += (url.indexOf('?') === -1 ? '?' : '&') + 'embed=1';
+          $('#stc-customer-format-frame').attr('src', url);
+          if ($.fn.modal) {
+            $('#stcCustomerFormatModal').modal('show');
+          } else {
+            $('#stcCustomerFormatModal').addClass('show').css('display', 'block').attr('aria-hidden', 'false');
+            $('body').addClass('modal-open');
+            if (!$('.modal-backdrop').length) $('body').append('<div class="modal-backdrop fade show"></div>');
+          }
+        });
+        function customerFormatExportUrl(type){
+          var url = challanFilterUrl().replace('verify-challan.php', 'verify-challan-customer.php');
+          url += (url.indexOf('?') === -1 ? '?' : '&') + 'export=' + encodeURIComponent(type);
+          return url;
+        }
+        function downloadCustomerFormat(type){
+          var a = document.createElement('a');
+          a.href = customerFormatExportUrl(type);
+          a.target = '_blank';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+        $('#stc-customer-format-pdf').on('click', function(){ downloadCustomerFormat('pdf'); });
+        $('#stc-customer-format-excel').on('click', function(){ downloadCustomerFormat('excel'); });
+        function hideCustomerFormatModal(){
+          $('#stcCustomerFormatModal').removeClass('show').css('display', 'none').attr('aria-hidden', 'true');
+          $('.modal-backdrop').remove();
+          $('body').removeClass('modal-open');
+          $('#stc-customer-format-frame').attr('src', 'about:blank');
+        }
+        $('#stcCustomerFormatModal').on('hidden.bs.modal', function(){
+          $('#stc-customer-format-frame').attr('src', 'about:blank');
+        });
+        $(document).on('click', '#stcCustomerFormatModal [data-dismiss="modal"]', function(){
+          if (!$.fn.modal) hideCustomerFormatModal();
         });
 
         var basePmNo = '<?php echo addslashes($pm_no); ?>';

@@ -626,6 +626,9 @@ STCAuthHelper::checkAuth();
                                                 <button id="stc-pending-reset-btn" class="btn btn-outline-secondary btn-sm" style="min-width:64px;">
                                                     Reset
                                                 </button>
+                                                <button type="button" id="stc-pending-summary-btn" class="btn btn-info btn-sm" style="min-width:80px;" data-toggle="modal" data-target="#stcWeeklyReqSummaryModal">
+                                                    <i class="fa fa-bar-chart"></i> Summary
+                                                </button>
                                             </div>
                                         </div>
 
@@ -806,6 +809,61 @@ STCAuthHelper::checkAuth();
                     <button type="button" class="btn btn-warning btn-sm" id="stc-pending-note-submit">
                         <i class="fa fa-save"></i> Update Pending
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Requisition Summary Modal -->
+    <div class="modal fade" id="stcWeeklyReqSummaryModal" tabindex="-1" role="dialog" aria-labelledby="stcWeeklyReqSummaryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#f8f9fa;border-bottom:1px solid #dee2e6;">
+                    <h5 class="modal-title" id="stcWeeklyReqSummaryModalLabel" style="font-size:15px;font-weight:700;">
+                        <i class="fa fa-bar-chart" style="color:#17a2b8;"></i> Weekly Requisition Summary
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding:16px 20px;">
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-4 mb-2">
+                            <span style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">From date</span>
+                            <input type="date" id="stc-weekly-req-from" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <span style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">To date</span>
+                            <input type="date" id="stc-weekly-req-to" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button type="button" id="stc-weekly-req-show-btn" class="btn btn-info btn-sm">
+                                <i class="fa fa-search"></i> Show
+                            </button>
+                        </div>
+                    </div>
+                    <p id="stc-weekly-req-summary-range" style="font-size:12px;color:#666;margin-bottom:12px;"></p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm mb-0" id="stc-weekly-req-summary-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Day</th>
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Arrived</th>
+                                    <th class="text-center">Dispatched</th>
+                                    <th class="text-center">Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stc-weekly-req-summary-body">
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding:20px;color:#888;">Loading&hellip;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background:#f8f9fa;">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1338,6 +1396,88 @@ STCAuthHelper::checkAuth();
             stcPendingSortDir = 'DESC';
             $('.stc-sort-icon').html('&#8645;').css('color','#aaa');
             stcLoadPendingList(1);
+        });
+
+        function stcFmtSummaryDate(ymd){
+            if(!ymd) return '';
+            var p = String(ymd).split('-');
+            if(p.length !== 3) return ymd;
+            return p[2] + '-' + p[1] + '-' + p[0];
+        }
+        function stcYmdLocal(d){
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        }
+        function stcDefaultWeekFrom(){
+            var d = new Date();
+            var day = d.getDay();
+            var diff = day === 0 ? 6 : day - 1;
+            d.setDate(d.getDate() - diff);
+            return stcYmdLocal(d);
+        }
+        function stcTodayYmd(){
+            return stcYmdLocal(new Date());
+        }
+        function stcLoadWeeklyReqSummary(){
+            var $body = $('#stc-weekly-req-summary-body');
+            var $range = $('#stc-weekly-req-summary-range');
+            var dateFrom = $('#stc-weekly-req-from').val();
+            var dateTo = $('#stc-weekly-req-to').val();
+            $range.text('');
+            $body.html('<tr><td colspan="5" class="text-center" style="padding:20px;color:#888;">Loading&hellip;</td></tr>');
+            $.ajax({
+                url: 'kattegat/ragnar_lothbrok.php',
+                method: 'POST',
+                data: {
+                    pending_weekly_summary: 1,
+                    date_from: dateFrom,
+                    date_to: dateTo
+                },
+                dataType: 'json',
+                success: function(data){
+                    if(!data || !data.success){
+                        $body.html('<tr><td colspan="5" class="text-center text-danger">Could not load weekly summary.</td></tr>');
+                        return;
+                    }
+                    if(data.week_from) $('#stc-weekly-req-from').val(data.week_from);
+                    if(data.week_to) $('#stc-weekly-req-to').val(data.week_to);
+                    $range.text('Showing: ' + stcFmtSummaryDate(data.week_from) + ' to ' + stcFmtSummaryDate(data.week_to));
+                    if(!data.rows || data.rows.length === 0){
+                        $body.html('<tr><td colspan="5" class="text-center" style="padding:20px;">No requisitions for this date range.</td></tr>');
+                        return;
+                    }
+                    var html = '';
+                    $.each(data.rows, function(_, r){
+                        html += '<tr>' +
+                            '<td>' + (r.day_name || '') + '</td>' +
+                            '<td class="text-center">' + stcFmtSummaryDate(r.day_date) + '</td>' +
+                            '<td class="text-right">' + r.req_arrived + '</td>' +
+                            '<td class="text-right">' + r.req_dispatched + '</td>' +
+                            '<td class="text-right">' + r.req_pending + '</td>' +
+                            '</tr>';
+                    });
+                    html += '<tr style="font-weight:700;background:#f8f9fa;">' +
+                        '<td colspan="2" class="text-right">Total</td>' +
+                        '<td class="text-right">' + (data.totals.req_arrived || 0) + '</td>' +
+                        '<td class="text-right">' + (data.totals.req_dispatched || 0) + '</td>' +
+                        '<td class="text-right">' + (data.totals.req_pending || 0) + '</td>' +
+                        '</tr>';
+                    $body.html(html);
+                },
+                error: function(){
+                    $body.html('<tr><td colspan="5" class="text-center text-danger">Error loading weekly summary.</td></tr>');
+                }
+            });
+        }
+        $('#stcWeeklyReqSummaryModal').on('show.bs.modal', function(){
+            if(!$('#stc-weekly-req-from').val()) $('#stc-weekly-req-from').val(stcDefaultWeekFrom());
+            if(!$('#stc-weekly-req-to').val()) $('#stc-weekly-req-to').val(stcTodayYmd());
+            stcLoadWeeklyReqSummary();
+        });
+        $('#stc-weekly-req-show-btn').on('click', function(){
+            stcLoadWeeklyReqSummary();
         });
 
         // Enter key in any search field triggers search

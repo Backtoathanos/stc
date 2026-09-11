@@ -2273,6 +2273,86 @@ class sceptor extends tesseract{
 		];
 	}
 
+	// Requisition arrived / dispatched / pending by combiner date
+	public function stc_weekly_req_summary($date_from = '', $date_to = ''){
+		$out = array(
+			'success' => true,
+			'week_from' => '',
+			'week_to' => '',
+			'rows' => array(),
+			'totals' => array(
+				'req_arrived' => 0,
+				'req_dispatched' => 0,
+				'req_pending' => 0
+			)
+		);
+		$weekStart = date('Y-m-d', strtotime('monday this week'));
+		$today = date('Y-m-d');
+		$fromTs = $date_from !== '' ? strtotime($date_from) : false;
+		$toTs = $date_to !== '' ? strtotime($date_to) : false;
+		$from = $fromTs ? date('Y-m-d', $fromTs) : $weekStart;
+		$to = $toTs ? date('Y-m-d', $toTs) : $today;
+		if($from > $to){
+			$tmp = $from;
+			$from = $to;
+			$to = $tmp;
+		}
+		$out['week_from'] = $from;
+		$out['week_to'] = $to;
+		$from_esc = mysqli_real_escape_string($this->stc_dbs, $from);
+		$to_esc = mysqli_real_escape_string($this->stc_dbs, $to);
+		$qry = mysqli_query($this->stc_dbs, "
+			SELECT
+				DATE(C.`stc_requisition_combiner_date`) AS day_date,
+				DAYNAME(C.`stc_requisition_combiner_date`) AS day_name,
+				COUNT(I.`stc_cust_super_requisition_list_id`) AS req_arrived,
+				SUM(CASE WHEN IFNULL(R.dispatched_qty, 0) > 0 THEN 1 ELSE 0 END) AS req_dispatched,
+				SUM(CASE WHEN IFNULL(R.dispatched_qty, 0) = 0 THEN 1 ELSE 0 END) AS req_pending
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner_req` CR
+				ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner` C
+				ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			LEFT JOIN (
+				SELECT
+					`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+					SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+				FROM `stc_cust_super_requisition_list_items_rec`
+				GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+			) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
+			WHERE DATE(C.`stc_requisition_combiner_date`) >= '".$from_esc."'
+			  AND DATE(C.`stc_requisition_combiner_date`) <= '".$to_esc."'
+			  AND L.`stc_cust_super_requisition_list_status` != '1'
+			GROUP BY
+				DATE(C.`stc_requisition_combiner_date`),
+				DAYNAME(C.`stc_requisition_combiner_date`)
+			ORDER BY day_date ASC
+		");
+		if($qry){
+			while($row = mysqli_fetch_assoc($qry)){
+				$arrived = (int)$row['req_arrived'];
+				$dispatched = (int)$row['req_dispatched'];
+				$pending = (int)$row['req_pending'];
+				$out['rows'][] = array(
+					'day_date' => $row['day_date'],
+					'day_name' => $row['day_name'],
+					'req_arrived' => $arrived,
+					'req_dispatched' => $dispatched,
+					'req_pending' => $pending
+				);
+				$out['totals']['req_arrived'] += $arrived;
+				$out['totals']['req_dispatched'] += $dispatched;
+				$out['totals']['req_pending'] += $pending;
+			}
+		}else{
+			$out['success'] = false;
+			$out['message'] = 'Could not load weekly summary.';
+		}
+		return $out;
+	}
+
 	// Return list: paginated + search + sort for Returned (status=8) requisition items
 	public function stc_return_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
 		$this->stc_ensure_return_accepted_column();
@@ -2635,6 +2715,18 @@ if(isset($_POST["pending_list"])){
     header('Content-Type: application/json');
     echo json_encode($out);
     exit;
+}
+
+// This week's requisition summary (arrived / dispatched / pending)
+if(isset($_POST["pending_weekly_summary"])){
+	session_start();
+	$date_from = isset($_POST['date_from']) ? trim($_POST['date_from']) : '';
+	$date_to   = isset($_POST['date_to']) ? trim($_POST['date_to']) : '';
+	$obj = new sceptor();
+	$out = $obj->stc_weekly_req_summary($date_from, $date_to);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
 }
 
 // API endpoint for AJAX paginated return list (dashboard) — supports search + sort
