@@ -33,6 +33,7 @@ use App\Http\Controllers\PPETrackerController;
 use App\Http\Controllers\ToolTrackerController;
 use App\Http\Controllers\GldChallanController;
 use App\Http\Controllers\DbSyncController;
+use App\Http\Controllers\DbTableController;
 use App\Http\Controllers\MediaImagesController;
 
 /*
@@ -59,6 +60,13 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/db-sync', [DbSyncController::class, 'index']);
     Route::post('/db-sync/sync', [DbSyncController::class, 'sync']);
     Route::post('/db-sync/run-server-query', [DbSyncController::class, 'runServerQuery']);
+
+    Route::get('/db-table', [DbTableController::class, 'index']);
+    Route::post('/db-table/tables', [DbTableController::class, 'tables']);
+    Route::post('/db-table/run', [DbTableController::class, 'run']);
+    Route::post('/db-table/update', [DbTableController::class, 'updateRow']);
+    Route::post('/db-table/copy', [DbTableController::class, 'copyRow']);
+    Route::post('/db-table/delete', [DbTableController::class, 'deleteRow']);
     
     // user admin route
     Route::get('/users/admin', [SuperAdminUsersController::class, 'show']);

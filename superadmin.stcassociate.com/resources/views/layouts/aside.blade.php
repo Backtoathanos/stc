@@ -218,6 +218,12 @@
               <p>Users</p>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="{{ url('/db-table') }}" class="nav-link @if(request()->path() === 'db-table') active @endif">
+              <i class="nav-icon fas fa-database"></i>
+              <p>DB Table</p>
+            </a>
+          </li>
           <!-- <li class="nav-item">
             <a href="{{ url('/db-sync') }}" class="nav-link @if(request()->path() === 'db-sync') active @endif">
               <i class="nav-icon fas fa-sync"></i>
