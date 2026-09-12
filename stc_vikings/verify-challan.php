@@ -496,6 +496,7 @@ $selected_site_title = $site_label;
             <div>
               <button type="button" class="btn btn-danger btn-sm" id="stc-customer-format-pdf">Export to PDF</button>
               <button type="button" class="btn btn-success btn-sm" id="stc-customer-format-excel" style="margin-left:6px;">Export to Excel</button>
+              <button type="button" class="btn btn-primary btn-sm" id="stc-customer-format-word" style="margin-left:6px;">Export to Word</button>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin:0 0 0 8px;">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -578,6 +579,7 @@ $selected_site_title = $site_label;
         }
         $('#stc-customer-format-pdf').on('click', function(){ downloadCustomerFormat('pdf'); });
         $('#stc-customer-format-excel').on('click', function(){ downloadCustomerFormat('excel'); });
+        $('#stc-customer-format-word').on('click', function(){ downloadCustomerFormat('word'); });
         function hideCustomerFormatModal(){
           $('#stcCustomerFormatModal').removeClass('show').css('display', 'none').attr('aria-hidden', 'true');
           $('.modal-backdrop').remove();

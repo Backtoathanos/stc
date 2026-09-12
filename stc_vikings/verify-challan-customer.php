@@ -74,6 +74,32 @@ function stc_challan_slot($value, $width){
   return '<span class="gas-slot" style="width:'.$width.'ch">'.htmlspecialchars($value).'</span>';
 }
 
+function stc_challan_is_tata_steel_amc($site_label, $to_site, $to_lines = array()){
+  $checks = array($site_label, $to_site);
+  foreach((array) $to_lines as $line){
+    $checks[] = $line;
+  }
+  foreach($checks as $val){
+    if(strcasecmp(trim((string) $val), 'TATA STEEL AMC') === 0){
+      return true;
+    }
+  }
+  return false;
+}
+
+function stc_challan_row_sitename($row){
+  $site = trim((string) ($row['sitename'] ?? ''));
+  if($site === ''){
+    $site = trim((string) ($row['display_site'] ?? ''));
+  }
+  if($site === '') return '';
+  // e.g. "SP#1 (PWOG/00192/25-26) (TATA STEEL AMC)" -> "SP#1"
+  if(preg_match('/^([^(]+)/', $site, $m)){
+    return trim($m[1]);
+  }
+  return $site;
+}
+
 function stc_challan_data_uri($path){
   if(!is_file($path)) return '';
   $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -86,62 +112,130 @@ function stc_challan_export_filename($challan_no, $date){
   return preg_replace('/[^A-Za-z0-9._-]+/', '-', $base).'-customer-challan';
 }
 
-function stc_customer_challan_export_pdf($meta){
-  $autoload = dirname(__DIR__).'/vendor/autoload.php';
-  if(!is_file($autoload)){
-    header('HTTP/1.1 500 Internal Server Error');
-    echo 'PDF library is not installed.';
-    exit;
-  }
-  require_once $autoload;
-
-  $headerUri = stc_challan_data_uri(__DIR__.'/images/gas-header.jpg');
-  $wmUri = stc_challan_data_uri(__DIR__.'/images/gas-watermark.png');
+function stc_customer_challan_document_html($meta, $opts = array()){
+  $headerSrc = isset($opts['header_src']) ? $opts['header_src'] : stc_challan_data_uri(__DIR__.'/images/gas-header.jpg');
+  $wmSrc = isset($opts['wm_src']) ? $opts['wm_src'] : stc_challan_data_uri(__DIR__.'/images/gas-watermark.png');
+  $forWord = !empty($opts['for_word']);
   $challanDigits = preg_replace('/^GAS\s*/i', '', $meta['challan_no']);
   $toHtml = $meta['to_lines'] ? htmlspecialchars(implode("\n", $meta['to_lines'])) : '—';
+  $showSitename = !empty($meta['show_sitename']);
+  $colCount = $showSitename ? 5 : 4;
   $rowsHtml = '';
   $sl = 0;
   foreach($meta['rows'] as $row){
     $sl++;
-    $rowsHtml .= '<tr><td class="sl">'.$sl.'</td><td>'.nl2br(htmlspecialchars(trim((string)$row['item_desc']))).'</td><td class="c">'.number_format((float)$row['accepted_qty'], 2).'</td><td class="c">'.htmlspecialchars($row['unit']).'</td></tr>';
+    $siteCell = $showSitename ? '<td style="border:1px solid #111;padding:3px 6px;font-size:12px;">'.htmlspecialchars(stc_challan_row_sitename($row)).'</td>' : '';
+    $rowsHtml .= '<tr>'
+      .'<td class="sl" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">'.$sl.'</td>'
+      .$siteCell
+      .'<td style="border:1px solid #111;padding:3px 6px;font-size:12px;">'.nl2br(htmlspecialchars(trim((string)$row['item_desc']))).'</td>'
+      .'<td class="c" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">'.number_format((float)$row['accepted_qty'], 2).'</td>'
+      .'<td class="c" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">'.htmlspecialchars($row['unit']).'</td>'
+      .'</tr>';
   }
   $blank = max(0, (int)$meta['blank_rows']);
   for($i = 0; $i < $blank; $i++){
-    $rowsHtml .= '<tr><td class="sl">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>';
+    $blankSite = $showSitename ? '<td style="border:1px solid #111;padding:3px 6px;height:18px;">&nbsp;</td>' : '';
+    $rowsHtml .= '<tr><td class="sl" style="border:1px solid #111;padding:3px 6px;height:18px;">&nbsp;</td>'.$blankSite.'<td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td></tr>';
   }
   if($rowsHtml === ''){
-    $rowsHtml = '<tr><td colspan="4" class="c">No accepted items found for this date.</td></tr>';
+    $rowsHtml = '<tr><td colspan="'.$colCount.'" class="c" style="border:1px solid #111;padding:6px;text-align:center;">No accepted items found for this date.</td></tr>';
+  }
+  $thead = $showSitename
+    ? '<tr>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">SL NO</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:90px;">SITENAME</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;">MATERIAL DESCRIPTION</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">QUANTITY</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">UNIT</th>'
+      .'</tr>'
+    : '<tr>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">SL NO</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;">MATERIAL DESCRIPTION</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">QUANTITY</th>'
+      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">UNIT</th>'
+      .'</tr>';
+
+  $headerHtml = '';
+  if($headerSrc !== ''){
+    if($forWord){
+      $headerHtml = '<p style="margin:0;padding:0;text-align:left;">'
+        .'<img src="'.$headerSrc.'" width="680" height="110" alt="Global AC System" style="width:680px;height:110px;border:0;display:block;">'
+        .'</p>';
+    }else{
+      $headerHtml = '<img class="hdr" src="'.$headerSrc.'" alt="Global AC System">';
+    }
   }
 
-  $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-    @page { margin: 0; size: A4 portrait; }
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
-    .sheet { position: relative; width: 210mm; min-height: 297mm; }
-    .hdr { width: 210mm; display: block; }
-    .wm { position: absolute; left: 16%; top: 90mm; width: 68%; opacity: 0.45; z-index: 0; }
-    .body { position: relative; z-index: 1; padding: 6mm 14mm 18mm; }
-    .title { text-align: center; font-weight: 700; font-size: 15px; margin: 6px 0 12px; line-height: 1.3; }
-    .meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-    .meta td { vertical-align: top; font-weight: 700; font-size: 13px; }
-    .meta .right { text-align: right; white-space: nowrap; width: 46%; }
-    .to .lbl { margin-bottom: 3px; }
-    .items { width: 100%; border-collapse: collapse; }
-    .items th, .items td { border: 1px solid #111; padding: 3px 6px; font-size: 12px; }
-    .items th { text-align: center; }
-    .items td.sl, .items td.c { text-align: center; }
-    .sign { text-align: right; font-weight: 700; font-size: 13px; margin-top: 22px; }
-    .footer { position: absolute; left: 10mm; right: 10mm; bottom: 6mm; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 9px; line-height: 1.45; }
-    .footer a { color: #3b3dc4; text-decoration: underline; }
+  $wmHtml = '';
+  if($wmSrc !== ''){
+    if($forWord){
+      $wmHtml = '<!--[if gte vml 1]>'
+        .'<v:shape id="Watermark" o:preferrelative="t" o:spt="75" type="#_x0000_t75" '
+        .'style="position:absolute;margin-left:90pt;margin-top:120pt;width:320pt;height:320pt;z-index:-1;visibility:visible;" filled="f" stroked="f">'
+        .'<v:imagedata src="'.$wmSrc.'" o:title="watermark"/>'
+        .'<w:wrap type="none"/>'
+        .'<w:anchorlock/>'
+        .'</v:shape>'
+        .'<![endif]-->';
+    }else{
+      $wmHtml = '<img class="wm" src="'.$wmSrc.'" alt="">';
+    }
+  }
+
+  $pageCss = $forWord
+    ? '@page Section1 { size: 595.3pt 841.9pt; margin: 28pt 36pt 36pt 36pt; }
+       div.Section1 { page: Section1; }
+       body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
+       img { border: 0; }
+       table { border-collapse: collapse; }
+       .title { text-align: center; font-weight: 700; font-size: 15pt; margin: 8pt 0 10pt; line-height: 1.25; }
+       .meta { width: 100%; margin-bottom: 8pt; }
+       .meta td { vertical-align: top; font-weight: 700; font-size: 12pt; }
+       .meta .right { text-align: right; white-space: nowrap; width: 48%; }
+       .items { width: 100%; }
+       .sign { text-align: right; font-weight: 700; font-size: 12pt; margin-top: 22pt; }
+       .footer { margin-top: 18pt; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 8pt; line-height: 1.4; }'
+    : '@page { margin: 0; size: A4 portrait; }
+       * { box-sizing: border-box; }
+       body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
+       .sheet { position: relative; width: 210mm; min-height: 297mm; }
+       .hdr { width: 210mm; display: block; }
+       .wm { position: absolute; left: 16%; top: 90mm; width: 68%; opacity: 0.45; z-index: 0; }
+       .body { position: relative; z-index: 1; padding: 6mm 14mm 18mm; }
+       .title { text-align: center; font-weight: 700; font-size: 15px; margin: 6px 0 12px; line-height: 1.3; }
+       .meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+       .meta td { vertical-align: top; font-weight: 700; font-size: 13px; }
+       .meta .right { text-align: right; white-space: nowrap; width: 46%; }
+       .to .lbl { margin-bottom: 3px; }
+       .items { width: 100%; border-collapse: collapse; }
+       .items th, .items td { border: 1px solid #111; padding: 3px 6px; font-size: 12px; }
+       .items th { text-align: center; }
+       .items td.sl, .items td.c { text-align: center; }
+       .sign { text-align: right; font-weight: 700; font-size: 13px; margin-top: 22px; }
+       .footer { position: absolute; left: 10mm; right: 10mm; bottom: 6mm; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 9px; line-height: 1.45; }
+       .footer a { color: #3b3dc4; text-decoration: underline; }';
+
+  $openWrap = $forWord ? '<div class="Section1">' : '<div class="sheet">';
+  $closeWrap = '</div>';
+  $bodyOpen = $forWord ? '<div class="body" style="position:relative;">' : '<div class="body">';
+
+  return '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:v="urn:schemas-microsoft-com:vml" xmlns="http://www.w3.org/TR/REC-html40"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!--[if gte mso 9]><xml>
+   <o:OfficeDocumentSettings><o:AllowPNG/></o:OfficeDocumentSettings>
+   <w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument>
+  </xml><![endif]-->
+  <style>
+    '.$pageCss.'
   </style></head><body>
-  <div class="sheet">
-    '.($headerUri !== '' ? '<img class="hdr" src="'.$headerUri.'">' : '').'
-    '.($wmUri !== '' ? '<img class="wm" src="'.$wmUri.'">' : '').'
-    <div class="body">
+  '.$openWrap.'
+    '.$headerHtml.'
+    '.$wmHtml.'
+    '.$bodyOpen.'
       <div class="title">2 COPY ENTRY CHALLAN<br>CONSUMABLE MATERIALS</div>
-      <table class="meta"><tr>
-        <td class="to"><div class="lbl">To,</div>'.nl2br($toHtml).'</td>
-        <td class="right">
+      <table class="meta" width="100%" cellspacing="0" cellpadding="0"><tr>
+        <td class="to" valign="top"><div class="lbl">To,</div>'.nl2br($toHtml).'</td>
+        <td class="right" valign="top">
           CHALLAN NO : GAS '.htmlspecialchars($challanDigits).'<br>
           DATE : '.htmlspecialchars($meta['challan_date']).'<br>
           ORDER NO : '.htmlspecialchars($meta['order_no'] !== '' ? $meta['order_no'] : '').'<br>
@@ -149,8 +243,8 @@ function stc_customer_challan_export_pdf($meta){
           VEHICLE NO. – '.htmlspecialchars($meta['vehicle_no']).'
         </td>
       </tr></table>
-      <table class="items">
-        <thead><tr><th style="width:8%">SL NO</th><th>MATERIAL DESCRIPTION</th><th style="width:14%">QUANTITY</th><th style="width:12%">UNIT</th></tr></thead>
+      <table class="items" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+        <thead>'.$thead.'</thead>
         <tbody>'.$rowsHtml.'</tbody>
       </table>
       <div class="sign">FOR GLOBAL AC SYSTEM JSR PVT LTD</div>
@@ -161,9 +255,20 @@ function stc_customer_challan_export_pdf($meta){
       Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808<br>
       Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA
     </div>
-  </div>
+  '.$closeWrap.'
   </body></html>';
+}
 
+function stc_customer_challan_export_pdf($meta){
+  $autoload = dirname(__DIR__).'/vendor/autoload.php';
+  if(!is_file($autoload)){
+    header('HTTP/1.1 500 Internal Server Error');
+    echo 'PDF library is not installed.';
+    exit;
+  }
+  require_once $autoload;
+
+  $html = stc_customer_challan_document_html($meta);
   $options = new \Dompdf\Options();
   $options->set('isRemoteEnabled', true);
   $options->set('isHtml5ParserEnabled', true);
@@ -173,6 +278,52 @@ function stc_customer_challan_export_pdf($meta){
   $dompdf->loadHtml($html);
   $dompdf->render();
   $dompdf->stream(stc_challan_export_filename($meta['challan_no'], $meta['date']).'.pdf', array('Attachment' => true));
+  exit;
+}
+
+function stc_customer_challan_export_word($meta){
+  $filename = stc_challan_export_filename($meta['challan_no'], $meta['date']).'.doc';
+  $boundary = '----=_NextPart_STC_'.md5(uniqid('', true));
+  $headerPath = __DIR__.'/images/gas-header.jpg';
+  $wmPath = __DIR__.'/images/gas-watermark.png';
+
+  $html = stc_customer_challan_document_html($meta, array(
+    'for_word' => true,
+    'header_src' => is_file($headerPath) ? 'cid:gas-header.jpg' : '',
+    'wm_src' => is_file($wmPath) ? 'cid:gas-watermark.png' : '',
+  ));
+
+  $doc = "MIME-Version: 1.0\r\n";
+  $doc .= 'Content-Type: multipart/related; boundary="'.$boundary.'"'."\r\n\r\n";
+  $doc .= '--'.$boundary."\r\n";
+  $doc .= "Content-Type: text/html; charset=\"utf-8\"\r\n";
+  $doc .= "Content-Transfer-Encoding: quoted-printable\r\n";
+  $doc .= "Content-Location: challan.htm\r\n\r\n";
+  $doc .= quoted_printable_encode($html)."\r\n";
+
+  if(is_file($headerPath)){
+    $doc .= '--'.$boundary."\r\n";
+    $doc .= "Content-Type: image/jpeg\r\n";
+    $doc .= "Content-Transfer-Encoding: base64\r\n";
+    $doc .= "Content-ID: <gas-header.jpg>\r\n";
+    $doc .= "Content-Location: gas-header.jpg\r\n\r\n";
+    $doc .= chunk_split(base64_encode(file_get_contents($headerPath)))."\r\n";
+  }
+  if(is_file($wmPath)){
+    $doc .= '--'.$boundary."\r\n";
+    $doc .= "Content-Type: image/png\r\n";
+    $doc .= "Content-Transfer-Encoding: base64\r\n";
+    $doc .= "Content-ID: <gas-watermark.png>\r\n";
+    $doc .= "Content-Location: gas-watermark.png\r\n\r\n";
+    $doc .= chunk_split(base64_encode(file_get_contents($wmPath)))."\r\n";
+  }
+  $doc .= '--'.$boundary."--\r\n";
+
+  header('Content-Type: application/msword; charset=UTF-8');
+  header('Content-Disposition: attachment; filename="'.$filename.'"');
+  header('Cache-Control: max-age=0');
+  header('Content-Length: '.strlen($doc));
+  echo $doc;
   exit;
 }
 
@@ -188,10 +339,19 @@ function stc_customer_challan_export_excel($meta){
   $ss = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
   $sheet = $ss->getActiveSheet();
   $sheet->setTitle('Challan');
-  $sheet->getColumnDimension('A')->setWidth(12);
-  $sheet->getColumnDimension('B')->setWidth(55);
-  $sheet->getColumnDimension('C')->setWidth(16);
-  $sheet->getColumnDimension('D')->setWidth(12);
+  $showSitename = !empty($meta['show_sitename']);
+  $lastCol = $showSitename ? 'E' : 'D';
+  $sheet->getColumnDimension('A')->setWidth(10);
+  if($showSitename){
+    $sheet->getColumnDimension('B')->setWidth(28);
+    $sheet->getColumnDimension('C')->setWidth(45);
+    $sheet->getColumnDimension('D')->setWidth(12);
+    $sheet->getColumnDimension('E')->setWidth(10);
+  }else{
+    $sheet->getColumnDimension('B')->setWidth(55);
+    $sheet->getColumnDimension('C')->setWidth(16);
+    $sheet->getColumnDimension('D')->setWidth(12);
+  }
 
   $headerPath = __DIR__.'/images/gas-header.jpg';
   $row = 1;
@@ -202,17 +362,17 @@ function stc_customer_challan_export_excel($meta){
     $drawing->setCoordinates('A1');
     $drawing->setWidth(720);
     $drawing->setWorksheet($sheet);
-    $sheet->mergeCells('A1:D1');
+    $sheet->mergeCells('A1:'.$lastCol.'1');
     $sheet->getRowDimension(1)->setRowHeight(52);
     $row = 3;
   }
 
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, '2 COPY ENTRY CHALLAN');
   $sheet->getStyle('A'.$row)->getFont()->setBold(true)->setSize(14);
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $row++;
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, 'CONSUMABLE MATERIALS');
   $sheet->getStyle('A'.$row)->getFont()->setBold(true)->setSize(12);
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -237,58 +397,74 @@ function stc_customer_challan_export_excel($meta){
     array('ORDER DATE :', $meta['order_date']),
     array('VEHICLE NO. –', $meta['vehicle_no']),
   );
+  $metaLabelCol = $showSitename ? 'D' : 'C';
+  $metaValueCol = $showSitename ? 'E' : 'D';
   foreach($metaPairs as $pair){
-    $sheet->setCellValue('C'.$metaRow, $pair[0]);
-    $sheet->setCellValue('D'.$metaRow, $pair[1]);
-    $sheet->getStyle('C'.$metaRow.':D'.$metaRow)->getFont()->setBold(true);
-    $sheet->getStyle('C'.$metaRow.':D'.$metaRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+    $sheet->setCellValue($metaLabelCol.$metaRow, $pair[0]);
+    $sheet->setCellValue($metaValueCol.$metaRow, $pair[1]);
+    $sheet->getStyle($metaLabelCol.$metaRow.':'.$metaValueCol.$metaRow)->getFont()->setBold(true);
+    $sheet->getStyle($metaLabelCol.$metaRow.':'.$metaValueCol.$metaRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
     $metaRow++;
   }
   $row = max($row, $metaRow) + 1;
 
   $headRow = $row;
-  $sheet->fromArray(array('SL NO', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT'), null, 'A'.$headRow);
-  $sheet->getStyle('A'.$headRow.':D'.$headRow)->getFont()->setBold(true);
-  $sheet->getStyle('A'.$headRow.':D'.$headRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+  $headers = $showSitename
+    ? array('SL NO', 'SITENAME', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT')
+    : array('SL NO', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT');
+  $sheet->fromArray($headers, null, 'A'.$headRow);
+  $sheet->getStyle('A'.$headRow.':'.$lastCol.$headRow)->getFont()->setBold(true);
+  $sheet->getStyle('A'.$headRow.':'.$lastCol.$headRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $row++;
   $sl = 0;
   foreach($meta['rows'] as $item){
     $sl++;
     $sheet->setCellValue('A'.$row, $sl);
-    $sheet->setCellValue('B'.$row, trim((string)$item['item_desc']));
-    $sheet->setCellValue('C'.$row, (float)$item['accepted_qty']);
-    $sheet->setCellValue('D'.$row, $item['unit']);
-    $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle('C'.$row.':D'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle('C'.$row)->getNumberFormat()->setFormatCode('0.00');
-    $sheet->getStyle('B'.$row)->getAlignment()->setWrapText(true);
+    if($showSitename){
+      $sheet->setCellValue('B'.$row, stc_challan_row_sitename($item));
+      $sheet->setCellValue('C'.$row, trim((string)$item['item_desc']));
+      $sheet->setCellValue('D'.$row, (float)$item['accepted_qty']);
+      $sheet->setCellValue('E'.$row, $item['unit']);
+      $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+      $sheet->getStyle('D'.$row.':E'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+      $sheet->getStyle('D'.$row)->getNumberFormat()->setFormatCode('0.00');
+      $sheet->getStyle('B'.$row.':C'.$row)->getAlignment()->setWrapText(true);
+    }else{
+      $sheet->setCellValue('B'.$row, trim((string)$item['item_desc']));
+      $sheet->setCellValue('C'.$row, (float)$item['accepted_qty']);
+      $sheet->setCellValue('D'.$row, $item['unit']);
+      $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+      $sheet->getStyle('C'.$row.':D'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+      $sheet->getStyle('C'.$row)->getNumberFormat()->setFormatCode('0.00');
+      $sheet->getStyle('B'.$row)->getAlignment()->setWrapText(true);
+    }
     $row++;
   }
   if($sl === 0){
-    $sheet->mergeCells('A'.$row.':D'.$row);
+    $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
     $sheet->setCellValue('A'.$row, 'No accepted items found for this date.');
     $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     $row++;
   }
   $lastTable = $row - 1;
-  $sheet->getStyle('A'.$headRow.':D'.$lastTable)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+  $sheet->getStyle('A'.$headRow.':'.$lastCol.$lastTable)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
   $row += 2;
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, 'FOR GLOBAL AC SYSTEM JSR PVT LTD');
   $sheet->getStyle('A'.$row)->getFont()->setBold(true);
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
   $row += 2;
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, 'Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA');
   $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $sheet->getStyle('A'.$row)->getFont()->setSize(9);
   $row++;
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, 'Website: www.globalacsystem.com, E-Mail: globalacsystem@yahoo.com, Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808');
   $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $sheet->getStyle('A'.$row)->getFont()->setSize(9);
   $row++;
-  $sheet->mergeCells('A'.$row.':D'.$row);
+  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
   $sheet->setCellValue('A'.$row, 'Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA');
   $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $sheet->getStyle('A'.$row)->getFont()->setSize(9);
@@ -419,8 +595,26 @@ if($to_site !== '' && strcasecmp($to_site, $to_customer) !== 0) $toLines[] = $to
 if($to_address !== '') $toLines[] = $to_address;
 if(!$toLines) $toLines[] = '—';
 
+$show_sitename = stc_challan_is_tata_steel_amc($site_label, $to_site, $toLines);
+
+if($show_sitename){
+  $toLines = array(
+    'The Head Security Work',
+    'TATA STEEL LTD JSR',
+    'JMD GATE',
+  );
+}
+
+if($show_sitename && count($rows) > 1){
+  usort($rows, function($a, $b){
+    $cmp = strcasecmp(stc_challan_row_sitename($a), stc_challan_row_sitename($b));
+    if($cmp !== 0) return $cmp;
+    return strcasecmp(trim((string)($a['item_desc'] ?? '')), trim((string)($b['item_desc'] ?? '')));
+  });
+}
+
 $export = isset($_GET['export']) ? strtolower(trim((string) $_GET['export'])) : '';
-if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
+if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export === 'word' || $export === 'doc'){
   $exportMeta = array(
     'date' => $date,
     'challan_no' => $challan_no,
@@ -431,9 +625,12 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
     'to_lines' => $toLines,
     'rows' => $rows,
     'blank_rows' => $blank_rows,
+    'show_sitename' => $show_sitename,
   );
   if($export === 'pdf'){
     stc_customer_challan_export_pdf($exportMeta);
+  }elseif($export === 'word' || $export === 'doc'){
+    stc_customer_challan_export_word($exportMeta);
   }else{
     stc_customer_challan_export_excel($exportMeta);
   }
@@ -568,6 +765,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
         font-size: 12px;
       }
       .gas-table td.sl { width: 70px; text-align: center; }
+      .gas-table td.site { width: 18%; word-wrap: break-word; font-size: 11px; }
       .gas-table td.qty, .gas-table td.unit { text-align: center; }
       .gas-table td.desc { word-wrap: break-word; }
       .gas-sign {
@@ -661,6 +859,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
             <thead>
               <tr>
                 <th style="width:8%;">SL NO</th>
+                <?php if($show_sitename){ ?><th style="width:18%;">SITENAME</th><?php } ?>
                 <th>MATERIAL DESCRIPTION</th>
                 <th style="width:14%;">QUANTITY</th>
                 <th style="width:12%;">UNIT</th>
@@ -675,6 +874,9 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
               ?>
                 <tr>
                   <td class="sl"><?php echo $sl; ?></td>
+                  <?php if($show_sitename){ ?>
+                    <td class="site"><?php echo htmlspecialchars(stc_challan_row_sitename($row)); ?></td>
+                  <?php } ?>
                   <td class="desc"><?php echo nl2br(htmlspecialchars($desc)); ?></td>
                   <td class="qty"><?php echo number_format((float)$row['accepted_qty'], 2); ?></td>
                   <td class="unit"><?php echo htmlspecialchars($row['unit']); ?></td>
@@ -682,7 +884,9 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx'){
               <?php
               }
               for($i = 0; $i < $blank_rows; $i++){
-                echo '<tr><td class="sl">&nbsp;</td><td class="desc">&nbsp;</td><td class="qty">&nbsp;</td><td class="unit">&nbsp;</td></tr>';
+                echo '<tr><td class="sl">&nbsp;</td>';
+                if($show_sitename) echo '<td class="site">&nbsp;</td>';
+                echo '<td class="desc">&nbsp;</td><td class="qty">&nbsp;</td><td class="unit">&nbsp;</td></tr>';
               }
               ?>
             </tbody>
