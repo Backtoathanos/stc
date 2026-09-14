@@ -118,16 +118,13 @@ function stc_customer_challan_document_html($meta, $opts = array()){
   $forWord = !empty($opts['for_word']);
   $challanDigits = preg_replace('/^GAS\s*/i', '', $meta['challan_no']);
   $toHtml = $meta['to_lines'] ? htmlspecialchars(implode("\n", $meta['to_lines'])) : '—';
-  $showSitename = !empty($meta['show_sitename']);
-  $colCount = $showSitename ? 5 : 4;
+  $colCount = 4;
   $rowsHtml = '';
   $sl = 0;
   foreach($meta['rows'] as $row){
     $sl++;
-    $siteCell = $showSitename ? '<td style="border:1px solid #111;padding:3px 6px;font-size:12px;">'.htmlspecialchars(stc_challan_row_sitename($row)).'</td>' : '';
     $rowsHtml .= '<tr>'
       .'<td class="sl" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">'.$sl.'</td>'
-      .$siteCell
       .'<td style="border:1px solid #111;padding:3px 6px;font-size:12px;">'.nl2br(htmlspecialchars(trim((string)$row['item_desc']))).'</td>'
       .'<td class="c" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">'.number_format((float)$row['accepted_qty'], 2).'</td>'
       .'<td class="c" style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">'.htmlspecialchars($row['unit']).'</td>'
@@ -135,26 +132,17 @@ function stc_customer_challan_document_html($meta, $opts = array()){
   }
   $blank = max(0, (int)$meta['blank_rows']);
   for($i = 0; $i < $blank; $i++){
-    $blankSite = $showSitename ? '<td style="border:1px solid #111;padding:3px 6px;height:18px;">&nbsp;</td>' : '';
-    $rowsHtml .= '<tr><td class="sl" style="border:1px solid #111;padding:3px 6px;height:18px;">&nbsp;</td>'.$blankSite.'<td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td></tr>';
+    $rowsHtml .= '<tr><td class="sl" style="border:1px solid #111;padding:3px 6px;height:18px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td><td style="border:1px solid #111;padding:3px 6px;">&nbsp;</td></tr>';
   }
   if($rowsHtml === ''){
     $rowsHtml = '<tr><td colspan="'.$colCount.'" class="c" style="border:1px solid #111;padding:6px;text-align:center;">No accepted items found for this date.</td></tr>';
   }
-  $thead = $showSitename
-    ? '<tr>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">SL NO</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:90px;">SITENAME</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;">MATERIAL DESCRIPTION</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">QUANTITY</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">UNIT</th>'
-      .'</tr>'
-    : '<tr>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">SL NO</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;">MATERIAL DESCRIPTION</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">QUANTITY</th>'
-      .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">UNIT</th>'
-      .'</tr>';
+  $thead = '<tr>'
+    .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:55px;">SL NO</th>'
+    .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;">MATERIAL DESCRIPTION</th>'
+    .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:80px;">QUANTITY</th>'
+    .'<th style="border:1px solid #111;padding:3px 6px;font-size:12px;text-align:center;width:70px;">UNIT</th>'
+    .'</tr>';
 
   $headerHtml = '';
   if($headerSrc !== ''){
@@ -339,19 +327,11 @@ function stc_customer_challan_export_excel($meta){
   $ss = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
   $sheet = $ss->getActiveSheet();
   $sheet->setTitle('Challan');
-  $showSitename = !empty($meta['show_sitename']);
-  $lastCol = $showSitename ? 'E' : 'D';
+  $lastCol = 'D';
   $sheet->getColumnDimension('A')->setWidth(10);
-  if($showSitename){
-    $sheet->getColumnDimension('B')->setWidth(28);
-    $sheet->getColumnDimension('C')->setWidth(45);
-    $sheet->getColumnDimension('D')->setWidth(12);
-    $sheet->getColumnDimension('E')->setWidth(10);
-  }else{
-    $sheet->getColumnDimension('B')->setWidth(55);
-    $sheet->getColumnDimension('C')->setWidth(16);
-    $sheet->getColumnDimension('D')->setWidth(12);
-  }
+  $sheet->getColumnDimension('B')->setWidth(55);
+  $sheet->getColumnDimension('C')->setWidth(16);
+  $sheet->getColumnDimension('D')->setWidth(12);
 
   $headerPath = __DIR__.'/images/gas-header.jpg';
   $row = 1;
@@ -397,8 +377,8 @@ function stc_customer_challan_export_excel($meta){
     array('ORDER DATE :', $meta['order_date']),
     array('VEHICLE NO. –', $meta['vehicle_no']),
   );
-  $metaLabelCol = $showSitename ? 'D' : 'C';
-  $metaValueCol = $showSitename ? 'E' : 'D';
+  $metaLabelCol = 'C';
+  $metaValueCol = 'D';
   foreach($metaPairs as $pair){
     $sheet->setCellValue($metaLabelCol.$metaRow, $pair[0]);
     $sheet->setCellValue($metaValueCol.$metaRow, $pair[1]);
@@ -409,9 +389,7 @@ function stc_customer_challan_export_excel($meta){
   $row = max($row, $metaRow) + 1;
 
   $headRow = $row;
-  $headers = $showSitename
-    ? array('SL NO', 'SITENAME', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT')
-    : array('SL NO', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT');
+  $headers = array('SL NO', 'MATERIAL DESCRIPTION', 'QUANTITY', 'UNIT');
   $sheet->fromArray($headers, null, 'A'.$headRow);
   $sheet->getStyle('A'.$headRow.':'.$lastCol.$headRow)->getFont()->setBold(true);
   $sheet->getStyle('A'.$headRow.':'.$lastCol.$headRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -420,24 +398,13 @@ function stc_customer_challan_export_excel($meta){
   foreach($meta['rows'] as $item){
     $sl++;
     $sheet->setCellValue('A'.$row, $sl);
-    if($showSitename){
-      $sheet->setCellValue('B'.$row, stc_challan_row_sitename($item));
-      $sheet->setCellValue('C'.$row, trim((string)$item['item_desc']));
-      $sheet->setCellValue('D'.$row, (float)$item['accepted_qty']);
-      $sheet->setCellValue('E'.$row, $item['unit']);
-      $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-      $sheet->getStyle('D'.$row.':E'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-      $sheet->getStyle('D'.$row)->getNumberFormat()->setFormatCode('0.00');
-      $sheet->getStyle('B'.$row.':C'.$row)->getAlignment()->setWrapText(true);
-    }else{
-      $sheet->setCellValue('B'.$row, trim((string)$item['item_desc']));
-      $sheet->setCellValue('C'.$row, (float)$item['accepted_qty']);
-      $sheet->setCellValue('D'.$row, $item['unit']);
-      $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-      $sheet->getStyle('C'.$row.':D'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-      $sheet->getStyle('C'.$row)->getNumberFormat()->setFormatCode('0.00');
-      $sheet->getStyle('B'.$row)->getAlignment()->setWrapText(true);
-    }
+    $sheet->setCellValue('B'.$row, trim((string)$item['item_desc']));
+    $sheet->setCellValue('C'.$row, (float)$item['accepted_qty']);
+    $sheet->setCellValue('D'.$row, $item['unit']);
+    $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle('C'.$row.':D'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle('C'.$row)->getNumberFormat()->setFormatCode('0.00');
+    $sheet->getStyle('B'.$row)->getAlignment()->setWrapText(true);
     $row++;
   }
   if($sl === 0){
@@ -625,7 +592,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
     'to_lines' => $toLines,
     'rows' => $rows,
     'blank_rows' => $blank_rows,
-    'show_sitename' => $show_sitename,
   );
   if($export === 'pdf'){
     stc_customer_challan_export_pdf($exportMeta);
@@ -765,7 +731,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         font-size: 12px;
       }
       .gas-table td.sl { width: 70px; text-align: center; }
-      .gas-table td.site { width: 18%; word-wrap: break-word; font-size: 11px; }
       .gas-table td.qty, .gas-table td.unit { text-align: center; }
       .gas-table td.desc { word-wrap: break-word; }
       .gas-sign {
