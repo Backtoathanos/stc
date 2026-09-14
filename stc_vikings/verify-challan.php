@@ -411,8 +411,10 @@ $selected_site_title = $site_label;
                   <th>Item Desc</th>
                   <th>Unit</th>
                   <th>Dispatched Qty</th>
-                  <th>Rack</th>
-                  <th>Req From</th>
+                  <?php if($selected_site_title!='TATA STEEL AMC'){ ?>
+                    <th>Rack</th>
+                    <th>Req From</th>
+                  <?php } ?>
                   <th>Sign</th>
                 </tr>
               </thead>
@@ -471,8 +473,10 @@ $selected_site_title = $site_label;
                     <td><?php echo nl2br(htmlspecialchars($row['item_desc'])); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($row['unit']); ?></td>
                     <td class="text-right"><b><?php echo number_format((float)$row['accepted_qty'], 2); ?></b></td>
-                    <td><?php echo htmlspecialchars($rack); ?></td>
-                    <td><?php echo $reqFrom; ?></td>
+                    <?php if($selected_site_title!='TATA STEEL AMC'){ ?>
+                      <td><?php echo htmlspecialchars($rack); ?></td>
+                      <td><?php echo $reqFrom; ?></td>
+                    <?php } ?>
                     <td></td>
                   </tr>
                 <?php
