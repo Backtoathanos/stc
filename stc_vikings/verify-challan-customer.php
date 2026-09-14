@@ -859,7 +859,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
             <thead>
               <tr>
                 <th style="width:8%;">SL NO</th>
-                <?php if($show_sitename){ ?><th style="width:18%;">SITENAME</th><?php } ?>
                 <th>MATERIAL DESCRIPTION</th>
                 <th style="width:14%;">QUANTITY</th>
                 <th style="width:12%;">UNIT</th>
@@ -874,9 +873,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
               ?>
                 <tr>
                   <td class="sl"><?php echo $sl; ?></td>
-                  <?php if($show_sitename){ ?>
-                    <td class="site"><?php echo htmlspecialchars(stc_challan_row_sitename($row)); ?></td>
-                  <?php } ?>
                   <td class="desc"><?php echo nl2br(htmlspecialchars($desc)); ?></td>
                   <td class="qty"><?php echo number_format((float)$row['accepted_qty'], 2); ?></td>
                   <td class="unit"><?php echo htmlspecialchars($row['unit']); ?></td>
@@ -885,7 +881,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
               }
               for($i = 0; $i < $blank_rows; $i++){
                 echo '<tr><td class="sl">&nbsp;</td>';
-                if($show_sitename) echo '<td class="site">&nbsp;</td>';
                 echo '<td class="desc">&nbsp;</td><td class="qty">&nbsp;</td><td class="unit">&nbsp;</td></tr>';
               }
               ?>
