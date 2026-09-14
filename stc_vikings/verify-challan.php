@@ -294,19 +294,47 @@ $selected_site_title = $site_label;
       }
       @media print {
         body{ margin: 0 !important; }
-        .hidden-print { visibility: hidden; }
-        .tm-footer { visibility: hidden; }
+        .hidden-print { display: none !important; }
+        .tm-footer { display: none !important; }
         #stcCustomerFormatModal, .modal-backdrop { display: none !important; }
         .tm-mt-big{ margin-top: 0 !important; }
         .tm-mb-big{ margin-bottom: 0 !important; }
-        .invoice{ margin-top: -5px !important; }
+        .invoice{ margin-top: 0 !important; overflow: visible !important; }
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
         tr { page-break-inside: avoid; }
-        #logo_print_pre{
-          position: relative;
-          float: right;
-          right: -180px;
+        .row.header {
+          display: flex !important;
+          flex-wrap: nowrap !important;
+          overflow: visible !important;
+          page-break-inside: avoid;
+        }
+        .row.header > [class*="col-"] {
+          display: block !important;
+          float: none !important;
+          max-width: none !important;
+        }
+        .row.header img {
+          display: block !important;
+          visibility: visible !important;
+          max-width: 100%;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        #logo_print_pre {
+          display: block !important;
+          visibility: visible !important;
+          position: static !important;
+          float: none !important;
+          right: auto !important;
+          margin: 0 !important;
+          text-align: right;
+        }
+        #logo_print_pre img {
+          display: inline-block !important;
+          height: 70px !important;
+          width: auto !important;
         }
         #verifyChallanTable, #verifyChallanTable th, #verifyChallanTable td {
           color: #000 !important;
