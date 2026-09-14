@@ -477,7 +477,7 @@ $selected_site_title = $site_label;
                       <td><?php echo htmlspecialchars($rack); ?></td>
                       <td><?php echo $reqFrom; ?></td>
                     <?php } ?>
-                    <td></td>
+                    <td><span style="opacity: 0;">..................................</span></td>
                   </tr>
                 <?php
                   }
