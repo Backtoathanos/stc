@@ -218,6 +218,14 @@ if($sql && mysqli_num_rows($sql) > 0){
   }
 }
 
+if(count($challan_rows) > 1){
+  usort($challan_rows, function($a, $b){
+    $cmp = strcasecmp((string)($a['sitename'] ?? ''), (string)($b['sitename'] ?? ''));
+    if($cmp !== 0) return $cmp;
+    return strcasecmp((string)($a['item_desc'] ?? ''), (string)($b['item_desc'] ?? ''));
+  });
+}
+
 if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
   header('Content-Type: application/json; charset=UTF-8');
   echo json_encode(array(
