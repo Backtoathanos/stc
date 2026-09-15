@@ -479,6 +479,16 @@ $challanFrom = "
     ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
   LEFT JOIN `stc_requisition_combiner` C
     ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+  LEFT JOIN (
+    SELECT
+      REC.`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+      GROUP_CONCAT(DISTINCT TRIM(APA.`stc_purchase_product_adhoc_itemdesc`) ORDER BY APA.`stc_purchase_product_adhoc_id` SEPARATOR '\n') AS adhoc_name
+    FROM `stc_cust_super_requisition_list_items_rec` REC
+    INNER JOIN `stc_purchase_product_adhoc` APA
+      ON APA.`stc_purchase_product_adhoc_id` = REC.`stc_cust_super_requisition_list_items_rec_list_poaid`
+    WHERE TRIM(COALESCE(APA.`stc_purchase_product_adhoc_itemdesc`, '')) <> ''
+    GROUP BY REC.`stc_cust_super_requisition_list_items_rec_list_item_id`
+  ) ADH ON ADH.`item_id` = I.`stc_cust_super_requisition_list_id`
   WHERE DATE(VA.`created_date`) = '".$date_esc."'
 ";
 
@@ -498,7 +508,7 @@ $order_date_to = '';
 $sql = mysqli_query($con, "
   SELECT
     VA.`qty` AS accepted_qty,
-    I.`stc_cust_super_requisition_list_items_title` AS item_desc,
+    COALESCE(NULLIF(TRIM(ADH.`adhoc_name`), ''), I.`stc_cust_super_requisition_list_items_title`) AS item_desc,
     I.`stc_cust_super_requisition_list_items_unit` AS unit,
     I.`stc_cust_super_requisition_list_id` AS item_id,
     P.`stc_cust_project_title` AS sitename,
@@ -556,21 +566,13 @@ if($order_date_from !== '' && $order_date_to !== '' && $order_date_from !== $ord
 $blank_rows = max(0, 22 - count($rows));
 $embed = isset($_GET['embed']) && $_GET['embed'] !== '0' && $_GET['embed'] !== '';
 
-$toLines = array();
-if($to_customer !== '') $toLines[] = $to_customer;
-if($to_site !== '' && strcasecmp($to_site, $to_customer) !== 0) $toLines[] = $to_site;
-if($to_address !== '') $toLines[] = $to_address;
-if(!$toLines) $toLines[] = '—';
+$show_sitename = stc_challan_is_tata_steel_amc($site_label, $to_site, array($to_customer, $to_site, $to_address));
 
-$show_sitename = stc_challan_is_tata_steel_amc($site_label, $to_site, $toLines);
-
-if($show_sitename){
-  $toLines = array(
-    'The Head Security Work',
-    'TATA STEEL LTD JSR',
-    'JMD GATE',
-  );
-}
+$toLines = array(
+  'The Head Security Work',
+  'TATA STEEL LTD JSR',
+  'JMD GATE',
+);
 
 if($show_sitename && count($rows) > 1){
   usort($rows, function($a, $b){
