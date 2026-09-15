@@ -171,42 +171,94 @@ function stc_customer_challan_document_html($meta, $opts = array()){
     }
   }
 
+  $titleMetaHtml = '<div class="title">2 COPY ENTRY CHALLAN<br>CONSUMABLE MATERIALS</div>'
+    .'<table class="meta" width="100%" cellspacing="0" cellpadding="0"><tr>'
+    .'<td class="to" valign="top"><div class="lbl">To,</div>'.nl2br($toHtml).'</td>'
+    .'<td class="right" valign="top">'
+    .'CHALLAN NO : GAS '.htmlspecialchars($challanDigits).'<br>'
+    .'DATE : '.htmlspecialchars($meta['challan_date']).'<br>'
+    .'ORDER NO : '.htmlspecialchars($meta['order_no'] !== '' ? $meta['order_no'] : '').'<br>'
+    .'ORDER DATE : '.htmlspecialchars($meta['order_date']).'<br>'
+    .'VEHICLE NO. – '.htmlspecialchars($meta['vehicle_no'])
+    .'</td></tr></table>';
+  $letterheadHtml = $headerHtml.$titleMetaHtml;
+
+  $footerHtml = '<div class="footer">'
+    .'Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA Website: '
+    .'www.globalacsystem.com, E-Mail: globalacsystem@yahoo.com, '
+    .'Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808<br>'
+    .'Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA'
+    .'</div>';
+
   $pageCss = $forWord
-    ? '@page Section1 { size: 595.3pt 841.9pt; margin: 28pt 36pt 36pt 36pt; }
+    ? '@page Section1 { size: 595.3pt 841.9pt; margin: 28pt 36pt 42pt 36pt; mso-header-margin: 12pt; mso-footer-margin: 18pt; }
        div.Section1 { page: Section1; }
        body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
        img { border: 0; }
        table { border-collapse: collapse; }
+       thead { display: table-header-group; }
+       tfoot { display: table-footer-group; }
        .title { text-align: center; font-weight: 700; font-size: 15pt; margin: 8pt 0 10pt; line-height: 1.25; }
        .meta { width: 100%; margin-bottom: 8pt; }
        .meta td { vertical-align: top; font-weight: 700; font-size: 12pt; }
        .meta .right { text-align: right; white-space: nowrap; width: 48%; }
        .items { width: 100%; }
-       .sign { text-align: right; font-weight: 700; font-size: 12pt; margin-top: 22pt; }
-       .footer { margin-top: 18pt; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 8pt; line-height: 1.4; }'
-    : '@page { margin: 0; size: A4 portrait; }
+       .letterhead td, .footcell td, .sign td { border: 0 !important; }
+       .sign { text-align: right; font-weight: 700; font-size: 12pt; padding-top: 18pt; }
+       .footer { text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 8pt; line-height: 1.4; }'
+    : '@page { size: A4 portrait; margin: 78mm 12mm 24mm 12mm; }
        * { box-sizing: border-box; }
        body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
-       .sheet { position: relative; width: 210mm; min-height: 297mm; }
-       .hdr { width: 210mm; display: block; }
-       .wm { position: absolute; left: 16%; top: 90mm; width: 68%; opacity: 0.45; z-index: 0; }
-       .body { position: relative; z-index: 1; padding: 6mm 14mm 18mm; }
-       .title { text-align: center; font-weight: 700; font-size: 15px; margin: 6px 0 12px; line-height: 1.3; }
-       .meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-       .meta td { vertical-align: top; font-weight: 700; font-size: 13px; }
+       .page-header { position: fixed; top: -76mm; left: -12mm; right: -12mm; }
+       .page-header .hdr { width: 210mm; display: block; }
+       .page-header .head-pad { padding: 2mm 14mm 0; }
+       .wm { position: fixed; left: 16%; top: 40%; width: 68%; opacity: 0.35; z-index: -1; }
+       .title { text-align: center; font-weight: 700; font-size: 14px; margin: 4px 0 8px; line-height: 1.25; }
+       .meta { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+       .meta td { vertical-align: top; font-weight: 700; font-size: 12px; }
        .meta .right { text-align: right; white-space: nowrap; width: 46%; }
        .to .lbl { margin-bottom: 3px; }
        .items { width: 100%; border-collapse: collapse; }
        .items th, .items td { border: 1px solid #111; padding: 3px 6px; font-size: 12px; }
        .items th { text-align: center; }
        .items td.sl, .items td.c { text-align: center; }
-       .sign { text-align: right; font-weight: 700; font-size: 13px; margin-top: 22px; }
-       .footer { position: absolute; left: 10mm; right: 10mm; bottom: 6mm; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 9px; line-height: 1.45; }
+       thead { display: table-header-group; }
+       .sign { text-align: right; font-weight: 700; font-size: 13px; margin-top: 18px; page-break-inside: avoid; }
+       .page-footer { position: fixed; bottom: -22mm; left: 0; right: 0; height: 20mm; }
+       .footer { text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 8px; line-height: 1.35; }
        .footer a { color: #3b3dc4; text-decoration: underline; }';
 
-  $openWrap = $forWord ? '<div class="Section1">' : '<div class="sheet">';
-  $closeWrap = '</div>';
-  $bodyOpen = $forWord ? '<div class="body" style="position:relative;">' : '<div class="body">';
+  $itemsTable = '<table class="items" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">'
+    .'<thead>'.$thead.'</thead>'
+    .'<tbody>'.$rowsHtml.'</tbody>'
+    .'</table>'
+    .'<div class="sign">FOR GLOBAL AC SYSTEM JSR PVT LTD</div>';
+
+  if($forWord){
+    $wordTable = '<table class="items" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">'
+      .'<thead>'
+      .'<tr class="letterhead"><td colspan="'.$colCount.'" style="border:0;padding:0 0 8pt 0;">'.$letterheadHtml.'</td></tr>'
+      .$thead
+      .'</thead>'
+      .'<tbody>'.$rowsHtml
+      .'<tr class="sign"><td colspan="'.$colCount.'" style="border:0;padding-top:18pt;text-align:right;font-weight:700;">FOR GLOBAL AC SYSTEM JSR PVT LTD</td></tr>'
+      .'</tbody>'
+      .'<tfoot>'
+      .'<tr class="footcell"><td colspan="'.$colCount.'" style="border:0;padding-top:10pt;">'.$footerHtml.'</td></tr>'
+      .'</tfoot>'
+      .'</table>';
+    $bodyInner = $wmHtml.$wordTable;
+    $openWrap = '<div class="Section1">';
+    $closeWrap = '</div>';
+    $fixedHeader = '';
+    $fixedFooter = '';
+  }else{
+    $bodyInner = $wmHtml.'<div class="body">'.$itemsTable.'</div>';
+    $openWrap = '';
+    $closeWrap = '';
+    $fixedHeader = '<div class="page-header">'.$headerHtml.'<div class="head-pad">'.$titleMetaHtml.'</div></div>';
+    $fixedFooter = '<div class="page-footer">'.$footerHtml.'</div>';
+  }
 
   return '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:v="urn:schemas-microsoft-com:vml" xmlns="http://www.w3.org/TR/REC-html40"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <!--[if gte mso 9]><xml>
@@ -217,32 +269,9 @@ function stc_customer_challan_document_html($meta, $opts = array()){
     '.$pageCss.'
   </style></head><body>
   '.$openWrap.'
-    '.$headerHtml.'
-    '.$wmHtml.'
-    '.$bodyOpen.'
-      <div class="title">2 COPY ENTRY CHALLAN<br>CONSUMABLE MATERIALS</div>
-      <table class="meta" width="100%" cellspacing="0" cellpadding="0"><tr>
-        <td class="to" valign="top"><div class="lbl">To,</div>'.nl2br($toHtml).'</td>
-        <td class="right" valign="top">
-          CHALLAN NO : GAS '.htmlspecialchars($challanDigits).'<br>
-          DATE : '.htmlspecialchars($meta['challan_date']).'<br>
-          ORDER NO : '.htmlspecialchars($meta['order_no'] !== '' ? $meta['order_no'] : '').'<br>
-          ORDER DATE : '.htmlspecialchars($meta['order_date']).'<br>
-          VEHICLE NO. – '.htmlspecialchars($meta['vehicle_no']).'
-        </td>
-      </tr></table>
-      <table class="items" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
-        <thead>'.$thead.'</thead>
-        <tbody>'.$rowsHtml.'</tbody>
-      </table>
-      <div class="sign">FOR GLOBAL AC SYSTEM JSR PVT LTD</div>
-    </div>
-    <div class="footer">
-      Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA Website:
-      www.globalacsystem.com, E-Mail: globalacsystem@yahoo.com,
-      Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808<br>
-      Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA
-    </div>
+    '.$fixedHeader.'
+    '.$fixedFooter.'
+    '.$bodyInner.'
   '.$closeWrap.'
   </body></html>';
 }
@@ -420,24 +449,15 @@ function stc_customer_challan_export_excel($meta){
   $sheet->setCellValue('A'.$row, 'FOR GLOBAL AC SYSTEM JSR PVT LTD');
   $sheet->getStyle('A'.$row)->getFont()->setBold(true);
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-  $row += 2;
-  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
-  $sheet->setCellValue('A'.$row, 'Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA');
-  $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-  $sheet->getStyle('A'.$row)->getFont()->setSize(9);
-  $row++;
-  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
-  $sheet->setCellValue('A'.$row, 'Website: www.globalacsystem.com, E-Mail: globalacsystem@yahoo.com, Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808');
-  $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-  $sheet->getStyle('A'.$row)->getFont()->setSize(9);
-  $row++;
-  $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
-  $sheet->setCellValue('A'.$row, 'Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA');
-  $sheet->getStyle('A'.$row)->getAlignment()->setWrapText(true)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-  $sheet->getStyle('A'.$row)->getFont()->setSize(9);
   $sheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
   $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
-  $sheet->getPageSetup()->setFitToPage(true)->setFitToWidth(1)->setFitToHeight(1);
+  $sheet->getPageSetup()->setFitToPage(true)->setFitToWidth(1)->setFitToHeight(0);
+  $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, $headRow);
+  $sheet->getPageMargins()->setTop(0.5)->setBottom(0.8)->setHeader(0.3)->setFooter(0.6);
+  $excelFooter = "&C&8Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA\nWebsite: www.globalacsystem.com, E-Mail: globalacsystem@yahoo.com, Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808\nBranch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA";
+  $sheet->getHeaderFooter()->setOddFooter($excelFooter);
+  $sheet->getHeaderFooter()->setEvenFooter($excelFooter);
+  $sheet->getHeaderFooter()->setAlignWithMargins(true);
 
   $filename = stc_challan_export_filename($meta['challan_no'], $meta['date']).'.xlsx';
   header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -646,27 +666,27 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         display: flex;
         flex-direction: column;
         width: 210mm;
-        height: 297mm;
         min-height: 297mm;
-        max-height: 297mm;
         margin: 12px auto 24px;
         background: #fff;
         box-shadow: 0 2px 14px rgba(0,0,0,.12);
-        overflow: hidden;
+        overflow: visible;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
       .gas-header {
         display: block;
-        width: 100%;
+        width: calc(100% + 28mm);
+        max-width: none;
         height: auto;
+        margin: 0 -14mm 2mm;
         flex: 0 0 auto;
         border: 0;
       }
       .gas-body {
         position: relative;
         flex: 1 1 auto;
-        padding: 6mm 14mm 16mm;
+        padding: 0 14mm 8mm;
         display: flex;
         flex-direction: column;
         min-height: 0;
@@ -732,7 +752,6 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         position: relative;
         z-index: 1;
         width: 100%;
-        height: 100%;
         border-collapse: collapse;
         table-layout: fixed;
         background: transparent;
@@ -753,38 +772,39 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
       .gas-table td.sl { width: 70px; text-align: center; }
       .gas-table td.qty, .gas-table td.unit { text-align: center; }
       .gas-table td.desc { word-wrap: break-word; }
-      .gas-sign {
-        margin-top: auto;
-        padding-top: 10mm;
+      .gas-table thead tr.gas-lh th,
+      .gas-table tfoot tr.gas-ft td,
+      .gas-table tbody tr.gas-sign-row td {
+        border: 0;
+        height: auto;
+        background: #fff;
+      }
+      .gas-table thead tr.gas-lh th { padding: 0 0 4mm; }
+      .gas-table tbody tr.gas-sign-row td {
+        padding: 10mm 0 4mm;
         text-align: right;
         font-weight: 700;
         font-size: 13px;
         letter-spacing: .2px;
       }
-      .gas-footer {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 3mm 10mm 5mm;
+      .gas-table tfoot tr.gas-ft td {
+        padding: 3mm 2mm 4mm;
         text-align: center;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 9px;
         color: #222;
         line-height: 1.45;
-        background: #fff;
       }
       .gas-footer a { color: #3b3dc4; text-decoration: underline; }
       body.gas-embed .hidden-print { display: none !important; }
       body.gas-embed .gas-sheet { margin: 8px auto 12px; }
       @page {
         size: A4 portrait;
-        margin: 0;
+        margin: 8mm 10mm 10mm;
       }
       @media print {
         html, body {
           width: 210mm !important;
-          height: 297mm !important;
           margin: 0 !important;
           padding: 0 !important;
           background: #fff !important;
@@ -792,15 +812,31 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         .hidden-print { display: none !important; }
         .gas-sheet {
           width: 210mm !important;
-          height: 297mm !important;
-          min-height: 297mm !important;
-          max-height: 297mm !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
           margin: 0 !important;
           box-shadow: none !important;
-          page-break-inside: avoid;
-          break-inside: avoid;
+          overflow: visible !important;
+          page-break-inside: auto;
         }
-        .gas-header, .gas-watermark, .gas-sheet, .gas-footer {
+        .gas-body, .gas-content, .gas-table-wrap {
+          display: block !important;
+          height: auto !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+          padding: 0 !important;
+        }
+        thead { display: table-header-group !important; }
+        tfoot { display: table-footer-group !important; }
+        tr { page-break-inside: avoid; }
+        .gas-watermark {
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        .gas-header, .gas-watermark, .gas-sheet {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
@@ -814,34 +850,36 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
     </div>
 
     <div class="gas-sheet">
-      <img class="gas-header" src="images/gas-header.jpg" alt="Global AC System">
       <div class="gas-body">
         <div class="gas-content">
-          <div class="gas-title">
-            2 COPY ENTRY CHALLAN<br>
-            CONSUMABLE MATERIALS
-          </div>
-
-          <div class="gas-meta">
-            <div class="gas-to">
-              <div class="lbl">To,</div>
-              <div class="val">
-                <?php echo nl2br(htmlspecialchars(implode("\n", $toLines))); ?>
-              </div>
-            </div>
-            <div class="gas-right">
-              CHALLAN NO : GAS <?php echo stc_challan_slot(preg_replace('/^GAS\s*/i', '', $challan_no), 10); ?><br>
-              DATE : <?php echo htmlspecialchars($challan_date); ?><br>
-              ORDER NO : <?php echo stc_challan_slot($meta_order, 14); ?><br>
-              ORDER DATE : <?php echo htmlspecialchars($order_date_text); ?><br>
-              VEHICLE NO. – <?php echo stc_challan_slot('', 10); ?>
-            </div>
-          </div>
-
           <div class="gas-table-wrap">
             <img class="gas-watermark" src="images/gas-watermark.png" alt="">
           <table class="gas-table">
             <thead>
+              <tr class="gas-lh">
+                <th colspan="4">
+                  <img class="gas-header" src="images/gas-header.jpg" alt="Global AC System">
+                  <div class="gas-title">
+                    2 COPY ENTRY CHALLAN<br>
+                    CONSUMABLE MATERIALS
+                  </div>
+                  <div class="gas-meta">
+                    <div class="gas-to">
+                      <div class="lbl">To,</div>
+                      <div class="val">
+                        <?php echo nl2br(htmlspecialchars(implode("\n", $toLines))); ?>
+                      </div>
+                    </div>
+                    <div class="gas-right">
+                      CHALLAN NO : GAS <?php echo stc_challan_slot(preg_replace('/^GAS\s*/i', '', $challan_no), 10); ?><br>
+                      DATE : <?php echo htmlspecialchars($challan_date); ?><br>
+                      ORDER NO : <?php echo stc_challan_slot($meta_order, 14); ?><br>
+                      ORDER DATE : <?php echo htmlspecialchars($order_date_text); ?><br>
+                      VEHICLE NO. – <?php echo stc_challan_slot('', 10); ?>
+                    </div>
+                  </div>
+                </th>
+              </tr>
               <tr>
                 <th style="width:8%;">SL NO</th>
                 <th>MATERIAL DESCRIPTION</th>
@@ -869,19 +907,24 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
                 echo '<td class="desc">&nbsp;</td><td class="qty">&nbsp;</td><td class="unit">&nbsp;</td></tr>';
               }
               ?>
+              <tr class="gas-sign-row">
+                <td colspan="4">FOR GLOBAL AC SYSTEM JSR PVT LTD</td>
+              </tr>
             </tbody>
+            <tfoot>
+              <tr class="gas-ft">
+                <td colspan="4" class="gas-footer">
+                  Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA Website:
+                  <a href="http://www.globalacsystem.com" target="_blank">www.globalacsystem.com</a>,
+                  E-Mail: <a href="mailto:globalacsystem@yahoo.com">globalacsystem@yahoo.com</a>,
+                  Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808<br>
+                  Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA
+                </td>
+              </tr>
+            </tfoot>
           </table>
           </div>
-
-          <div class="gas-sign">FOR GLOBAL AC SYSTEM JSR PVT LTD</div>
         </div>
-      </div>
-      <div class="gas-footer">
-        Registered Office: 502/A, Jawahar Nagar, Road No.:17, PO – Azad Nagar, Mango, Jamshedpur – 832110, Jharkhand, INDIA Website:
-        <a href="http://www.globalacsystem.com" target="_blank">www.globalacsystem.com</a>,
-        E-Mail: <a href="mailto:globalacsystem@yahoo.com">globalacsystem@yahoo.com</a>,
-        Mobile No.: 9471129415 / 9471127774, Ph No.: 06572230808<br>
-        Branch Office Add: C/o. Majesty 79, A Block, Dhatkidih, PO – Bistupur, Jamshedpur – 831001, Jharkhand, INDIA
       </div>
     </div>
 
