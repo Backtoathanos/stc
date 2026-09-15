@@ -553,6 +553,24 @@ if($sql && mysqli_num_rows($sql) > 0){
   }
 }
 
+if($rows){
+  $grouped = array();
+  foreach($rows as $row){
+    $desc = trim(preg_replace('/\s+/', ' ', (string)($row['item_desc'] ?? '')));
+    $unit = trim((string)($row['unit'] ?? ''));
+    $key = strtoupper($desc)."\0".strtoupper($unit);
+    if(!isset($grouped[$key])){
+      $row['item_desc'] = $desc;
+      $row['unit'] = $unit;
+      $row['accepted_qty'] = (float)$row['accepted_qty'];
+      $grouped[$key] = $row;
+    }else{
+      $grouped[$key]['accepted_qty'] += (float)$row['accepted_qty'];
+    }
+  }
+  $rows = array_values($grouped);
+}
+
 $challan_no = 'GAS '.date('dmy', strtotime($date));
 $challan_date = date('d/m/Y', strtotime($date));
 $order_date_text = '—';

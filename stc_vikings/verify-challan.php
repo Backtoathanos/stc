@@ -140,15 +140,29 @@ if($siteListQ){
     $label = stc_challan_combination_label($sr['sitename'] ?? '', $sr['pr_location'] ?? '');
     if($label === '') continue;
     $key = strtoupper($label);
-    if(isset($siteSeen[$key])) continue;
-    $siteSeen[$key] = true;
-    $site_options[] = array(
-      'sitename' => $label
-    );
+    $on = trim((string)($sr['order_number'] ?? ''));
+    if(!isset($siteSeen[$key])){
+      $siteSeen[$key] = array(
+        'sitename' => $label,
+        'order_number' => $on
+      );
+    }elseif($siteSeen[$key]['order_number'] === '' && $on !== ''){
+      $siteSeen[$key]['order_number'] = $on;
+    }
   }
+  $site_options = array_values($siteSeen);
   usort($site_options, function($a, $b){
     return strcasecmp($a['sitename'], $b['sitename']);
   });
+}
+
+if($site_label !== '' && $order_number === ''){
+  foreach($site_options as $so){
+    if(strcasecmp($so['sitename'], $site_label) === 0 && $so['order_number'] !== ''){
+      $order_number = $so['order_number'];
+      break;
+    }
+  }
 }
 
 $filter_sql = '';
@@ -381,7 +395,7 @@ $selected_site_title = $site_label;
           <?php foreach($site_options as $so){
             $soName = $so['sitename'];
           ?>
-            <li data-value="<?php echo htmlspecialchars($soName); ?>" class="<?php echo ($site_label === $soName) ? 'is-active' : ''; ?>">
+            <li data-value="<?php echo htmlspecialchars($soName); ?>" data-order="<?php echo htmlspecialchars($so['order_number'] ?? ''); ?>" class="<?php echo ($site_label === $soName) ? 'is-active' : ''; ?>">
               <?php echo htmlspecialchars($soName); ?>
             </li>
           <?php } ?>
@@ -576,7 +590,7 @@ $selected_site_title = $site_label;
         });
         $('#stc-dd-site .stc-dd-menu li').on('click', function(){
           var siteLabel = $(this).attr('data-value') || '';
-          var orderNo = $('.vorder-number').val() || '';
+          var orderNo = siteLabel ? ($(this).attr('data-order') || '') : ($('.vorder-number').val() || '');
           window.location.href = challanFilterUrl(orderNo, siteLabel);
         });
         $('.filterbydate').on('click', function(){
