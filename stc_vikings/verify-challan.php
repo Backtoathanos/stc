@@ -108,61 +108,50 @@ $challanFrom = "
 ";
 
 $order_options = array();
-$orderListQ = mysqli_query($con, "
-  SELECT DISTINCT TRIM(L.`stc_cust_super_requisition_list_order_number`) AS order_number
-  ".$challanFrom."
-  AND TRIM(COALESCE(L.`stc_cust_super_requisition_list_order_number`, '')) <> ''
-  ORDER BY order_number ASC
-");
-if($orderListQ){
-  while($or = mysqli_fetch_assoc($orderListQ)){
-    if($or['order_number'] !== ''){
-      $order_options[] = $or['order_number'];
-    }
-  }
-}
-
-$siteFrom = $challanFrom;
-if($order_number !== ''){
-  $siteFrom .= " AND L.`stc_cust_super_requisition_list_order_number` = '".mysqli_real_escape_string($con, $order_number)."'";
-}
 $site_options = array();
 $siteSeen = array();
-$siteListQ = mysqli_query($con, "
+$orderSeen = array();
+
+$listQ = mysqli_query($con, "
   SELECT DISTINCT
     TRIM(COALESCE(L.`stc_cust_super_requisition_list_order_number`, '')) AS order_number,
     P.`stc_cust_project_title` AS sitename,
     C.`stc_requisition_combiner_refrence` AS pr_location
-  ".$siteFrom."
+  ".$challanFrom."
 ");
-if($siteListQ){
-  while($sr = mysqli_fetch_assoc($siteListQ)){
+if($listQ){
+  while($sr = mysqli_fetch_assoc($listQ)){
     $label = stc_challan_combination_label($sr['sitename'] ?? '', $sr['pr_location'] ?? '');
-    if($label === '') continue;
-    $key = strtoupper($label);
     $on = trim((string)($sr['order_number'] ?? ''));
-    if(!isset($siteSeen[$key])){
-      $siteSeen[$key] = array(
-        'sitename' => $label,
-        'order_number' => $on
-      );
-    }elseif($siteSeen[$key]['order_number'] === '' && $on !== ''){
-      $siteSeen[$key]['order_number'] = $on;
+
+    if($label !== ''){
+      $siteKey = strtoupper($label);
+      if(!isset($siteSeen[$siteKey])){
+        $siteSeen[$siteKey] = true;
+        $site_options[] = array('sitename' => $label);
+      }
+    }
+
+    if($on === '') continue;
+    if($site_label !== ''){
+      if($label === '' || strcasecmp($label, $site_label) !== 0) continue;
+    }
+    $orderKey = strtoupper($on);
+    if(!isset($orderSeen[$orderKey])){
+      $orderSeen[$orderKey] = true;
+      $order_options[] = $on;
     }
   }
-  $site_options = array_values($siteSeen);
   usort($site_options, function($a, $b){
     return strcasecmp($a['sitename'], $b['sitename']);
   });
+  usort($order_options, function($a, $b){
+    return strcasecmp($a, $b);
+  });
 }
 
-if($site_label !== '' && $order_number === ''){
-  foreach($site_options as $so){
-    if(strcasecmp($so['sitename'], $site_label) === 0 && $so['order_number'] !== ''){
-      $order_number = $so['order_number'];
-      break;
-    }
-  }
+if($order_number !== '' && !in_array($order_number, $order_options, true)){
+  $order_number = '';
 }
 
 $filter_sql = '';
@@ -171,6 +160,80 @@ if($order_number !== ''){
 }
 
 $selected_site_title = $site_label;
+$hide_extra_cols = (strcasecmp($selected_site_title, 'TATA STEEL AMC') === 0);
+
+$challan_rows = array();
+$sql = mysqli_query($con, "
+  SELECT
+    VA.`item_id`,
+    VA.`qty` AS accepted_qty,
+    VA.`created_date` AS accepted_date,
+    I.`stc_cust_super_requisition_list_items_title` AS item_desc,
+    I.`stc_cust_super_requisition_list_items_unit` AS unit,
+    I.`stc_cust_super_requisition_list_id` AS item_id,
+    L.`stc_cust_super_requisition_list_id` AS requisition_id,
+    L.`stc_cust_super_requisition_list_date` AS requisition_date,
+    P.`stc_cust_project_title` AS sitename,
+    S.`stc_cust_pro_supervisor_fullname` AS req_from,
+    S.`stc_cust_pro_supervisor_contact` AS req_from_contact,
+    C.`stc_requisition_combiner_id` AS pr_no,
+    C.`stc_requisition_combiner_date` AS pr_date,
+    C.`stc_requisition_combiner_refrence` AS pr_location,
+    L.`stc_cust_super_requisition_list_order_number` AS order_number
+  ".$challanFrom."
+  ".$filter_sql."
+  ORDER BY TIMESTAMP(VA.`created_date`) DESC, VA.`id` DESC
+");
+
+if($sql && mysqli_num_rows($sql) > 0){
+  while($row = mysqli_fetch_assoc($sql)){
+    $combinationName = stc_challan_combination_label($row['sitename'], $row['pr_location']);
+    if($site_label !== '' && strcasecmp($combinationName, $site_label) !== 0){
+      continue;
+    }
+    $reqFrom = trim((string)($row['req_from'] ?? ''));
+    $reqContact = trim((string)($row['req_from_contact'] ?? ''));
+    $reqFromHtml = htmlspecialchars($reqFrom);
+    if($reqContact !== ''){
+      $reqFromHtml .= ($reqFromHtml !== '' ? '<br>' : '').htmlspecialchars($reqContact);
+    }
+    $item_id_esc = mysqli_real_escape_string($con, $row['item_id']);
+    $query2 = mysqli_query($con, "
+        SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS stc_rack_name
+        FROM `stc_cust_super_requisition_list_items_rec` REC
+        INNER JOIN `stc_purchase_product_adhoc` APA ON APA.`stc_purchase_product_adhoc_id` = REC.`stc_cust_super_requisition_list_items_rec_list_poaid`
+        LEFT JOIN `stc_rack` RK ON RK.`stc_rack_id` = APA.`stc_purchase_product_adhoc_rackid`
+        WHERE REC.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".$item_id_esc."'
+    ");
+    $rackRow = ($query2 && mysqli_num_rows($query2) > 0) ? mysqli_fetch_assoc($query2) : array();
+    $rack = ($rackRow['stc_rack_name'] ?? '') ?: '-';
+    $challan_rows[] = array(
+      'sitename' => stc_challan_site_label($row['sitename'], $row['pr_location']),
+      'item_desc' => (string)($row['item_desc'] ?? ''),
+      'unit' => (string)($row['unit'] ?? ''),
+      'accepted_qty' => number_format((float)$row['accepted_qty'], 2),
+      'rack' => $rack,
+      'req_from_html' => $reqFromHtml
+    );
+  }
+}
+
+if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
+  header('Content-Type: application/json; charset=UTF-8');
+  echo json_encode(array(
+    'success' => true,
+    'date' => $date,
+    'pm_no' => $pm_no,
+    'pm_date' => $pm_date,
+    'order_number' => $order_number,
+    'site' => $site_label,
+    'hide_extra_cols' => $hide_extra_cols,
+    'order_options' => $order_options,
+    'site_options' => array_map(function($s){ return $s['sitename']; }, $site_options),
+    'rows' => $challan_rows
+  ));
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -395,7 +458,7 @@ $selected_site_title = $site_label;
           <?php foreach($site_options as $so){
             $soName = $so['sitename'];
           ?>
-            <li data-value="<?php echo htmlspecialchars($soName); ?>" data-order="<?php echo htmlspecialchars($so['order_number'] ?? ''); ?>" class="<?php echo ($site_label === $soName) ? 'is-active' : ''; ?>">
+            <li data-value="<?php echo htmlspecialchars($soName); ?>" class="<?php echo ($site_label === $soName) ? 'is-active' : ''; ?>">
               <?php echo htmlspecialchars($soName); ?>
             </li>
           <?php } ?>
@@ -423,13 +486,9 @@ $selected_site_title = $site_label;
           <h2 align="center" style="font-size:40px;">Delivery Challan</h2>
           <div>
             <h4 align="left">P.M No : <span id="pmNoDisplay"><?php echo htmlspecialchars($pm_no); ?></span></h4>
-            <h4 align="left">P.M Date : <?php echo $pm_date; ?></h4>
-            <?php if($order_number !== ''){ ?>
-              <h4 align="left">Order Number : <?php echo htmlspecialchars($order_number); ?></h4>
-            <?php } ?>
-            <?php if($selected_site_title !== ''){ ?>
-              <h4 align="left">Site : <?php echo htmlspecialchars($selected_site_title); ?></h4>
-            <?php } ?>
+            <h4 align="left">P.M Date : <span id="challanPmDate"><?php echo htmlspecialchars($pm_date); ?></span></h4>
+            <h4 align="left" id="challanMetaOrder" style="<?php echo $order_number === '' ? 'display:none;' : ''; ?>">Order Number : <span id="challanMetaOrderVal"><?php echo htmlspecialchars($order_number); ?></span></h4>
+            <h4 align="left" id="challanMetaSite" style="<?php echo $selected_site_title === '' ? 'display:none;' : ''; ?>">Site : <span id="challanMetaSiteVal"><?php echo htmlspecialchars($selected_site_title); ?></span></h4>
           </div>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
@@ -446,85 +505,44 @@ $selected_site_title = $site_label;
           </div>
           <div style="overflow-x:auto;">
             <table class="table table-bordered table-hover" style="color:#000; border:1px solid #000;" id="verifyChallanTable">
-              <thead>
+              <thead id="verifyChallanThead">
                 <tr>
                   <th>Sl No</th>
                   <th>Sitename</th>
                   <th>Item Desc</th>
                   <th>Unit</th>
                   <th>Dispatched Qty</th>
-                  <?php if($selected_site_title!='TATA STEEL AMC'){ ?>
+                  <?php if(!$hide_extra_cols){ ?>
                     <th>Rack</th>
                     <th>Req From</th>
                   <?php } ?>
                   <th>Sign</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="verifyChallanTbody">
                 <?php
-                $sl = 0;
-                $sql = mysqli_query($con, "
-                  SELECT
-                    VA.`item_id`,
-                    VA.`qty` AS accepted_qty,
-                    VA.`created_date` AS accepted_date,
-                    I.`stc_cust_super_requisition_list_items_title` AS item_desc,
-                    I.`stc_cust_super_requisition_list_items_unit` AS unit,
-                    I.`stc_cust_super_requisition_list_id` AS item_id,
-                    L.`stc_cust_super_requisition_list_id` AS requisition_id,
-                    L.`stc_cust_super_requisition_list_date` AS requisition_date,
-                    P.`stc_cust_project_title` AS sitename,
-                    S.`stc_cust_pro_supervisor_fullname` AS req_from,
-                    S.`stc_cust_pro_supervisor_contact` AS req_from_contact,
-                    C.`stc_requisition_combiner_id` AS pr_no,
-                    C.`stc_requisition_combiner_date` AS pr_date,
-                    C.`stc_requisition_combiner_refrence` AS pr_location,
-                    L.`stc_cust_super_requisition_list_order_number` AS order_number
-                  ".$challanFrom."
-                  ".$filter_sql."
-                  ORDER BY TIMESTAMP(VA.`created_date`) DESC, VA.`id` DESC
-                ");
-
-                if($sql && mysqli_num_rows($sql) > 0){
-                  while($row = mysqli_fetch_assoc($sql)){
-                    $reqFrom = $row['req_from'];
-                    if($row['req_from_contact']){
-                      $reqFrom .= '<br>'.$row['req_from_contact'];
-                    }
-                    $displaySite = stc_challan_site_label($row['sitename'], $row['pr_location']);
-                    $combinationName = stc_challan_combination_label($row['sitename'], $row['pr_location']);
-                    if($site_label !== '' && strcasecmp($combinationName, $site_label) !== 0){
-                      continue;
-                    }
+                if(count($challan_rows) > 0){
+                  $sl = 0;
+                  foreach($challan_rows as $row){
                     $sl++;
-                    $sitename = htmlspecialchars($displaySite);
-                    $item_id_esc = mysqli_real_escape_string($con, $row['item_id']);
-                    $query2 = mysqli_query($con, "
-                        SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS stc_rack_name
-                        FROM `stc_cust_super_requisition_list_items_rec` REC
-                        INNER JOIN `stc_purchase_product_adhoc` APA ON APA.`stc_purchase_product_adhoc_id` = REC.`stc_cust_super_requisition_list_items_rec_list_poaid`
-                        LEFT JOIN `stc_rack` RK ON RK.`stc_rack_id` = APA.`stc_purchase_product_adhoc_rackid`
-                        WHERE REC.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".$item_id_esc."'
-                    ");
-                    $rackRow = mysqli_num_rows($query2)>0 ? mysqli_fetch_assoc($query2) : array();
-                    $rack = ($rackRow['stc_rack_name'] ?? '') ?: '-';
                 ?>
                   <tr>
                     <td class="text-center dr-slno"><?php echo $sl; ?></td>
-                    <td><?php echo $sitename; ?></td>
+                    <td><?php echo htmlspecialchars($row['sitename']); ?></td>
                     <td><?php echo nl2br(htmlspecialchars($row['item_desc'])); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($row['unit']); ?></td>
-                    <td class="text-right"><b><?php echo number_format((float)$row['accepted_qty'], 2); ?></b></td>
-                    <?php if($selected_site_title!='TATA STEEL AMC'){ ?>
-                      <td><?php echo htmlspecialchars($rack); ?></td>
-                      <td><?php echo $reqFrom; ?></td>
+                    <td class="text-right"><b><?php echo htmlspecialchars($row['accepted_qty']); ?></b></td>
+                    <?php if(!$hide_extra_cols){ ?>
+                      <td><?php echo htmlspecialchars($row['rack']); ?></td>
+                      <td><?php echo $row['req_from_html']; ?></td>
                     <?php } ?>
                     <td><span style="opacity: 0;">..................................</span></td>
                   </tr>
                 <?php
                   }
                 }else{
-                  echo '<tr><td colspan="9" class="text-center">No accepted items found for this date.</td></tr>';
+                  $colspan = $hide_extra_cols ? 6 : 8;
+                  echo '<tr><td colspan="'.$colspan.'" class="text-center">No accepted items found for this date.</td></tr>';
                 }
                 ?>
               </tbody>
@@ -561,9 +579,20 @@ $selected_site_title = $site_label;
     <script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script>
       $(document).ready(function(){
-        $('#printInvoice').click(function(){
-          window.print();
-        });
+        var basePmNo = '<?php echo addslashes($pm_no); ?>';
+        var challanLoading = false;
+
+        function escHtml(str){
+          return String(str == null ? '' : str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+        function nl2brEsc(str){
+          return escHtml(str).replace(/\r\n|\r|\n/g, '<br>');
+        }
         function challanFilterUrl(orderNo, siteLabel){
           var date = $('.vdate').val();
           if (typeof orderNo === 'undefined') orderNo = $('.vorder-number').val() || '';
@@ -573,6 +602,107 @@ $selected_site_title = $site_label;
           if (siteLabel) url += '&site=' + encodeURIComponent(siteLabel);
           return url;
         }
+        function updateBrowserUrl(orderNo, siteLabel){
+          if (window.history && window.history.pushState) {
+            window.history.pushState({challan:1}, '', challanFilterUrl(orderNo, siteLabel));
+          }
+        }
+        function renderOrderOptions(options, selected){
+          var html = '<li data-value="" class="'+(selected === '' ? 'is-active' : '')+'">All Order Numbers</li>';
+          (options || []).forEach(function(on){
+            html += '<li data-value="'+escHtml(on)+'" class="'+(selected === on ? 'is-active' : '')+'">'+escHtml(on)+'</li>';
+          });
+          $('#stc-dd-order .stc-dd-menu').html(html);
+          $('#stc-dd-order .stc-dd-toggle').text(selected !== '' ? selected : 'All Order Numbers');
+          $('.vorder-number').val(selected || '');
+        }
+        function renderSiteOptions(options, selected){
+          var html = '<li data-value="" class="'+(selected === '' ? 'is-active' : '')+'">All Sites</li>';
+          (options || []).forEach(function(site){
+            html += '<li data-value="'+escHtml(site)+'" class="'+(selected === site ? 'is-active' : '')+'">'+escHtml(site)+'</li>';
+          });
+          $('#stc-dd-site .stc-dd-menu').html(html);
+          $('#stc-dd-site .stc-dd-toggle').text(selected !== '' ? selected : 'All Sites');
+          $('.vsite').val(selected || '');
+        }
+        function renderChallanTable(rows, hideExtra){
+          var thead = '<tr><th>Sl No</th><th>Sitename</th><th>Item Desc</th><th>Unit</th><th>Dispatched Qty</th>';
+          if(!hideExtra) thead += '<th>Rack</th><th>Req From</th>';
+          thead += '<th>Sign</th></tr>';
+          $('#verifyChallanThead').html(thead);
+
+          var body = '';
+          if(rows && rows.length){
+            rows.forEach(function(row, i){
+              body += '<tr>'
+                + '<td class="text-center dr-slno">'+(i+1)+'</td>'
+                + '<td>'+escHtml(row.sitename)+'</td>'
+                + '<td>'+nl2brEsc(row.item_desc)+'</td>'
+                + '<td class="text-center">'+escHtml(row.unit)+'</td>'
+                + '<td class="text-right"><b>'+escHtml(row.accepted_qty)+'</b></td>';
+              if(!hideExtra){
+                body += '<td>'+escHtml(row.rack)+'</td>'
+                  + '<td>'+(row.req_from_html || '')+'</td>';
+              }
+              body += '<td><span style="opacity: 0;">..................................</span></td></tr>';
+            });
+          }else{
+            var cols = hideExtra ? 6 : 8;
+            body = '<tr><td colspan="'+cols+'" class="text-center">No accepted items found for this date.</td></tr>';
+          }
+          $('#verifyChallanTbody').html(body);
+          $('#tableSearch').val('');
+          bindTableSearch();
+        }
+        function applyChallanMeta(data){
+          basePmNo = data.pm_no || basePmNo;
+          $('#pmNoDisplay').text(basePmNo);
+          $('#challanPmDate').text(data.pm_date || '');
+          if(data.order_number){
+            $('#challanMetaOrderVal').text(data.order_number);
+            $('#challanMetaOrder').show();
+          }else{
+            $('#challanMetaOrder').hide();
+            $('#challanMetaOrderVal').text('');
+          }
+          if(data.site){
+            $('#challanMetaSiteVal').text(data.site);
+            $('#challanMetaSite').show();
+          }else{
+            $('#challanMetaSite').hide();
+            $('#challanMetaSiteVal').text('');
+          }
+          if(data.date) $('.vdate').val(data.date);
+        }
+        function loadChallanRecords(orderNo, siteLabel, pushUrl){
+          if (typeof orderNo === 'undefined') orderNo = $('.vorder-number').val() || '';
+          if (typeof siteLabel === 'undefined') siteLabel = $('.vsite').val() || '';
+          if (pushUrl !== false) updateBrowserUrl(orderNo, siteLabel);
+          if (challanLoading) return;
+          challanLoading = true;
+          var url = challanFilterUrl(orderNo, siteLabel);
+          url += (url.indexOf('?') === -1 ? '?' : '&') + 'ajax=1';
+          $('#verifyChallanTbody').css('opacity', 0.45);
+          $.getJSON(url)
+            .done(function(data){
+              if(!data || !data.success) return;
+              applyChallanMeta(data);
+              renderOrderOptions(data.order_options || [], data.order_number || '');
+              renderSiteOptions(data.site_options || [], data.site || '');
+              renderChallanTable(data.rows || [], !!data.hide_extra_cols);
+            })
+            .fail(function(){
+              alert('Failed to load challan records.');
+            })
+            .always(function(){
+              challanLoading = false;
+              $('#verifyChallanTbody').css('opacity', 1);
+            });
+        }
+
+        $('#printInvoice').click(function(){
+          window.print();
+        });
         $('.stc-dd-toggle').on('click', function(e){
           e.preventDefault();
           e.stopPropagation();
@@ -583,19 +713,31 @@ $selected_site_title = $site_label;
         $(document).on('click', function(){
           $('.stc-dd').removeClass('open');
         });
-        $('.stc-dd-menu').on('click', function(e){ e.stopPropagation(); });
-        $('#stc-dd-order .stc-dd-menu li').on('click', function(){
+        $(document).on('click', '.stc-dd-menu', function(e){ e.stopPropagation(); });
+        $(document).on('click', '#stc-dd-order .stc-dd-menu li', function(){
           var orderNo = $(this).attr('data-value') || '';
-          window.location.href = challanFilterUrl(orderNo, '');
+          var siteLabel = $('.vsite').val() || '';
+          $('.stc-dd').removeClass('open');
+          loadChallanRecords(orderNo, siteLabel, true);
         });
-        $('#stc-dd-site .stc-dd-menu li').on('click', function(){
+        $(document).on('click', '#stc-dd-site .stc-dd-menu li', function(){
           var siteLabel = $(this).attr('data-value') || '';
-          var orderNo = siteLabel ? ($(this).attr('data-order') || '') : ($('.vorder-number').val() || '');
-          window.location.href = challanFilterUrl(orderNo, siteLabel);
+          $('.stc-dd').removeClass('open');
+          loadChallanRecords('', siteLabel, true);
         });
-        $('.filterbydate').on('click', function(){
-          window.location.href = challanFilterUrl();
+        $('.filterbydate').on('click', function(e){
+          e.preventDefault();
+          loadChallanRecords($('.vorder-number').val() || '', $('.vsite').val() || '', true);
         });
+        $(window).on('popstate', function(){
+          var params = new URLSearchParams(window.location.search);
+          var date = params.get('date') || $('.vdate').val();
+          var orderNo = params.get('order_number') || '';
+          var siteLabel = params.get('site') || '';
+          if(date) $('.vdate').val(date);
+          loadChallanRecords(orderNo, siteLabel, false);
+        });
+
         $('#stc-customer-format-btn').on('click', function(e){
           e.preventDefault();
           var url = challanFilterUrl().replace('verify-challan.php', 'verify-challan-customer.php');
@@ -639,32 +781,32 @@ $selected_site_title = $site_label;
           if (!$.fn.modal) hideCustomerFormatModal();
         });
 
-        var basePmNo = '<?php echo addslashes($pm_no); ?>';
-        var $rows = $('#verifyChallanTable tbody tr');
-        $rows.each(function(i){ $(this).data('origSl', i + 1); });
-        function renumberSlNo(){
-          var sl = 0;
-          $('#verifyChallanTable tbody tr:visible').each(function(){
-            sl++;
-            $(this).find('.dr-slno').text(sl);
+        function bindTableSearch(){
+          var $rows = $('#verifyChallanTable tbody tr');
+          $rows.each(function(i){ $(this).data('origSl', i + 1); });
+          $('#tableSearch').off('keyup.challanSearch').on('keyup.challanSearch', function(){
+            var val = $(this).val().trim();
+            var valLower = val.toLowerCase();
+            $rows = $('#verifyChallanTable tbody tr');
+            $rows.each(function(){
+              var text = $(this).text().toLowerCase();
+              $(this).toggle(text.indexOf(valLower) > -1);
+            });
+            var sl = 0;
+            $('#verifyChallanTable tbody tr:visible').each(function(){
+              sl++;
+              $(this).find('.dr-slno').text(sl);
+            });
+            var pmNo = basePmNo;
+            if (val.length >= 2) {
+              pmNo += ' (' + val.charAt(0).toUpperCase() + '-' + val.charAt(val.length - 1).toUpperCase() + ')';
+            } else if (val.length === 1) {
+              pmNo += ' (' + val.charAt(0).toUpperCase() + ')';
+            }
+            $('#pmNoDisplay').text(pmNo);
           });
         }
-        $('#tableSearch').on('keyup', function(){
-          var val = $(this).val().trim();
-          var valLower = val.toLowerCase();
-          $rows.each(function(){
-            var text = $(this).text().toLowerCase();
-            $(this).toggle(text.indexOf(valLower) > -1);
-          });
-          renumberSlNo();
-          var pmNo = basePmNo;
-          if (val.length >= 2) {
-            pmNo += ' (' + val.charAt(0).toUpperCase() + '-' + val.charAt(val.length - 1).toUpperCase() + ')';
-          } else if (val.length === 1) {
-            pmNo += ' (' + val.charAt(0).toUpperCase() + ')';
-          }
-          $('#pmNoDisplay').text(pmNo);
-        });
+        bindTableSearch();
       });
     </script>
   </body>
