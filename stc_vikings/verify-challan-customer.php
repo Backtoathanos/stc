@@ -160,7 +160,9 @@ function stc_customer_challan_document_html($meta, $opts = array()){
     if($forWord){
       $wmHtml = '<!--[if gte vml 1]>'
         .'<v:shape id="Watermark" o:preferrelative="t" o:spt="75" type="#_x0000_t75" '
-        .'style="position:absolute;margin-left:90pt;margin-top:120pt;width:320pt;height:320pt;z-index:-1;visibility:visible;" filled="f" stroked="f">'
+        .'style="position:absolute;width:280pt;height:280pt;z-index:-1;visibility:visible;'
+        .'mso-position-horizontal:center;mso-position-vertical:center;'
+        .'mso-position-horizontal-relative:page;mso-position-vertical-relative:page;" filled="f" stroked="f">'
         .'<v:imagedata src="'.$wmSrc.'" o:title="watermark"/>'
         .'<w:wrap type="none"/>'
         .'<w:anchorlock/>'
@@ -191,7 +193,7 @@ function stc_customer_challan_document_html($meta, $opts = array()){
     .'</div>';
 
   $pageCss = $forWord
-    ? '@page Section1 { size: 595.3pt 841.9pt; margin: 28pt 36pt 42pt 36pt; mso-header-margin: 12pt; mso-footer-margin: 18pt; }
+    ? '@page Section1 { size: 595.3pt 841.9pt; margin: 28pt 36pt 42pt 36pt; mso-header: url("") h1; mso-header-margin: 12pt; mso-footer-margin: 18pt; }
        div.Section1 { page: Section1; }
        body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; color: #111; }
        img { border: 0; }
@@ -212,7 +214,7 @@ function stc_customer_challan_document_html($meta, $opts = array()){
        .page-header { position: fixed; top: -76mm; left: -12mm; right: -12mm; }
        .page-header .hdr { width: 210mm; display: block; }
        .page-header .head-pad { padding: 2mm 14mm 0; }
-       .wm { position: fixed; left: 16%; top: 40%; width: 68%; opacity: 0.35; z-index: -1; }
+       .wm { position: fixed; left: 38mm; top: 16mm; width: 110mm; height: auto; opacity: 0.32; z-index: -1; }
        .title { text-align: center; font-weight: 700; font-size: 14px; margin: 4px 0 8px; line-height: 1.25; }
        .meta { width: 100%; border-collapse: collapse; margin-bottom: 0; }
        .meta td { vertical-align: top; font-weight: 700; font-size: 12px; }
@@ -247,10 +249,10 @@ function stc_customer_challan_document_html($meta, $opts = array()){
       .'<tr class="footcell"><td colspan="'.$colCount.'" style="border:0;padding-top:10pt;">'.$footerHtml.'</td></tr>'
       .'</tfoot>'
       .'</table>';
-    $bodyInner = $wmHtml.$wordTable;
+    $bodyInner = $wordTable;
     $openWrap = '<div class="Section1">';
     $closeWrap = '</div>';
-    $fixedHeader = '';
+    $fixedHeader = '<div id="h1" style="mso-element:header"><p style="margin:0;font-size:1pt;line-height:1px;">&nbsp;</p>'.$wmHtml.'</div>';
     $fixedFooter = '';
   }else{
     $bodyInner = $wmHtml.'<div class="body">'.$itemsTable.'</div>';
@@ -285,7 +287,7 @@ function stc_customer_challan_export_pdf($meta){
   }
   require_once $autoload;
 
-  $html = stc_customer_challan_document_html($meta);
+  $html = stc_customer_challan_document_html($meta, array('wm_src' => ''));
   $options = new \Dompdf\Options();
   $options->set('isRemoteEnabled', true);
   $options->set('isHtml5ParserEnabled', true);
@@ -294,6 +296,26 @@ function stc_customer_challan_export_pdf($meta){
   $dompdf->setPaper('A4', 'portrait');
   $dompdf->loadHtml($html);
   $dompdf->render();
+
+  $wmPath = __DIR__.'/images/gas-watermark.png';
+  if(is_file($wmPath)){
+    $canvas = $dompdf->getCanvas();
+    $canvas->page_script(function($pageNumber, $pageCount, $canvas, $fontMetrics) use ($wmPath){
+      $w = $canvas->get_width();
+      $h = $canvas->get_height();
+      $size = min($w, $h) * 0.42;
+      $x = ($w - $size) / 2.0;
+      $y = ($h - $size) / 2.0;
+      if(method_exists($canvas, 'set_opacity')){
+        $canvas->set_opacity(0.28);
+      }
+      $canvas->image($wmPath, $x, $y, $size, $size);
+      if(method_exists($canvas, 'set_opacity')){
+        $canvas->set_opacity(1.0);
+      }
+    });
+  }
+
   $dompdf->stream(stc_challan_export_filename($meta['challan_no'], $meta['date']).'.pdf', array('Attachment' => true));
   exit;
 }
@@ -458,6 +480,18 @@ function stc_customer_challan_export_excel($meta){
   $sheet->getHeaderFooter()->setOddFooter($excelFooter);
   $sheet->getHeaderFooter()->setEvenFooter($excelFooter);
   $sheet->getHeaderFooter()->setAlignWithMargins(true);
+  $wmPath = __DIR__.'/images/gas-watermark.png';
+  if(is_file($wmPath)){
+    $wmDraw = new \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing();
+    $wmDraw->setName('Watermark');
+    $wmDraw->setPath($wmPath);
+    $wmDraw->setHeight(320);
+    $wmDraw->setOffsetY(90);
+    $hf = $sheet->getHeaderFooter();
+    $hf->addImage($wmDraw, \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooter::IMAGE_HEADER_CENTER);
+    $hf->setOddHeader('&C&G');
+    $hf->setEvenHeader('&C&G');
+  }
 
   $filename = stc_challan_export_filename($meta['challan_no'], $meta['date']).'.xlsx';
   header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -589,6 +623,11 @@ if($rows){
     }
   }
   $rows = array_values($grouped);
+  usort($rows, function($a, $b){
+    $cmp = strcasecmp(trim((string)($a['item_desc'] ?? '')), trim((string)($b['item_desc'] ?? '')));
+    if($cmp !== 0) return $cmp;
+    return strcasecmp(trim((string)($a['unit'] ?? '')), trim((string)($b['unit'] ?? '')));
+  });
 }
 
 $challan_no = 'GAS '.date('dmy', strtotime($date));
@@ -604,21 +643,11 @@ if($order_date_from !== '' && $order_date_to !== '' && $order_date_from !== $ord
 $blank_rows = max(0, 22 - count($rows));
 $embed = isset($_GET['embed']) && $_GET['embed'] !== '0' && $_GET['embed'] !== '';
 
-$show_sitename = stc_challan_is_tata_steel_amc($site_label, $to_site, array($to_customer, $to_site, $to_address));
-
 $toLines = array(
   'The Head Security Work',
   'TATA STEEL LTD JSR',
   'JMD GATE',
 );
-
-if($show_sitename && count($rows) > 1){
-  usort($rows, function($a, $b){
-    $cmp = strcasecmp(stc_challan_row_sitename($a), stc_challan_row_sitename($b));
-    if($cmp !== 0) return $cmp;
-    return strcasecmp(trim((string)($a['item_desc'] ?? '')), trim((string)($b['item_desc'] ?? '')));
-  });
-}
 
 $export = isset($_GET['export']) ? strtolower(trim((string) $_GET['export'])) : '';
 if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export === 'word' || $export === 'doc'){
@@ -708,10 +737,13 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 72%;
+        width: 110mm;
+        max-width: 72%;
+        height: auto;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: 0;
+        opacity: 0.35;
       }
       .gas-title {
         text-align: center;
@@ -831,10 +863,14 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
         tfoot { display: table-footer-group !important; }
         tr { page-break-inside: avoid; }
         .gas-watermark {
-          position: fixed;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
+          position: fixed !important;
+          left: 50% !important;
+          top: 50% !important;
+          width: 110mm !important;
+          max-width: 72% !important;
+          transform: translate(-50%, -50%) !important;
+          z-index: 0 !important;
+          opacity: 0.35;
         }
         .gas-header, .gas-watermark, .gas-sheet {
           -webkit-print-color-adjust: exact;
