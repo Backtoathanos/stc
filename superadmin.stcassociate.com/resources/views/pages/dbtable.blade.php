@@ -107,9 +107,11 @@
     .stc-dbt-field { margin-bottom: 10px; }
     .stc-dbt-field label { display: block; font-size: 11px; font-weight: 700; color: #6c757d; margin-bottom: 4px; }
     .stc-dbt-field .form-control[readonly] { background: #f4f6fb; }
-    .stc-dbt-null-row { display: flex; align-items: center; gap: 8px; }
+    .stc-dbt-null-row { display: flex; align-items: flex-start; gap: 8px; }
     .stc-dbt-null-row .form-control { flex: 1; }
-    .stc-dbt-null-row label { margin: 0; font-weight: 600; color: #6c757d; white-space: nowrap; }
+    .stc-dbt-null-row textarea.form-control { min-height: 88px; font-family: Consolas, Monaco, monospace; font-size: 12px; }
+    .stc-dbt-null-row label { margin: 0; font-weight: 600; color: #6c757d; white-space: nowrap; padding-top: 6px; }
+    .stc-dbt-html-hint { display: block; margin: 4px 0 0; font-size: 11px; font-weight: 600; color: #6c757d; }
     .stc-dbt-sort-ind { margin-left: 4px; color: #007bff; }
     @media (max-width: 767px) {
       .stc-dbt-shell { flex-direction: column; }
@@ -396,27 +398,46 @@ $(function(){
     });
   }
 
+  function isTextType(type) {
+    var t = String(type || '').toLowerCase();
+    return t.indexOf('text') !== -1 || t.indexOf('json') !== -1;
+  }
+
   function openEdit(idx) {
     var row = state.rows[idx];
     if (!row) return;
-    var html = '<input type="hidden" id="stc-dbt-edit-idx" value="' + idx + '">';
+    var $body = $('#stc-dbt-edit-body').empty();
+    $('<input>', { type: 'hidden', id: 'stc-dbt-edit-idx', value: idx }).appendTo($body);
     state.columns.forEach(function(col){
       var meta = state.meta[col] || {};
       var isPk = state.pk.indexOf(col) !== -1;
       var val = row[col];
       var isNull = val === null;
-      html += '<div class="stc-dbt-field"><label>' + escapeHtml(col);
-      if (meta.type) html += ' <span style="font-weight:600;color:#adb5bd">' + escapeHtml(meta.type) + '</span>';
-      html += '</label><div class="stc-dbt-null-row">';
-      html += '<input class="form-control form-control-sm stc-dbt-edit-input" data-col="' + escapeHtml(col) + '"' +
-        (isPk ? ' readonly' : '') + (isNull ? ' disabled' : '') +
-        ' value="' + escapeHtml(isNull ? '' : val) + '">';
+      var multiline = isTextType(meta.type);
+      var $field = $('<div class="stc-dbt-field">');
+      var $label = $('<label>').text(col + ' ');
+      if (meta.type) $label.append($('<span>').css({ fontWeight: 600, color: '#adb5bd' }).text(meta.type));
+      var $row = $('<div class="stc-dbt-null-row">');
+      var $input = $(multiline ? '<textarea>' : '<input>');
+      $input.addClass('form-control form-control-sm stc-dbt-edit-input')
+        .attr('data-col', col)
+        .prop('readonly', isPk)
+        .prop('disabled', isNull);
+      if (!multiline) $input.attr('type', 'text');
+      $input.val(isNull ? '' : (val == null ? '' : String(val)));
+      $row.append($input);
       if (!isPk && meta.null) {
-        html += '<label><input type="checkbox" class="stc-dbt-edit-null" data-col="' + escapeHtml(col) + '"' + (isNull ? ' checked' : '') + '> NULL</label>';
+        var $nullLab = $('<label>');
+        var $nullBox = $('<input>', { type: 'checkbox', class: 'stc-dbt-edit-null' }).attr('data-col', col).prop('checked', isNull);
+        $nullLab.append($nullBox).append(' NULL');
+        $row.append($nullLab);
       }
-      html += '</div></div>';
+      $field.append($label).append($row);
+      if (multiline) {
+        $field.append($('<span class="stc-dbt-html-hint">').text('Saved exactly as typed. HTML tags like <br> stay as HTML, they are not stripped.'));
+      }
+      $body.append($field);
     });
-    $('#stc-dbt-edit-body').html(html);
     $('#stc-dbt-edit').addClass('is-open');
   }
 

@@ -80,34 +80,10 @@ class DbTableController extends Controller
 
         $elapsed = (int) round((microtime(true) - $started) * 1000);
         $columns = [];
-        $blobCols = [];
         $colCount = $stmt->columnCount();
         for ($i = 0; $i < $colCount; $i++) {
             $meta = $stmt->getColumnMeta($i);
-            $name = isset($meta['name']) ? $meta['name'] : ('col_'.$i);
-            $columns[] = $name;
-            $native = isset($meta['native_type']) ? strtolower((string) $meta['native_type']) : '';
-            if (strpos($native, 'blob') !== false || strpos($native, 'binary') !== false) {
-                $blobCols[$name] = true;
-            }
-        }
-
-        $rows = [];
-        $truncated = false;
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if (count($rows) >= self::MAX_ROWS) {
-                $truncated = true;
-                break;
-            }
-            $clean = [];
-            foreach ($columns as $col) {
-                $val = array_key_exists($col, $row) ? $row[$col] : null;
-                if ($val !== null && isset($blobCols[$col])) {
-                    $val = '[BLOB]';
-                }
-                $clean[$col] = $val;
-            }
-            $rows[] = $clean;
+            $columns[] = isset($meta['name']) ? $meta['name'] : ('col_'.$i);
         }
 
         $table = $this->simpleSelectTable($sql);
@@ -134,6 +110,25 @@ class DbTableController extends Controller
                 }
                 $writable = $ok;
             }
+        }
+
+        $rows = [];
+        $truncated = false;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if (count($rows) >= self::MAX_ROWS) {
+                $truncated = true;
+                break;
+            }
+            $clean = [];
+            foreach ($columns as $col) {
+                $val = array_key_exists($col, $row) ? $row[$col] : null;
+                $mysqlType = isset($colMeta[$col]['type']) ? $colMeta[$col]['type'] : '';
+                if ($val !== null && $this->isBinaryMysqlType($mysqlType)) {
+                    $val = '[BLOB]';
+                }
+                $clean[$col] = $val;
+            }
+            $rows[] = $clean;
         }
 
         $this->log('query', $table, $sql, 'rows='.count($rows).($truncated ? '+truncated' : ''));
@@ -177,6 +172,9 @@ class DbTableController extends Controller
             if (!$this->validIdent($col) || !isset($prep['cols'][$col]) || in_array($col, $prep['pk'], true)) {
                 continue;
             }
+            if ($val === '[BLOB]') {
+                continue;
+            }
             if ($val === null) {
                 $sets[] = $this->ident($col).'=NULL';
             } else {
@@ -216,6 +214,9 @@ class DbTableController extends Controller
         $params = [];
         foreach ($info['columns'] as $col => $meta) {
             if (in_array($col, $info['auto_inc'], true) || !array_key_exists($col, $fields)) {
+                continue;
+            }
+            if ($fields[$col] === '[BLOB]') {
                 continue;
             }
             $cols[] = $this->ident($col);
@@ -409,6 +410,16 @@ class DbTableController extends Controller
         }
 
         return preg_replace("/('([^'\\\\]|\\\\.)*'|\"([^\"\\\\]|\\\\.)*\"|`([^`\\\\]|\\\\.)*`)/s", "''", $sql);
+    }
+
+    private function isBinaryMysqlType($type)
+    {
+        $base = strtolower(trim((string) $type));
+        $base = preg_replace('/\s+unsigned$/', '', $base);
+        $base = preg_replace('/\(.*$/', '', $base);
+        $base = trim($base);
+
+        return in_array($base, ['tinyblob', 'blob', 'mediumblob', 'longblob', 'binary', 'varbinary'], true);
     }
 
     private function validIdent($name)
