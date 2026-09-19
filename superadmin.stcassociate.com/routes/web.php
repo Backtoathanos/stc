@@ -245,7 +245,8 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/stc/departments/bulk-delete', [ProjectController::class, 'bulkDeleteDepartments']);
     
     // for stc requisition
-    Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);    
+    Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);
+    Route::get('/branch/stc/requisitions/operate/{id?}', [RequisitionController::class, 'operate']);
     Route::get('/branch/stc/requisitions/list', [RequisitionController::class, 'list']);
     Route::get('/branch/stc/requisitions/get', [RequisitionController::class, 'get']);
     Route::post('/branch/stc/requisitions/update', [RequisitionController::class, 'update']);

@@ -103,6 +103,7 @@ class RequisitionController extends Controller
                 "stc_cust_super_requisition_list_approved_by" => $record->stc_cust_super_requisition_list_approved_by,
                 "stc_cust_super_requisition_list_date" => $record->stc_cust_super_requisition_list_date,
                 "actionData" => $this->actionHtml($id, 'edit-req-btn', 'edit-req-modal', 'delete-modal', 'delete_id')
+                    .' <a href="'.url('/branch/stc/requisitions/operate/'.$id).'" class="btn btn-success btn-sm" title="Operate connected records" target="_blank">Operate</a>'
             );
         }
 
@@ -495,5 +496,124 @@ class RequisitionController extends Controller
         return $delete
             ? $this->jsonResult(true, 'Record deleted succesfully!')
             : $this->jsonResult(false, 'Record deleted failed!');
+    }
+
+    public function operate(Request $request, $id = null){
+        $data = [
+            'page_title' => 'Requisition Operate',
+            'q' => trim((string)$request->get('q', '')),
+            'req' => null,
+            'project_title' => '',
+            'supervisor_name' => '',
+            'items' => collect(),
+            'dispatches' => collect(),
+            'combinerLinks' => collect(),
+            'combiners' => collect(),
+            'logs' => collect(),
+            'received' => collect(),
+            'matches' => collect(),
+            'notFound' => false,
+        ];
+
+        $reqId = $id ? (int)$id : 0;
+        $q = $data['q'];
+
+        if(!$reqId && $q !== ''){
+            if(ctype_digit($q)){
+                $reqId = (int)$q;
+            }else{
+                $matches = $this->searchRequisitions($q);
+                if($matches->count() === 1){
+                    return redirect(url('/branch/stc/requisitions/operate/'.$matches[0]->stc_cust_super_requisition_list_id));
+                }
+                $data['matches'] = $matches;
+                return view('pages.requisition-operate', $data);
+            }
+        }
+
+        if($reqId){
+            return view('pages.requisition-operate', $this->operatePayload($reqId, $q));
+        }
+
+        return view('pages.requisition-operate', $data);
+    }
+
+    private function searchRequisitions($q){
+        return Requisition::leftjoin('stc_cust_project','stc_cust_project.stc_cust_project_id','=','stc_cust_super_requisition_list.stc_cust_super_requisition_list_project_id')
+            ->leftjoin('stc_cust_pro_supervisor','stc_cust_pro_supervisor.stc_cust_pro_supervisor_id','=','stc_cust_super_requisition_list.stc_cust_super_requisition_list_super_id')
+            ->where(function($w) use ($q){
+                $w->where('stc_cust_project.stc_cust_project_title', 'like', '%'.$q.'%');
+                if(ctype_digit((string)$q)){
+                    $w->orWhere('stc_cust_super_requisition_list.stc_cust_super_requisition_list_id', (int)$q);
+                }
+            })
+            ->select(
+                'stc_cust_super_requisition_list.stc_cust_super_requisition_list_id',
+                'stc_cust_super_requisition_list.stc_cust_super_requisition_list_date',
+                'stc_cust_super_requisition_list.stc_cust_super_requisition_list_status',
+                'stc_cust_project.stc_cust_project_title',
+                'stc_cust_pro_supervisor.stc_cust_pro_supervisor_fullname'
+            )
+            ->orderBy('stc_cust_super_requisition_list.stc_cust_super_requisition_list_id', 'desc')
+            ->limit(30)
+            ->get();
+    }
+
+    private function operatePayload($reqId, $q = ''){
+        $row = Requisition::leftjoin('stc_cust_project','stc_cust_project.stc_cust_project_id','=','stc_cust_super_requisition_list.stc_cust_super_requisition_list_project_id')
+            ->leftjoin('stc_cust_pro_supervisor','stc_cust_pro_supervisor.stc_cust_pro_supervisor_id','=','stc_cust_super_requisition_list.stc_cust_super_requisition_list_super_id')
+            ->where('stc_cust_super_requisition_list.stc_cust_super_requisition_list_id', $reqId)
+            ->select('stc_cust_super_requisition_list.*', 'stc_cust_project.stc_cust_project_title', 'stc_cust_pro_supervisor.stc_cust_pro_supervisor_fullname')
+            ->first();
+
+        $data = [
+            'page_title' => 'Requisition Operate',
+            'q' => $q !== '' ? $q : (string)$reqId,
+            'req' => $row,
+            'project_title' => $row ? $row->stc_cust_project_title : '',
+            'supervisor_name' => $row ? $row->stc_cust_pro_supervisor_fullname : '',
+            'items' => collect(),
+            'dispatches' => collect(),
+            'combinerLinks' => collect(),
+            'combiners' => collect(),
+            'logs' => collect(),
+            'received' => collect(),
+            'matches' => collect(),
+            'notFound' => !$row,
+        ];
+
+        if(!$row){
+            if($q !== '' && !ctype_digit((string)$q)){
+                $data['matches'] = $this->searchRequisitions($q);
+            }
+            return $data;
+        }
+
+        $items = RequisitionItems::where('stc_cust_super_requisition_list_items_req_id', $reqId)
+            ->orderBy('stc_cust_super_requisition_list_id', 'asc')
+            ->get();
+        $itemIds = $items->pluck('stc_cust_super_requisition_list_id')->filter()->values();
+
+        $data['items'] = $items;
+        $data['dispatches'] = RequisitionDispatch::where('stc_cust_super_requisition_list_items_rec_list_id', $reqId)
+            ->orderBy('stc_cust_super_requisition_list_items_rec_id', 'asc')
+            ->get();
+        $data['combinerLinks'] = RequisitionCombinerReq::where('stc_requisition_combiner_req_requisition_id', $reqId)
+            ->orderBy('stc_requisition_combiner_req_id', 'asc')
+            ->get();
+        $combIds = $data['combinerLinks']->pluck('stc_requisition_combiner_req_comb_id')->unique()->filter()->values();
+        $data['combiners'] = $combIds->isEmpty()
+            ? collect()
+            : RequisitionCombiner::whereIn('stc_requisition_combiner_id', $combIds)->get();
+        $data['logs'] = $itemIds->isEmpty()
+            ? collect()
+            : RequisitionItemLog::whereIn('item_id', $itemIds)->orderBy('id', 'desc')->get();
+        $data['received'] = $itemIds->isEmpty()
+            ? collect()
+            : RequisitionReceived::whereIn('stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid', $itemIds)
+                ->orderBy('stc_cust_super_requisition_rec_items_fr_supervisor_id', 'asc')
+                ->get();
+
+        return $data;
     }
 }
