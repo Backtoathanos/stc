@@ -12,15 +12,20 @@
   $stc_school_sections = array(
     'teachers' => array('label' => 'Teacher Management', 'icon' => 'person_add_alt_1', 'pane' => 'stc-create-teacher'),
     'students' => array('label' => 'Student Management', 'icon' => 'school', 'pane' => 'stc-create-student'),
+    'admission' => array('label' => 'Admission', 'icon' => 'how_to_reg', 'pane' => 'stc-create-admission'),
     'subjects' => array('label' => 'Subject Management', 'icon' => 'menu_book', 'pane' => 'stc-create-subject'),
     'classes' => array('label' => 'Class Management', 'icon' => 'class', 'pane' => 'stc-create-classroom'),
     'schedule' => array('label' => 'Schedule Management', 'icon' => 'event_note', 'pane' => 'stc-create-shedule'),
   );
   $stc_school_section = isset($_GET['school-section']) ? (string) $_GET['school-section'] : 'teachers';
+  if ($stc_school_section === 'readmission') {
+    $stc_school_section = 'admission';
+  }
   if (!isset($stc_school_sections[$stc_school_section])) {
     $stc_school_section = 'teachers';
   }
   $stc_school_current = $stc_school_sections[$stc_school_section];
+  $stc_admit_inner_tab = (isset($_GET['admit-tab']) && $_GET['admit-tab'] === 'readmission') || (isset($_GET['school-section']) && $_GET['school-section'] === 'readmission') ? 're' : 'new';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -179,6 +184,410 @@
                                 </div>
                               </div>
                           </div>
+                        </div>
+                      </div>
+
+                      <!-- Admission: New + Readmission -->
+                      <div class="tab-pane<?php echo $stc_school_section === 'admission' ? ' active' : ''; ?>" id="stc-create-admission" role="tabpanel" aria-labelledby="school-tab-admission">
+                        <div class="row">
+                          <div class="col-12">
+                            <h2 class="school-page-title mb-3">Admission</h2>
+                            <p class="text-muted mb-3">TIC fills student details and proposed amount. Boss will accept and lock the final amount from Reports.</p>
+                            <div class="mb-3">
+                              <button type="button" class="btn <?php echo $stc_admit_inner_tab === 'new' ? 'btn-primary' : 'btn-default'; ?> stc-admit-inner-tab" data-pane="new">New Admission</button>
+                              <button type="button" class="btn <?php echo $stc_admit_inner_tab === 're' ? 'btn-primary' : 'btn-default'; ?> stc-admit-inner-tab" data-pane="re">Readmission</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="stc-admit-subpane" data-pane="new"<?php echo $stc_admit_inner_tab === 'new' ? '' : ' style="display:none;"'; ?>>
+                        <form id="stc-admit-form" autocomplete="off">
+                          <div class="card mb-4">
+                            <div class="card-header"><h4 class="mb-0">Student details</h4></div>
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>School</h5>
+                                    <select id="stc-admit-school" class="form-control" required>
+                                      <option value="SGMS">Sara Girls Mission School</option>
+                                      <option value="SHS">Sara Hafiza Section</option>
+                                      <option value="SIS" selected>Sara International School</option>
+                                      <option value="SMS">Sara Model School</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-5">
+                                  <div class="mb-3">
+                                    <h5>Student ID</h5>
+                                    <input id="stc-admit-studid" type="text" class="form-control" placeholder="Enter student ID" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-3">
+                                  <div class="mb-3">
+                                    <h5>Class Room</h5>
+                                    <select id="stc-admit-classroom" class="form-control">
+                                      <option value="0">--Select--</option>
+                                      <?php
+                                        if (!isset($con)) {
+                                          include_once("../../MCU/db.php");
+                                        }
+                                        $class_sql_admit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
+                                        if ($class_sql_admit) {
+                                          foreach ($class_sql_admit as $classrow) {
+                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
+                                          }
+                                        }
+                                      ?>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>First Name</h5>
+                                    <input id="stc-admit-firstname" type="text" class="form-control" placeholder="First name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Last Name</h5>
+                                    <input id="stc-admit-lastname" type="text" class="form-control" placeholder="Last name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Date of Birth</h5>
+                                    <input id="stc-admit-dob" type="date" class="form-control" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Gender</h5>
+                                    <label><input type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Male" checked /> Male</label>
+                                    &nbsp;&nbsp;
+                                    <label><input type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Female" /> Female</label>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Blood Group</h5>
+                                    <select id="stc-admit-bloodgroup" class="form-control">
+                                      <option value="0">--Select--</option>
+                                      <option value="a_positive">A+</option>
+                                      <option value="a_negative">A-</option>
+                                      <option value="b_positive">B+</option>
+                                      <option value="b_negative">B-</option>
+                                      <option value="o_positive">O+</option>
+                                      <option value="o_negative">O-</option>
+                                      <option value="ab_positive">AB+</option>
+                                      <option value="ab_negative">AB-</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Email</h5>
+                                    <input id="stc-admit-email" type="email" class="form-control" placeholder="Email" />
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Contact</h5>
+                                    <input id="stc-admit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="mb-3">
+                                    <h5>Address</h5>
+                                    <textarea id="stc-admit-address" class="form-control" placeholder="Address"></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Religion</h5>
+                                    <input id="stc-admit-religion" type="text" class="form-control" placeholder="Religion" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Admission Date</h5>
+                                    <input id="stc-admit-admissiondate" type="date" class="form-control" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Parent / Guardian Name</h5>
+                                    <input id="stc-admit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="mb-3">
+                                    <h5>Remarks</h5>
+                                    <textarea id="stc-admit-student-remarks" class="form-control" placeholder="Remarks"></textarea>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mb-4">
+                            <div class="card-header"><h4 class="mb-0">Admission amount</h4></div>
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Admission amount</h5>
+                                    <input id="stc-admit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <button type="button" class="btn btn-success stc-admit-save-btn">Submit admission</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        <div class="card">
+                          <div class="card-header">
+                            <div class="school-toolbar-row">
+                              <h4 class="mb-0">Submitted admissions</h4>
+                              <div class="school-search-row">
+                                <input id="stc-admit-search" type="text" class="form-control school-search-field" placeholder="Search admissions..." />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="school-table-wrap">
+                              <div class="school-table-inner">
+                                <table class="table table-hover table-striped mb-0">
+                                  <thead>
+                                    <tr>
+                                      <th class="text-center">ID</th>
+                                      <th>School</th>
+                                      <th>Student ID</th>
+                                      <th>Name</th>
+                                      <th>Class</th>
+                                      <th class="text-right">Proposed amount</th>
+                                      <th class="text-right">Final amount</th>
+                                      <th>Status</th>
+                                      <th>Created</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody class="stc-admit-list-body">
+                                    <tr><td colspan="9" class="text-center text-muted">Loading...</td></tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+
+                        <div class="stc-admit-subpane" data-pane="re"<?php echo $stc_admit_inner_tab === 're' ? '' : ' style="display:none;"'; ?>>
+                        <form id="stc-readmit-form" autocomplete="off">
+                          <input type="hidden" id="stc-readmit-student-pk" value="0" />
+                          <div class="card mb-4">
+                            <div class="card-header"><h4 class="mb-0">Student details</h4></div>
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>School</h5>
+                                    <select id="stc-readmit-school" class="form-control" required>
+                                      <option value="SGMS">Sara Girls Mission School</option>
+                                      <option value="SHS">Sara Hafiza Section</option>
+                                      <option value="SIS" selected>Sara International School</option>
+                                      <option value="SMS">Sara Model School</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-5">
+                                  <div class="mb-3">
+                                    <h5>Student ID</h5>
+                                    <div class="d-flex">
+                                      <input id="stc-readmit-studid" type="text" class="form-control" placeholder="Enter student ID" required />
+                                      <button type="button" class="btn btn-info ml-2 stc-readmit-lookup-btn" style="white-space:nowrap;">Load</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-3">
+                                  <div class="mb-3">
+                                    <h5>Class Room</h5>
+                                    <select id="stc-readmit-classroom" class="form-control">
+                                      <option value="0">--Select--</option>
+                                      <?php
+                                        if (!isset($con)) {
+                                          include_once("../../MCU/db.php");
+                                        }
+                                        $class_sql_readmit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
+                                        if ($class_sql_readmit) {
+                                          foreach ($class_sql_readmit as $classrow) {
+                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
+                                          }
+                                        }
+                                      ?>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>First Name</h5>
+                                    <input id="stc-readmit-firstname" type="text" class="form-control" placeholder="First name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Last Name</h5>
+                                    <input id="stc-readmit-lastname" type="text" class="form-control" placeholder="Last name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Date of Birth</h5>
+                                    <input id="stc-readmit-dob" type="date" class="form-control" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Gender</h5>
+                                    <label><input type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Male" checked /> Male</label>
+                                    &nbsp;&nbsp;
+                                    <label><input type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Female" /> Female</label>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Blood Group</h5>
+                                    <select id="stc-readmit-bloodgroup" class="form-control">
+                                      <option value="0">--Select--</option>
+                                      <option value="a_positive">A+</option>
+                                      <option value="a_negative">A-</option>
+                                      <option value="b_positive">B+</option>
+                                      <option value="b_negative">B-</option>
+                                      <option value="o_positive">O+</option>
+                                      <option value="o_negative">O-</option>
+                                      <option value="ab_positive">AB+</option>
+                                      <option value="ab_negative">AB-</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Email</h5>
+                                    <input id="stc-readmit-email" type="email" class="form-control" placeholder="Email" />
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="mb-3">
+                                    <h5>Contact</h5>
+                                    <input id="stc-readmit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="mb-3">
+                                    <h5>Address</h5>
+                                    <textarea id="stc-readmit-address" class="form-control" placeholder="Address"></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Religion</h5>
+                                    <input id="stc-readmit-religion" type="text" class="form-control" placeholder="Religion" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Admission Date</h5>
+                                    <input id="stc-readmit-admissiondate" type="date" class="form-control" />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Parent / Guardian Name</h5>
+                                    <input id="stc-readmit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="mb-3">
+                                    <h5>Student remarks</h5>
+                                    <textarea id="stc-readmit-student-remarks" class="form-control" placeholder="Student remarks"></textarea>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mb-4">
+                            <div class="card-header"><h4 class="mb-0">Admission amount &amp; last status</h4></div>
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Admission amount</h5>
+                                    <input id="stc-readmit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Last status</h5>
+                                    <select id="stc-readmit-last-status" class="form-control" required>
+                                      <option value="">--Select--</option>
+                                      <option value="Promoted">Promoted</option>
+                                      <option value="Failed">Failed</option>
+                                      <option value="Repeater">Repeater</option>
+                                      <option value="Left">Left</option>
+                                      <option value="TC Issued">TC Issued</option>
+                                      <option value="Dropout">Dropout</option>
+                                      <option value="Inactive">Inactive</option>
+                                      <option value="Other">Other</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="mb-3">
+                                    <h5>Last status remarks</h5>
+                                    <textarea id="stc-readmit-last-remarks" class="form-control" placeholder="Remarks on last status"></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <button type="button" class="btn btn-success stc-readmit-save-btn">Submit readmission</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        <div class="card">
+                          <div class="card-header">
+                            <div class="school-toolbar-row">
+                              <h4 class="mb-0">Submitted readmissions</h4>
+                              <div class="school-search-row">
+                                <input id="stc-readmit-search" type="text" class="form-control school-search-field" placeholder="Search readmissions..." />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="school-table-wrap">
+                              <div class="school-table-inner">
+                                <table class="table table-hover table-striped mb-0">
+                                  <thead>
+                                    <tr>
+                                      <th class="text-center">ID</th>
+                                      <th>School</th>
+                                      <th>Student ID</th>
+                                      <th>Name</th>
+                                      <th>Class</th>
+                                      <th class="text-right">Proposed amount</th>
+                                      <th class="text-right">Final amount</th>
+                                      <th>Last status</th>
+                                      <th>Status</th>
+                                      <th>Created</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody class="stc-readmit-list-body">
+                                    <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         </div>
                       </div>
 
@@ -1511,7 +1920,8 @@
         const value = urlParams.get('school-management');
         const section = urlParams.get('school-section') || 'teachers';
         if(value=="yes"){
-          $('.school-management-' + section).addClass('active');
+          var side = (section === 'readmission') ? 'admission' : section;
+          $('.school-management-' + side).addClass('active');
         }
       });
     </script>
@@ -2005,6 +2415,327 @@
           patch[key]=pg;
           call_records(patch);
           return false;
+        });
+
+        function stcReadmitAlert(title, text, type) {
+          if (window.Swal && typeof window.Swal.fire === 'function') {
+            window.Swal.fire(title, text, type || 'info');
+          } else {
+            alert(title + (text ? "\n" + text : ""));
+          }
+        }
+
+        function stcReadmitStatusBadge(status) {
+          var s = (status || 'pending').toLowerCase();
+          if (s === 'accepted') return '<span class="badge badge-success">Accepted</span>';
+          if (s === 'rejected') return '<span class="badge badge-danger">Rejected</span>';
+          return '<span class="badge badge-warning">Pending</span>';
+        }
+
+        function stcReadmitMoney(v) {
+          if (v === null || v === undefined || v === '') return '—';
+          return Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function load_readmissions() {
+          if (!$('.stc-readmit-list-body').length) return;
+          $.ajax({
+            url: '../vanaheim/readmission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              stc_readmit_list: 1,
+              search: ($('#stc-readmit-search').val() || '').trim()
+            },
+            success: function(res) {
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status !== 'success') {
+                $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
+                return;
+              }
+              if (!res.data || !res.data.length) {
+                $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">No readmission requests yet.</td></tr>');
+                return;
+              }
+              var html = '';
+              res.data.forEach(function(r) {
+                html += '<tr>';
+                html += '<td class="text-center">' + r.id + '</td>';
+                html += '<td>' + (r.school || '') + '</td>';
+                html += '<td>' + (r.studid || '') + '</td>';
+                html += '<td>' + (r.name || '') + '</td>';
+                html += '<td>' + (r.classroom || '—') + '</td>';
+                html += '<td class="text-right">' + stcReadmitMoney(r.amount) + '</td>';
+                html += '<td class="text-right">' + stcReadmitMoney(r.final_amount) + '</td>';
+                html += '<td>' + (r.last_status || '') + '</td>';
+                html += '<td class="text-center">' + stcReadmitStatusBadge(r.status) + '</td>';
+                html += '<td>' + (r.created_date || '') + '</td>';
+                html += '</tr>';
+              });
+              $('.stc-readmit-list-body').html(html);
+            },
+            error: function() {
+              $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">Could not reach server.</td></tr>');
+            }
+          });
+        }
+
+        $(document).on('click', '.stc-readmit-lookup-btn', function(e) {
+          e.preventDefault();
+          var studid = ($('#stc-readmit-studid').val() || '').trim();
+          if (!studid) {
+            stcReadmitAlert('Student ID required', 'Enter student ID first.', 'warning');
+            return;
+          }
+          $.ajax({
+            url: '../vanaheim/readmission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: { stc_readmit_lookup: 1, studid: studid },
+            success: function(res) {
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status !== 'success') {
+                stcReadmitAlert('Not found', res.message || 'Student not found.', 'info');
+                return;
+              }
+              var d = res.data || {};
+              $('#stc-readmit-student-pk').val(d.student_pk || 0);
+              $('#stc-readmit-firstname').val(d.firstname || '');
+              $('#stc-readmit-lastname').val(d.lastname || '');
+              $('#stc-readmit-dob').val(d.dob || '');
+              $('.stc-readmit-gender').prop('checked', false);
+              $('.stc-readmit-gender[value="' + (d.gender || 'Male') + '"]').prop('checked', true);
+              $('#stc-readmit-bloodgroup').val(d.bloodgroup || '0');
+              $('#stc-readmit-email').val(d.email || '');
+              $('#stc-readmit-contact').val(d.contact || '');
+              $('#stc-readmit-address').val(d.address || '');
+              $('#stc-readmit-religion').val(d.religion || '');
+              $('#stc-readmit-admissiondate').val(d.admissiondate || '');
+              $('#stc-readmit-classroom').val(String(d.classroomid || 0));
+              $('#stc-readmit-guardian').val(d.guardianname || '');
+              $('#stc-readmit-student-remarks').val(d.remarks || '');
+              stcReadmitAlert('Loaded', 'Student details filled. Review and submit.', 'success');
+            },
+            error: function() {
+              stcReadmitAlert('Error', 'Could not load student.', 'error');
+            }
+          });
+        });
+
+        $(document).on('click', '.stc-readmit-save-btn', function(e) {
+          e.preventDefault();
+          var $btn = $(this);
+          var studid = ($('#stc-readmit-studid').val() || '').trim();
+          var firstname = ($('#stc-readmit-firstname').val() || '').trim();
+          var lastname = ($('#stc-readmit-lastname').val() || '').trim();
+          var contact = ($('#stc-readmit-contact').val() || '').trim();
+          var guardian = ($('#stc-readmit-guardian').val() || '').trim();
+          var amount = Number($('#stc-readmit-amount').val());
+          var lastStatus = ($('#stc-readmit-last-status').val() || '').trim();
+          if (!studid || !firstname || !lastname || !contact || !guardian || !lastStatus) {
+            stcReadmitAlert('Required', 'Fill student ID, name, contact, guardian and last status.', 'warning');
+            return;
+          }
+          if (!amount || amount <= 0) {
+            stcReadmitAlert('Required', 'Enter a valid admission amount.', 'warning');
+            return;
+          }
+          if ($btn.prop('disabled')) return;
+          $btn.prop('disabled', true);
+          $.ajax({
+            url: '../vanaheim/readmission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              stc_readmit_save: 1,
+              school: $('#stc-readmit-school').val(),
+              student_pk: $('#stc-readmit-student-pk').val(),
+              studid: studid,
+              firstname: firstname,
+              lastname: lastname,
+              dob: $('#stc-readmit-dob').val(),
+              gender: $('.stc-readmit-gender:checked').val(),
+              bloodgroup: $('#stc-readmit-bloodgroup').val(),
+              email: $('#stc-readmit-email').val(),
+              contact: contact,
+              address: $('#stc-readmit-address').val(),
+              religion: $('#stc-readmit-religion').val(),
+              admissiondate: $('#stc-readmit-admissiondate').val(),
+              classroomid: $('#stc-readmit-classroom').val(),
+              guardianname: guardian,
+              student_remarks: $('#stc-readmit-student-remarks').val(),
+              amount: amount,
+              last_status: lastStatus,
+              last_remarks: $('#stc-readmit-last-remarks').val()
+            },
+            success: function(res) {
+              $btn.prop('disabled', false);
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status === 'success') {
+                stcReadmitAlert('Submitted', res.message || 'Readmission submitted.', 'success');
+                $('#stc-readmit-form')[0].reset();
+                $('#stc-readmit-student-pk').val('0');
+                load_readmissions();
+                return;
+              }
+              stcReadmitAlert('Not saved', res.message || 'Please check the form.', res.status === 'empty' || res.status === 'duplicate' ? 'warning' : 'error');
+            },
+            error: function() {
+              $btn.prop('disabled', false);
+              stcReadmitAlert('Error', 'Could not save readmission.', 'error');
+            }
+          });
+        });
+
+        $('#stc-readmit-search').on('keyup', function() {
+          clearTimeout(window.__stc_readmit_timer);
+          window.__stc_readmit_timer = setTimeout(load_readmissions, 350);
+        });
+
+        function showAdmitInnerPane(pane) {
+          pane = pane === 're' ? 're' : 'new';
+          $('.stc-admit-inner-tab').removeClass('btn-primary active').addClass('btn-default');
+          $('.stc-admit-inner-tab[data-pane="' + pane + '"]').removeClass('btn-default').addClass('btn-primary active');
+          $('.stc-admit-subpane').hide();
+          $('.stc-admit-subpane[data-pane="' + pane + '"]').show();
+          if (pane === 're') {
+            load_readmissions();
+          } else {
+            load_admissions();
+          }
+        }
+
+        $(document).on('click', '.stc-admit-inner-tab', function(e) {
+          e.preventDefault();
+          showAdmitInnerPane($(this).data('pane'));
+        });
+
+        var admitSection = (new URLSearchParams(window.location.search).get('school-section') || '');
+        var admitTab = (new URLSearchParams(window.location.search).get('admit-tab') || '');
+        if (admitSection === 'admission' || admitSection === 'readmission') {
+          showAdmitInnerPane((admitSection === 'readmission' || admitTab === 'readmission') ? 're' : 'new');
+        }
+
+        function load_admissions() {
+          if (!$('.stc-admit-list-body').length) return;
+          $.ajax({
+            url: '../vanaheim/admission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              stc_admit_list: 1,
+              search: ($('#stc-admit-search').val() || '').trim()
+            },
+            success: function(res) {
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status !== 'success') {
+                $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
+                return;
+              }
+              if (!res.data || !res.data.length) {
+                $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">No admission requests yet.</td></tr>');
+                return;
+              }
+              var html = '';
+              res.data.forEach(function(r) {
+                html += '<tr>';
+                html += '<td class="text-center">' + r.id + '</td>';
+                html += '<td>' + (r.school || '') + '</td>';
+                html += '<td>' + (r.studid || '') + '</td>';
+                html += '<td>' + (r.name || '') + '</td>';
+                html += '<td>' + (r.classroom || '—') + '</td>';
+                html += '<td class="text-right">' + stcReadmitMoney(r.amount) + '</td>';
+                html += '<td class="text-right">' + stcReadmitMoney(r.final_amount) + '</td>';
+                html += '<td class="text-center">' + stcReadmitStatusBadge(r.status) + '</td>';
+                html += '<td>' + (r.created_date || '') + '</td>';
+                html += '</tr>';
+              });
+              $('.stc-admit-list-body').html(html);
+            },
+            error: function() {
+              $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">Could not reach server.</td></tr>');
+            }
+          });
+        }
+
+        $(document).on('click', '.stc-admit-save-btn', function(e) {
+          e.preventDefault();
+          var $btn = $(this);
+          var studid = ($('#stc-admit-studid').val() || '').trim();
+          var firstname = ($('#stc-admit-firstname').val() || '').trim();
+          var lastname = ($('#stc-admit-lastname').val() || '').trim();
+          var contact = ($('#stc-admit-contact').val() || '').trim();
+          var guardian = ($('#stc-admit-guardian').val() || '').trim();
+          var amount = Number($('#stc-admit-amount').val());
+          if (!studid || !firstname || !lastname || !contact || !guardian) {
+            stcReadmitAlert('Required', 'Fill student ID, name, contact and guardian.', 'warning');
+            return;
+          }
+          if (!amount || amount <= 0) {
+            stcReadmitAlert('Required', 'Enter a valid admission amount.', 'warning');
+            return;
+          }
+          if ($btn.prop('disabled')) return;
+          $btn.prop('disabled', true);
+          $.ajax({
+            url: '../vanaheim/admission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+              stc_admit_save: 1,
+              school: $('#stc-admit-school').val(),
+              studid: studid,
+              firstname: firstname,
+              lastname: lastname,
+              dob: $('#stc-admit-dob').val(),
+              gender: $('.stc-admit-gender:checked').val(),
+              bloodgroup: $('#stc-admit-bloodgroup').val(),
+              email: $('#stc-admit-email').val(),
+              contact: contact,
+              address: $('#stc-admit-address').val(),
+              religion: $('#stc-admit-religion').val(),
+              admissiondate: $('#stc-admit-admissiondate').val(),
+              classroomid: $('#stc-admit-classroom').val(),
+              guardianname: guardian,
+              student_remarks: $('#stc-admit-student-remarks').val(),
+              amount: amount
+            },
+            success: function(res) {
+              $btn.prop('disabled', false);
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status === 'success') {
+                stcReadmitAlert('Submitted', res.message || 'Admission submitted.', 'success');
+                $('#stc-admit-form')[0].reset();
+                load_admissions();
+                return;
+              }
+              stcReadmitAlert('Not saved', res.message || 'Please check the form.', res.status === 'empty' || res.status === 'duplicate' ? 'warning' : 'error');
+            },
+            error: function() {
+              $btn.prop('disabled', false);
+              stcReadmitAlert('Error', 'Could not save admission.', 'error');
+            }
+          });
+        });
+
+        $('#stc-admit-search').on('keyup', function() {
+          clearTimeout(window.__stc_admit_timer);
+          window.__stc_admit_timer = setTimeout(load_admissions, 350);
         });
 
         call_records();

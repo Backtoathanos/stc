@@ -14,6 +14,13 @@ require_once __DIR__ . '/../includes/school_session_defaults.php';
             </a>
           </li>
           <?php
+          $stc_school_side_section = isset($_GET['school-section']) ? (string) $_GET['school-section'] : '';
+          if ($stc_school_side_section === '' && basename($_SERVER['PHP_SELF']) === 'school-management.php') {
+            $stc_school_side_section = 'teachers';
+          }
+          $stc_school_side_active = function ($section) use ($stc_school_side_section) {
+            return $stc_school_side_section === $section ? ' active' : '';
+          };
           if($_SESSION['stc_school_user_for']!=4){
             echo '
           <li class="nav-item canteen">
@@ -30,16 +37,15 @@ require_once __DIR__ . '/../includes/school_session_defaults.php';
               <i class="material-icons">feed</i>
               <p>Fee Collection</p>
             </a>
+          </li>
+          <li class="nav-item school-management-admission'.($stc_school_side_section === 'admission' || $stc_school_side_section === 'readmission' ? ' active' : '').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=admission">
+                <i class="material-icons">how_to_reg</i>
+                <p>Admission</p>
+            </a>
           </li>';
           }
           if($_SESSION['stc_school_user_for']==3){
-            $stc_school_side_section = isset($_GET['school-section']) ? (string) $_GET['school-section'] : '';
-            if ($stc_school_side_section === '' && basename($_SERVER['PHP_SELF']) === 'school-management.php') {
-              $stc_school_side_section = 'teachers';
-            }
-            $stc_school_side_active = function ($section) use ($stc_school_side_section) {
-              return $stc_school_side_section === $section ? ' active' : '';
-            };
             echo '
 
           <li class="nav-item school-management-students'.$stc_school_side_active('students').'">

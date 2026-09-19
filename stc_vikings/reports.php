@@ -228,6 +228,11 @@ STCAuthHelper::checkAuth();?>
                                     <span>GLD</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-16" data-toggle="tab" href="#tab-content-16">
+                                    <span>School Admission</span>
+                                </a>
+                            </li>
                             ';
                                 }
                             ?>
@@ -1598,6 +1603,80 @@ STCAuthHelper::checkAuth();?>
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane tabs-animation fade" id="tab-content-16" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5 align="center">School Admission</h5>
+                                            <p class="text-center" style="margin:8px 0 0;">
+                                                <span style="display:inline-block;padding:3px 12px;background:#d9edf7;margin-right:8px;border:1px solid #bcdff1;">New</span>
+                                                <span style="display:inline-block;padding:3px 12px;background:#fff3cd;border:1px solid #f0e0a8;">Readmission</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <span>Status</span>
+                                            <select class="form-control stc-admit-filter-status">
+                                                <option value="all">All</option>
+                                                <option value="pending" selected>Pending</option>
+                                                <option value="accepted">Accepted</option>
+                                                <option value="rejected">Rejected</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <span>Type</span>
+                                            <select class="form-control stc-admit-filter-kind">
+                                                <option value="all" selected>All</option>
+                                                <option value="new">New</option>
+                                                <option value="readmission">Readmission</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <span>Search</span>
+                                            <input type="text" class="form-control stc-admit-filter-search" placeholder="Student ID, name, school...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <span>&nbsp;</span>
+                                            <button type="button" class="btn btn-success btn-block stc-admit-find">Find</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <div class="table-responsive">
+                                                <table class="mb-0 table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">ID</th>
+                                                            <th>Type</th>
+                                                            <th>School</th>
+                                                            <th>Student ID</th>
+                                                            <th>Name</th>
+                                                            <th>Class</th>
+                                                            <th>Last status</th>
+                                                            <th class="text-right">Proposed amount</th>
+                                                            <th class="text-right">Final amount</th>
+                                                            <th>Status</th>
+                                                            <th>TIC</th>
+                                                            <th>Date</th>
+                                                            <th class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-admit-report-body">
+                                                        <tr><td colspan="13" class="text-center text-muted">Click Find to load admissions.</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>  
                 </div>
@@ -2501,6 +2580,289 @@ STCAuthHelper::checkAuth();?>
                 });
             });
 
+            function stcReadmitMoney(v){
+                if(v === null || v === undefined || v === '') return '—';
+                return Number(v).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+            function stcReadmitBadge(status){
+                var s = (status || 'pending').toLowerCase();
+                if(s === 'accepted') return '<span class="label label-success">Accepted</span>';
+                if(s === 'rejected') return '<span class="label label-danger">Rejected</span>';
+                return '<span class="label label-warning">Pending</span>';
+            }
+            function stcAdmitKindBadge(kind){
+                if(kind === 'readmission') return '<span class="label label-warning">Readmission</span>';
+                return '<span class="label label-info">New</span>';
+            }
+            function stcAdmitStatusRank(status){
+                var s = (status || 'pending').toLowerCase();
+                if(s === 'pending') return 0;
+                if(s === 'accepted') return 1;
+                return 2;
+            }
+            function renderSchoolAdmitRows(rows){
+                if(!rows.length){
+                    $('.stc-admit-report-body').html('<tr><td colspan="13" class="text-center text-muted">No admission requests found.</td></tr>');
+                    return;
+                }
+                var html = '';
+                rows.forEach(function(r){
+                    var isRe = r.kind === 'readmission';
+                    var openClass = isRe ? 'stc-readmit-open' : 'stc-admit-open';
+                    var action = r.status === 'pending'
+                        ? '<button type="button" class="btn btn-primary btn-sm '+openClass+'" data-id="'+r.id+'">Review</button>'
+                        : '<button type="button" class="btn btn-info btn-sm '+openClass+'" data-id="'+r.id+'">View</button>';
+                    var bg = isRe ? '#fff3cd' : '#d9edf7';
+                    html += '<tr style="background-color:'+bg+' !important;">';
+                    html += '<td class="text-center">'+r.id+'</td>';
+                    html += '<td class="text-center">'+stcAdmitKindBadge(r.kind)+'</td>';
+                    html += '<td>'+(r.school||'')+'</td>';
+                    html += '<td>'+(r.studid||'')+'</td>';
+                    html += '<td>'+(r.name||'')+'</td>';
+                    html += '<td>'+(r.classroom||'—')+'</td>';
+                    html += '<td>'+(r.last_status||'—')+'</td>';
+                    html += '<td class="text-right">'+stcReadmitMoney(r.amount)+'</td>';
+                    html += '<td class="text-right">'+stcReadmitMoney(r.final_amount)+'</td>';
+                    html += '<td class="text-center">'+stcReadmitBadge(r.status)+'</td>';
+                    html += '<td>'+(r.created_by||'')+'</td>';
+                    html += '<td>'+(r.created_date||'')+'</td>';
+                    html += '<td class="text-center">'+action+'</td>';
+                    html += '</tr>';
+                });
+                $('.stc-admit-report-body').html(html);
+            }
+            function loadSchoolAdmissions(){
+                var status = $('.stc-admit-filter-status').val();
+                var search = $('.stc-admit-filter-search').val();
+                var kind = $('.stc-admit-filter-kind').val() || 'all';
+                $('.stc-admit-report-body').html('<tr><td colspan="13" class="text-center text-muted">Loading...</td></tr>');
+                var pending = 2;
+                var newRows = [];
+                var reRows = [];
+                function done(){
+                    pending--;
+                    if(pending > 0) return;
+                    var rows = newRows.concat(reRows);
+                    rows.sort(function(a, b){
+                        var sr = stcAdmitStatusRank(a.status) - stcAdmitStatusRank(b.status);
+                        if(sr !== 0) return sr;
+                        return String(b.created_date||'').localeCompare(String(a.created_date||''));
+                    });
+                    renderSchoolAdmitRows(rows);
+                }
+                if(kind === 'all' || kind === 'new'){
+                    $.ajax({
+                        url: 'kattegat/ragnar_reports.php',
+                        method: 'post',
+                        dataType: 'JSON',
+                        data: { stc_school_admission_list: 1, status: status, search: search },
+                        success: function(res){
+                            if(res && res.status === 'success' && res.data){
+                                newRows = res.data.map(function(r){ r.kind = 'new'; return r; });
+                            }
+                            done();
+                        },
+                        error: function(){ done(); }
+                    });
+                } else {
+                    pending--;
+                }
+                if(kind === 'all' || kind === 'readmission'){
+                    $.ajax({
+                        url: 'kattegat/ragnar_reports.php',
+                        method: 'post',
+                        dataType: 'JSON',
+                        data: { stc_school_readmission_list: 1, status: status, search: search },
+                        success: function(res){
+                            if(res && res.status === 'success' && res.data){
+                                reRows = res.data.map(function(r){ r.kind = 'readmission'; return r; });
+                            }
+                            done();
+                        },
+                        error: function(){ done(); }
+                    });
+                } else {
+                    pending--;
+                }
+            }
+            function loadSchoolReadmissions(){
+                loadSchoolAdmissions();
+            }
+            function fillReadmitModal(d){
+                $('.stc-readmit-modal-id').val(d.id);
+                $('.stc-rm-school').text(d.school || '');
+                $('.stc-rm-studid').text(d.studid || '');
+                $('.stc-rm-name').text(d.name || '');
+                $('.stc-rm-dob').text(d.dob || '');
+                $('.stc-rm-gender').text(d.gender || '');
+                $('.stc-rm-blood').text(d.bloodgroup || '');
+                $('.stc-rm-contact').text(d.contact || '');
+                $('.stc-rm-email').text(d.email || '');
+                $('.stc-rm-class').text(d.classroom || '');
+                $('.stc-rm-address').text(d.address || '');
+                $('.stc-rm-guardian').text(d.guardianname || '');
+                $('.stc-rm-religion').text(d.religion || '');
+                $('.stc-rm-last-status').text(d.last_status || '');
+                $('.stc-rm-last-remarks').text(d.last_remarks || '');
+                $('.stc-rm-student-remarks').text(d.student_remarks || '');
+                $('.stc-rm-amount').text(stcReadmitMoney(d.amount));
+                $('.stc-rm-tic').text(d.created_by || '');
+                $('.stc-readmit-modal-final').val(d.final_amount != null ? d.final_amount : d.amount);
+                $('.stc-readmit-modal-remarks').val(d.boss_remarks || '');
+                var pending = d.status === 'pending';
+                $('.stc-readmit-accept, .stc-readmit-reject, .stc-readmit-modal-final, .stc-readmit-modal-remarks').prop('disabled', !pending);
+                $('.stc-school-readmit-modal').modal('show');
+            }
+            $('a[href="#tab-content-16"]').on('shown.bs.tab', function(){
+                loadSchoolAdmissions();
+            });
+            $('body').delegate('.stc-readmit-open', 'click', function(e){
+                e.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: { stc_school_readmission_get: 1, id: id },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not open request.');
+                            return;
+                        }
+                        fillReadmitModal(res.data);
+                    }
+                });
+            });
+            function decideReadmission(action){
+                var id = $('.stc-readmit-modal-id').val();
+                var amt = $('.stc-readmit-modal-final').val();
+                var remarks = $('.stc-readmit-modal-remarks').val();
+                if(action === 'accepted' && (amt === '' || isNaN(Number(amt)) || Number(amt) <= 0)){
+                    alert('Enter a valid final admission amount.');
+                    return;
+                }
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: {
+                        stc_school_readmission_decide: 1,
+                        id: id,
+                        action: action,
+                        final_amount: amt,
+                        boss_remarks: remarks
+                    },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not update request.');
+                            return;
+                        }
+                        alert(res.message);
+                        $('.stc-school-readmit-modal').modal('hide');
+                        loadSchoolReadmissions();
+                    },
+                    error: function(){
+                        alert('Could not update request.');
+                    }
+                });
+            }
+            $('body').delegate('.stc-readmit-accept', 'click', function(e){
+                e.preventDefault();
+                decideReadmission('accepted');
+            });
+            $('body').delegate('.stc-readmit-reject', 'click', function(e){
+                e.preventDefault();
+                if(!confirm('Reject this readmission request?')) return;
+                decideReadmission('rejected');
+            });
+
+            function fillAdmitModal(d){
+                $('.stc-admit-modal-id').val(d.id);
+                $('.stc-am-school').text(d.school || '');
+                $('.stc-am-studid').text(d.studid || '');
+                $('.stc-am-name').text(d.name || '');
+                $('.stc-am-dob').text(d.dob || '');
+                $('.stc-am-gender').text(d.gender || '');
+                $('.stc-am-blood').text(d.bloodgroup || '');
+                $('.stc-am-contact').text(d.contact || '');
+                $('.stc-am-email').text(d.email || '');
+                $('.stc-am-class').text(d.classroom || '');
+                $('.stc-am-address').text(d.address || '');
+                $('.stc-am-guardian').text(d.guardianname || '');
+                $('.stc-am-religion').text(d.religion || '');
+                $('.stc-am-student-remarks').text(d.student_remarks || '');
+                $('.stc-am-amount').text(stcReadmitMoney(d.amount));
+                $('.stc-am-tic').text(d.created_by || '');
+                $('.stc-admit-modal-final').val(d.final_amount != null ? d.final_amount : d.amount);
+                $('.stc-admit-modal-remarks').val(d.boss_remarks || '');
+                var pending = d.status === 'pending';
+                $('.stc-admit-accept, .stc-admit-reject, .stc-admit-modal-final, .stc-admit-modal-remarks').prop('disabled', !pending);
+                $('.stc-school-admit-modal').modal('show');
+            }
+            $('body').delegate('.stc-admit-find', 'click', function(e){
+                e.preventDefault();
+                loadSchoolAdmissions();
+            });
+            $('body').delegate('.stc-admit-open', 'click', function(e){
+                e.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: { stc_school_admission_get: 1, id: id },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not open request.');
+                            return;
+                        }
+                        fillAdmitModal(res.data);
+                    }
+                });
+            });
+            function decideAdmission(action){
+                var id = $('.stc-admit-modal-id').val();
+                var amt = $('.stc-admit-modal-final').val();
+                var remarks = $('.stc-admit-modal-remarks').val();
+                if(action === 'accepted' && (amt === '' || isNaN(Number(amt)) || Number(amt) <= 0)){
+                    alert('Enter a valid final admission amount.');
+                    return;
+                }
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: {
+                        stc_school_admission_decide: 1,
+                        id: id,
+                        action: action,
+                        final_amount: amt,
+                        boss_remarks: remarks
+                    },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not update request.');
+                            return;
+                        }
+                        alert(res.message);
+                        $('.stc-school-admit-modal').modal('hide');
+                        loadSchoolAdmissions();
+                    },
+                    error: function(){
+                        alert('Could not update request.');
+                    }
+                });
+            }
+            $('body').delegate('.stc-admit-accept', 'click', function(e){
+                e.preventDefault();
+                decideAdmission('accepted');
+            });
+            $('body').delegate('.stc-admit-reject', 'click', function(e){
+                e.preventDefault();
+                if(!confirm('Reject this admission request?')) return;
+                decideAdmission('rejected');
+            });
+
             // call attendance
             $('body').delegate('.stc-school-att-find', 'click', function(e){
                 e.preventDefault();
@@ -3361,6 +3723,96 @@ STCAuthHelper::checkAuth();?>
         </div>
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade stc-school-admit-modal" tabindex="-1" role="dialog" aria-labelledby="stcAdmitModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="stcAdmitModalLabel">Accept new admission</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" class="stc-admit-modal-id" value="0">
+        <div class="row">
+          <div class="col-md-4"><p><b>School:</b> <span class="stc-am-school"></span></p></div>
+          <div class="col-md-4"><p><b>Student ID:</b> <span class="stc-am-studid"></span></p></div>
+          <div class="col-md-4"><p><b>Name:</b> <span class="stc-am-name"></span></p></div>
+          <div class="col-md-4"><p><b>DOB:</b> <span class="stc-am-dob"></span></p></div>
+          <div class="col-md-4"><p><b>Gender:</b> <span class="stc-am-gender"></span></p></div>
+          <div class="col-md-4"><p><b>Blood group:</b> <span class="stc-am-blood"></span></p></div>
+          <div class="col-md-4"><p><b>Contact:</b> <span class="stc-am-contact"></span></p></div>
+          <div class="col-md-4"><p><b>Email:</b> <span class="stc-am-email"></span></p></div>
+          <div class="col-md-4"><p><b>Class:</b> <span class="stc-am-class"></span></p></div>
+          <div class="col-md-12"><p><b>Address:</b> <span class="stc-am-address"></span></p></div>
+          <div class="col-md-6"><p><b>Guardian:</b> <span class="stc-am-guardian"></span></p></div>
+          <div class="col-md-6"><p><b>Religion:</b> <span class="stc-am-religion"></span></p></div>
+          <div class="col-md-12"><p><b>Remarks:</b> <span class="stc-am-student-remarks"></span></p></div>
+          <div class="col-md-6"><p><b>Proposed amount:</b> <span class="stc-am-amount"></span></p></div>
+          <div class="col-md-6"><p><b>TIC:</b> <span class="stc-am-tic"></span></p></div>
+          <div class="col-md-6">
+            <span>Final admission amount</span>
+            <input type="number" min="0" step="0.01" class="form-control stc-admit-modal-final">
+            <small class="text-muted">This amount becomes final after accept.</small>
+          </div>
+          <div class="col-md-6">
+            <span>Boss remarks</span>
+            <textarea class="form-control stc-admit-modal-remarks" rows="2" placeholder="Optional remarks"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger stc-admit-reject">Reject</button>
+        <button type="button" class="btn btn-success stc-admit-accept">Accept &amp; lock amount</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade stc-school-readmit-modal" tabindex="-1" role="dialog" aria-labelledby="stcReadmitModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="stcReadmitModalLabel">Accept readmission</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" class="stc-readmit-modal-id" value="0">
+        <div class="row">
+          <div class="col-md-4"><p><b>School:</b> <span class="stc-rm-school"></span></p></div>
+          <div class="col-md-4"><p><b>Student ID:</b> <span class="stc-rm-studid"></span></p></div>
+          <div class="col-md-4"><p><b>Name:</b> <span class="stc-rm-name"></span></p></div>
+          <div class="col-md-4"><p><b>DOB:</b> <span class="stc-rm-dob"></span></p></div>
+          <div class="col-md-4"><p><b>Gender:</b> <span class="stc-rm-gender"></span></p></div>
+          <div class="col-md-4"><p><b>Blood group:</b> <span class="stc-rm-blood"></span></p></div>
+          <div class="col-md-4"><p><b>Contact:</b> <span class="stc-rm-contact"></span></p></div>
+          <div class="col-md-4"><p><b>Email:</b> <span class="stc-rm-email"></span></p></div>
+          <div class="col-md-4"><p><b>Class:</b> <span class="stc-rm-class"></span></p></div>
+          <div class="col-md-12"><p><b>Address:</b> <span class="stc-rm-address"></span></p></div>
+          <div class="col-md-6"><p><b>Guardian:</b> <span class="stc-rm-guardian"></span></p></div>
+          <div class="col-md-6"><p><b>Religion:</b> <span class="stc-rm-religion"></span></p></div>
+          <div class="col-md-6"><p><b>Last status:</b> <span class="stc-rm-last-status"></span></p></div>
+          <div class="col-md-6"><p><b>Last remarks:</b> <span class="stc-rm-last-remarks"></span></p></div>
+          <div class="col-md-12"><p><b>Student remarks:</b> <span class="stc-rm-student-remarks"></span></p></div>
+          <div class="col-md-6"><p><b>Proposed amount:</b> <span class="stc-rm-amount"></span></p></div>
+          <div class="col-md-6"><p><b>TIC:</b> <span class="stc-rm-tic"></span></p></div>
+          <div class="col-md-6">
+            <span>Final admission amount</span>
+            <input type="number" min="0" step="0.01" class="form-control stc-readmit-modal-final">
+            <small class="text-muted">This amount becomes final after accept.</small>
+          </div>
+          <div class="col-md-6">
+            <span>Boss remarks</span>
+            <textarea class="form-control stc-readmit-modal-remarks" rows="2" placeholder="Optional remarks"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger stc-readmit-reject">Reject</button>
+        <button type="button" class="btn btn-success stc-readmit-accept">Accept &amp; lock amount</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
