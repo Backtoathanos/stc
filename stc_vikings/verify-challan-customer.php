@@ -80,11 +80,53 @@ function stc_challan_is_tata_steel_amc($site_label, $to_site, $to_lines = array(
     $checks[] = $line;
   }
   foreach($checks as $val){
-    if(strcasecmp(trim((string) $val), 'TATA STEEL AMC') === 0){
+    $v = strtoupper(trim((string) $val));
+    if($v === 'TATA STEEL AMC' || $v === 'TSL AMC'){
       return true;
     }
   }
   return false;
+}
+
+function stc_challan_customer_to_lines($site_key){
+  $site_key = strtoupper(trim(preg_replace('/\s+/', ' ', (string) $site_key)));
+  // SITE NAME => [addressee, sitename, company+city, gate name]
+  $map = array(
+    'TSL AMC' => array('The Head Security Work', 'MRSS3', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
+    'TATA STEEL AMC' => array('The Head Security Work', 'MRSS3', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
+    'TINPLATE' => array('The Head Security Work', '', 'TATA STEEL TINPLATE DIVISION', ''),
+    'BF RELINING & TSG GAMHARIA & OLD GAMHARIA' => array('The Head Security Work', '', 'TATA STEEL GAMHARIA', 'GAMHARIA'),
+    'GOLMURI SUBSTATION' => array('The Head Security Work', 'GOLMURI SUBSTATION HVAC PROJECT', '', 'GOLMURI JAMSHEDPUR'),
+    'O&M' => array('The Head Security Work', 'ECR building of COB#6A&6B', 'TATA STEEL JAMSHEDPUR', ''),
+    'XLRI' => array('The Head Security Work', '', 'XLRI, JAMSHEDPUR', ''),
+    'COKE OVEN' => array('The Head Security Work', '', 'TATA STEEL LTD. JSR.', 'JMD GATE'),
+  );
+  $parts = null;
+  if(isset($map[$site_key])){
+    $parts = $map[$site_key];
+  }else{
+    foreach($map as $key => $val){
+      if($site_key !== '' && (strpos($site_key, $key) !== false || strpos($key, $site_key) !== false)){
+        $parts = $val;
+        break;
+      }
+    }
+  }
+  if($parts === null){
+    return array(
+      'The Head Security Work',
+      'TATA STEEL LTD. JSR.',
+      'JMD GATE',
+    );
+  }
+  $lines = array();
+  foreach($parts as $part){
+    $part = trim((string) $part);
+    if($part !== ''){
+      $lines[] = $part;
+    }
+  }
+  return $lines ? $lines : array('The Head Security Work');
 }
 
 function stc_challan_row_sitename($row){
@@ -643,11 +685,8 @@ if($order_date_from !== '' && $order_date_to !== '' && $order_date_from !== $ord
 $blank_rows = max(0, 22 - count($rows));
 $embed = isset($_GET['embed']) && $_GET['embed'] !== '0' && $_GET['embed'] !== '';
 
-$toLines = array(
-  'The Head Security Work',
-  'TATA STEEL LTD JSR',
-  'JMD GATE',
-);
+$toLines = stc_challan_customer_to_lines($site_label !== '' ? $site_label : $to_site);
+$vehicle_no = 'JH05 CG 7026';
 
 $export = isset($_GET['export']) ? strtolower(trim((string) $_GET['export'])) : '';
 if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export === 'word' || $export === 'doc'){
@@ -657,7 +696,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
     'challan_date' => $challan_date,
     'order_no' => $meta_order,
     'order_date' => $order_date_text,
-    'vehicle_no' => '',
+    'vehicle_no' => $vehicle_no,
     'to_lines' => $toLines,
     'rows' => $rows,
     'blank_rows' => $blank_rows,
@@ -911,7 +950,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
                       DATE : <?php echo htmlspecialchars($challan_date); ?><br>
                       ORDER NO : <?php echo stc_challan_slot($meta_order, 14); ?><br>
                       ORDER DATE : <?php echo htmlspecialchars($order_date_text); ?><br>
-                      VEHICLE NO. – <?php echo stc_challan_slot('', 10); ?>
+                      VEHICLE NO. – <?php echo stc_challan_slot($vehicle_no, 14); ?>
                     </div>
                   </div>
                 </th>
