@@ -2151,7 +2151,7 @@ class pirates_project extends tesseract{
 		if ($total === 0) {
 			return json_encode([
 				'ok' => true,
-				'tbody' => '<tr><td colspan="10" class="text-center text-muted">No requisitions for this filter.</td></tr>',
+				'tbody' => '<tr><td colspan="11" class="text-center text-muted">No requisitions for this filter.</td></tr>',
 				'pagination' => '',
 				'summary' => '0 records',
 				'total' => 0,
@@ -2172,6 +2172,7 @@ class pirates_project extends tesseract{
 				I.`stc_cust_super_requisition_list_id` AS reqlistid,
 				L.`stc_cust_super_requisition_list_id` AS list_id,
 				DATE(L.`stc_cust_super_requisition_list_date`) AS req_date,
+				IFNULL(L.`stc_cust_super_requisition_list_order_number`,'') AS order_number,
 				I.`stc_cust_super_requisition_list_items_title`,
 				I.`stc_cust_super_requisition_list_items_unit`,
 				I.`stc_cust_super_requisition_list_items_reqqty`,
@@ -2216,10 +2217,12 @@ class pirates_project extends tesseract{
 				}
 
 				$gm = (float) ($row['stc_cust_super_requisition_items_finalqty'] ?? 0);
+				$order_number = trim((string) ($row['order_number'] ?? ''));
 				$html .= '<tr class="stc-req-det-tr">
 					<td class="text-center text-muted"><small>'.$sl.'</small></td>
 					<td class="text-center">'.htmlspecialchars(date('d-m-Y', strtotime($row['req_date'])), ENT_QUOTES, 'UTF-8').'</td>
 					<td class="text-center"><span class="label label-info">'.$list_id.'</span></td>
+					<td class="text-center">'.($order_number !== '' ? htmlspecialchars($order_number, ENT_QUOTES, 'UTF-8') : '<span class="text-muted">-</span>').'</td>
 					<td>'.htmlspecialchars((string) $row['stc_cust_super_requisition_list_items_title'], ENT_QUOTES, 'UTF-8').'</td>
 					<td class="text-center">'.htmlspecialchars((string) $row['stc_cust_super_requisition_list_items_unit'], ENT_QUOTES, 'UTF-8').'</td>
 					<td class="text-right">'.number_format((float) ($row['stc_cust_super_requisition_list_items_reqqty'] ?? 0), 2).'</td>
@@ -2322,13 +2325,14 @@ class pirates_project extends tesseract{
 		header('Cache-Control: max-age=0');
 		echo "\xEF\xBB\xBF";
 		$out = fopen('php://output', 'w');
-		fputcsv($out, ['Sl No', 'Req Date', 'Requisition number', 'Item name', 'Unit', 'Req qty', 'GM passed qty', 'Dispatched qty', 'Received qty', 'Item type']);
+		fputcsv($out, ['Sl No', 'Req Date', 'Requisition number', 'Order number', 'Item name', 'Unit', 'Req qty', 'GM passed qty', 'Dispatched qty', 'Received qty', 'Item type']);
 
 		$q = mysqli_query($this->stc_dbs, "
 			SELECT
 				I.`stc_cust_super_requisition_list_id` AS reqlistid,
 				L.`stc_cust_super_requisition_list_id` AS list_id,
 				DATE(L.`stc_cust_super_requisition_list_date`) AS req_date,
+				IFNULL(L.`stc_cust_super_requisition_list_order_number`,'') AS order_number,
 				I.`stc_cust_super_requisition_list_items_title`,
 				I.`stc_cust_super_requisition_list_items_unit`,
 				I.`stc_cust_super_requisition_list_items_reqqty`,
@@ -2379,6 +2383,7 @@ class pirates_project extends tesseract{
 					$sl,
 					date('d-m-Y', strtotime($row['req_date'])),
 					$list_id,
+					trim((string) ($row['order_number'] ?? '')),
 					(string) $row['stc_cust_super_requisition_list_items_title'],
 					(string) $row['stc_cust_super_requisition_list_items_unit'],
 					number_format((float) ($row['stc_cust_super_requisition_list_items_reqqty'] ?? 0), 2, '.', ''),
@@ -3431,7 +3436,7 @@ class pirates_supervisor extends tesseract{
 	}
 
 	// get supervisors order & requisitions 
-	public function stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_superid, $stc_projeid){
+	public function stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_projeid){
 		$optimusprime='';
 		$slno=0;
 		$getrequisitionsqry=mysqli_query($this->stc_dbs, "
@@ -3439,6 +3444,7 @@ class pirates_supervisor extends tesseract{
 				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
 				DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
 				`stc_cust_super_requisition_list_items_req_id`,
+				IFNULL(`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_order_number`,'') AS order_number,
 				`stc_cust_super_requisition_list_items_title`,
 			    `stc_cust_super_requisition_list_items_unit`,
 			    `stc_cust_super_requisition_list_items_reqqty`,
@@ -3450,8 +3456,6 @@ class pirates_supervisor extends tesseract{
 			INNER JOIN `stc_cust_super_requisition_list` 
 			ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
 			WHERE 
-				`stc_cust_super_requisition_list_super_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_superid)."'
-			AND 
 				`stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
 			AND (
 				DATE(`stc_cust_super_requisition_list_date`) 
@@ -3466,12 +3470,27 @@ class pirates_supervisor extends tesseract{
 				$stcdispatchedqty=0;
 				$stcrecievedqty=0;
 				$stcpendingqty=0;
-				if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
-					$rqitemstts='ALLOW';
-				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
-					$rqitemstts='DIRECT';
+				$item_status=(int) $requisitionrow['stc_cust_super_requisition_list_items_status'];
+				if($item_status==1){
+					$rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
+				}elseif($item_status==2){
+					$rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
+				}elseif($item_status==3){
+					$rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
+				}elseif($item_status==4){
+					$rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
+				}elseif($item_status==5){
+					$rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
+				}elseif($item_status==6){
+					$rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
+				}elseif($item_status==7){
+					$rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
+				}elseif($item_status==8){
+					$rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+				}elseif($item_status==9){
+					$rqitemstts='<span style="background-color: rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
 				}else{
-					$rqitemstts='NOT ALLOW';
+					$rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
 				}
 				$stcdecqtyqry=mysqli_query($this->stc_dbs, "
 					SELECT 
@@ -3522,11 +3541,36 @@ class pirates_supervisor extends tesseract{
 				$priority=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ff9e9e;'" : "Normal";
 				$stock=$stcrecievedqty - $stcconsumedqty;
+				$order_number=trim((string) ($requisitionrow['order_number'] ?? ''));
+				$log_html='';
+				$logqry=mysqli_query($this->stc_dbs, "
+					SELECT `title`, `message`, `created_by`, `created_date`
+					FROM `stc_cust_super_requisition_list_items_log`
+					WHERE `item_id`='".mysqli_real_escape_string($this->stc_dbs, (string) $requisitionrow['reqlistid'])."'
+					ORDER BY `id` DESC
+				");
+				if($logqry && mysqli_num_rows($logqry)>0){
+					foreach($logqry as $logrow){
+						$log_html.='
+							<div class="noExl" style="display:none;border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-family: \'Segoe UI\', sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); background-color: #fff;">
+								<div style="display: flex; justify-content: space-between; align-items: center;">
+									<span style="font-weight: 600; color: #212121; font-size: 16px;">'.htmlspecialchars((string) $logrow['title'], ENT_QUOTES, 'UTF-8').'</span>
+									<span style="font-size: 12px; color: #757575;">'.date('d-m-Y h:i A', strtotime($logrow['created_date'])).'</span>
+								</div>
+								<div style="margin-top: 4px; font-size: 14px; color: #424242;">'.$logrow['message'].'</div>
+							</div>
+						';
+					}
+				}else{
+					$log_html='<div class="noExl text-center text-muted" style="display:none;">No logs found.</div>';
+				}
+				$rqitemstts='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" title="View Log" class="stc-sup-requisition-viewlog-modal-btn" style="text-decoration:none;cursor:pointer;">'.$rqitemstts.'</a>'.$log_html;
 				$optimusprime.='
 						<tr>
 							<td>'.$slno.'</td>
 							<td class="text-center">'.date('d-m-Y', strtotime($requisitionrow['stc_req_date'])).'</td>
 							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'</td>
+							<td class="text-center">'.($order_number !== '' ? htmlspecialchars($order_number, ENT_QUOTES, 'UTF-8') : '-').'</td>
 							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
 							<td class="text-center">'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
 							<td class="text-right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
@@ -3538,14 +3582,14 @@ class pirates_supervisor extends tesseract{
 							<td class="text-right">'.number_format($stcconsumedqty, 2).'</td>
 							<td class="text-right">'.number_format($stock, 2).'</td>
 							<td '.$bgcolor.' class="text-center">'.$priority.'</td>
-							<td>'.$rqitemstts.'</td>
+							<td class="text-center">'.$rqitemstts.'</td>
 						</tr>
 				';
 			}
 		}else{
 			$optimusprime.='
 					<tr>
-						<td colspan="10">No requisition found!!!</td>
+						<td colspan="16">No requisition found!!!</td>
 					</tr>
 			';
 		}
@@ -6018,7 +6062,6 @@ if(isset($_POST['get_supervisorconsite'])){
 if(isset($_POST['js_pending_reports_req'])){
 	$stc_begdate=date("Y-m-d", strtotime($_POST['stc_begdate']));
 	$stc_enddate=date("Y-m-d", strtotime($_POST['stc_enddate']));
-	$stc_superid=$_POST['stc_superid'];
 	$stc_projeid=$_POST['stc_projeid'];
 	$out='
 		<table class="mb-0 table table-bordered table-hover" id="stc-reports-pending-view">
@@ -6027,6 +6070,7 @@ if(isset($_POST['js_pending_reports_req'])){
 			    <th class="text-center">#</th>
 			    <th class="text-center">Date</th>
 			    <th class="text-center">PR No</th>
+			    <th class="text-center">Order Number</th>
 			    <th class="text-center">Item Desc</th>
 			    <th class="text-center">Unit</th>
 			    <th class="text-center">PR Qty</th>
@@ -6046,14 +6090,14 @@ if(isset($_POST['js_pending_reports_req'])){
 	$start_date = strtotime($stc_begdate);
 	$end_date = strtotime($stc_enddate);
 	$objloki=new pirates_supervisor();
-	if(empty($stc_begdate) || empty($stc_enddate) || $stc_superid==0 || $stc_superid==0){
+	if(empty($_POST['stc_begdate']) || empty($_POST['stc_enddate']) || empty($stc_projeid) || $stc_projeid==0){
 		$out='
 			<tr>
 				<td colspan="10">Dont late any fields empty</td>
 			</tr>
 		';
 	}else{
-		$opobjloki=$objloki->stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_superid, $stc_projeid);
+		$opobjloki=$objloki->stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_projeid);
 		$out.=$opobjloki;
 	}
 

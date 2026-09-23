@@ -877,3 +877,13 @@ label.valid {
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+.app-header .search-wrapper,
+.app-header .search-icon,
+.app-header .search-icon-2,
+.app-header a[href="ag-cart.php"],
+.app-header .fa-shopping-cart,
+.app-header .pe-7s-shopbag,
+.app-header .pe-7s-cart {
+  display: none !important;
+}

@@ -39,12 +39,12 @@
                         Home
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="stc-product.php?page=product" class="product">
                         <i class="metismenu-icon pe-7s-box2"></i>
                         Products
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="manage-project.php?page=projectmanagement" class="projectmanagement">
                         <i class="metismenu-icon pe-7s-news-paper"></i>

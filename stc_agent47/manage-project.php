@@ -589,6 +589,7 @@ include_once("../MCU/db.php");
                                                                 <th class="text-center">Sl No</th>
                                                                 <th class="text-center">Req Date</th>
                                                                 <th class="text-center">Requisition number</th>
+                                                                <th class="text-center">Order number</th>
                                                                 <th class="text-center">Item name</th>
                                                                 <th class="text-center">Unit</th>
                                                                 <th class="text-center">Req qty</th>
@@ -600,7 +601,7 @@ include_once("../MCU/db.php");
                                                         </thead>
                                                         <tbody id="stc-req-details-tbody">
                                                             <tr>
-                                                                <td colspan="10" class="text-center text-muted">Select a project and click Search.</td>
+                                                                <td colspan="11" class="text-center text-muted">Select a project and click Search.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1151,7 +1152,7 @@ include_once("../MCU/db.php");
           if (!v) return;
           page = parseInt(page, 10) || 1;
           var perPage = parseInt($('#stc-req-details-per-page').val(), 10) || 25;
-          $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+          $('#stc-req-details-tbody').html('<tr><td colspan="11" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
           $('#stc-req-details-pagination-wrap').empty();
           $('#stc-req-details-summary').text('Loading…');
           $.ajax({
@@ -1169,7 +1170,7 @@ include_once("../MCU/db.php");
             success: function (res) {
               if (!res || !res.ok) {
                 var msg = (res && res.message) ? res.message : 'Could not load data.';
-                $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">' + $('<div/>').text(msg).html() + '</td></tr>');
+                $('#stc-req-details-tbody').html('<tr><td colspan="11" class="text-center text-danger">' + $('<div/>').text(msg).html() + '</td></tr>');
                 $('#stc-req-details-summary').text('');
                 return;
               }
@@ -1178,7 +1179,7 @@ include_once("../MCU/db.php");
               $('#stc-req-details-summary').text(res.summary || '');
             },
             error: function () {
-              $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">Could not load data.</td></tr>');
+              $('#stc-req-details-tbody').html('<tr><td colspan="11" class="text-center text-danger">Could not load data.</td></tr>');
               $('#stc-req-details-summary').text('');
             }
           });

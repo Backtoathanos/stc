@@ -1,3 +1,14 @@
+<style>
+    .app-header .search-wrapper,
+    .app-header .search-icon,
+    .app-header .search-icon-2,
+    .app-header a[href="ag-cart.php"],
+    .app-header .fa-shopping-cart,
+    .app-header .pe-7s-shopbag,
+    .app-header .pe-7s-cart {
+        display: none !important;
+    }
+</style>
         <div class="app-header header-shadow">
             <div class="app-header__logo">
                 <!-- <div class="logo"></div> -->
@@ -23,8 +34,6 @@
             </div>
             <div class="app-header__menu">
                 <span>
-                    <a style="font-size: 25px;" href="ag-cart.php" class="metismenu-icon pe-7s-cart">
-                    </a>
                     <button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
                         <span class="btn-icon-wrapper">
                             <i class="fa fa-ellipsis-v fa-w-6"></i>
@@ -33,16 +42,6 @@
                 </span>
             </div>    
             <div class="app-header__content">
-                <div class="app-header-left">
-                    <div class="search-wrapper">
-                        <div class="input-holder">
-                            <input type="text" class="search-input agent-pro-search" placeholder="Type to search">
-                            <button class="search-icon"><span></span></button>
-                            <button style="position: absolute;right: 12px;z-index: 10;padding: 5px;display: none;" class="search-icon-2"><span><i class="fas fa-search"></i></span></button>
-                        </div>
-                        <button class="close close-co"></button>
-                    </div>  
-                </div>
                 <div class="app-header-right">
                     <div class="header-btn-lg pr-0">
                         <div class="widget-content p-0">
@@ -76,11 +75,6 @@
                                     <div class="widget-subheading">
                                         Your Position on your co
                                     </div>
-                                </div>
-                                <div class="widget-content-right header-user-info ml-3">
-                                    <a href="ag-cart.php" style="font-size: 25px;" class="">
-                                        <i class="metismenu-icon pe-7s-cart"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>

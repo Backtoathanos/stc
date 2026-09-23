@@ -110,36 +110,47 @@ else {
                                         </button>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-xl-6 col-sm-12"> 
+                                <div class="col-md-12 col-xl-12 col-sm-12"> 
                                     <div class="card mb-3 widget-content">
-                                        <select class="form-control btn btn-secondary stc-agents-pending-items-rep-super-select">
+                                        <select class="form-control btn btn-secondary stc-agents-pending-items-rep-project-select">
                                             <?php 
                                                 include_once("../MCU/db.php");
-                                                echo '<option value="0" selected>Please select supervisor!!!</option>';
-                                                $stcagentspendreportssup=mysqli_query($con, "
-                                                    SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
-                                                    FROM `stc_cust_pro_supervisor` 
-                                                    LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
-                                                    ON `stc_cust_pro_supervisor_collaborate_userid`=`stc_cust_pro_supervisor_id`
-                                                    WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
-                                                    OR `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                    ORDER BY `stc_cust_pro_supervisor_fullname` ASC
-                                                ");
-                                                if(mysqli_num_rows($stcagentspendreportssup)>0){
-                                                    foreach($stcagentspendreportssup as $pendrepcheckrow){
-                                                        echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_pro_supervisor_id'].'">'.$pendrepcheckrow['stc_cust_pro_supervisor_fullname'].'</option>';
+                                                echo '<option value="0" selected>Please Select Project</option>';
+                                                $stc_agent_id = $_SESSION['stc_agent_id'];
+                                                if(isset($_SESSION['stc_agent_role']) && $_SESSION['stc_agent_role']==3){
+                                                    $stcagentspendreportsproj=mysqli_query($con, "
+                                                        SELECT DISTINCT
+                                                            `stc_cust_project_id`,
+                                                            `stc_cust_project_title`
+                                                        FROM `stc_cust_project`
+                                                        INNER JOIN `stc_agent_requested_customer`
+                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id` 
+                                                        INNER JOIN `stc_agents`
+                                                        ON `stc_agent_requested_customer_agent_id`=`stc_agents_id` 
+                                                        WHERE `stc_agents_id`='".$stc_agent_id."'
+                                                        ORDER BY `stc_cust_project_title` ASC
+                                                    ");
+                                                }else{
+                                                    $stcagentspendreportsproj=mysqli_query($con, "
+                                                        SELECT DISTINCT
+                                                            `stc_cust_project_id`,
+                                                            `stc_cust_project_title`
+                                                        FROM `stc_cust_project` 
+                                                        LEFT JOIN `stc_cust_project_collaborate`
+                                                        ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+                                                        WHERE `stc_cust_project_createdby`='".$stc_agent_id."'
+                                                        OR `stc_cust_project_collaborate_teamid`='".$stc_agent_id."'
+                                                        ORDER BY `stc_cust_project_title` ASC
+                                                    ");
+                                                }
+                                                if(mysqli_num_rows($stcagentspendreportsproj)>0){
+                                                    foreach($stcagentspendreportsproj as $pendrepcheckrow){
+                                                        echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
                                                     }
                                                 }else{
-                                                    echo '<option value="0">No supervisor found!!!</option>';
+                                                    echo '<option value="0">No project found!!!</option>';
                                                 }
                                             ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-6 col-sm-12"> 
-                                    <div class="card mb-3 widget-content">
-                                        <select class="form-control btn btn-secondary stc-agents-pending-items-rep-site-select">
-                                            <option value="0" selected>Please Select Site</option>                                        
                                         </select>
                                     </div>
                                 </div>
@@ -419,6 +430,33 @@ else {
             </div>
         </div>
     </div>
+    <div class="modal fade bd-log-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Items Log</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xl-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <h5 class="card-title">View Items Log</h5>
+                                    <div class="items-log-display"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
@@ -467,31 +505,22 @@ else {
             });
 
             $('.hidden-excel-section').hide();
-            // on select super visor site call
-            $('body').delegate('.stc-agents-pending-items-rep-super-select', 'change', function(e){
+
+            $('body').delegate('.stc-sup-requisition-viewlog-modal-btn', 'click', function(e){
                 e.preventDefault();
-                var jsstcsupid=$(this).val();
-                $.ajax({
-                    url         : "nemesis/stc_project.php",
-                    method      : "POST",
-                    data        : {
-                        get_supervisorconsite:1,
-                        stcsupid:jsstcsupid
-                    },
-                    success     : function(getsiteconsupervisor){
-                        $('.stc-agents-pending-items-rep-site-select').html(getsiteconsupervisor);
-                    }
-                });
+                var data=$(this).parent().html();
+                $('.items-log-display').html(data);
+                $('.items-log-display').find('div').show();
+                $('.items-log-display').find('a').remove();
+                $('.bd-log-modal-lg').modal('show');
             });
 
-            // call reports
             $('body').delegate('.stc-reportsFind-hit', 'click', function(e){
                 e.preventDefault();
-                $('.hidden-excel-section').show();
                 var jsbegdate=$('.stc-init-date').val();
                 var jsenddate=$('.stc-end-date').val();
-                var jssuperid=$('.stc-agents-pending-items-rep-super-select').val();
-                var jsprojeid=$('.stc-agents-pending-items-rep-site-select').val();
+                var jsprojeid=$('.stc-agents-pending-items-rep-project-select').val();
+                $('.hidden-excel-section').show();
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
@@ -499,7 +528,6 @@ else {
                         js_pending_reports_req:1,
                         stc_begdate:jsbegdate,
                         stc_enddate:jsenddate,
-                        stc_superid:jssuperid,
                         stc_projeid:jsprojeid
                     },
                     success     : function(reportsfindres){

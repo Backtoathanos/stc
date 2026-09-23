@@ -3,7 +3,7 @@
     <p class="text-center text-white mb-0 px-4 small">
       Copyright &copy; <b><?php echo date("Y");?></b> All rights reserved. 
       
-      Design By: <a rel="nofollow noopener" href="bluenix.in" class="tm-footer-link">Bluenix</a>
+      Design By: <a rel="nofollow noopener" href="https://stcassociate.com" class="tm-footer-link">STC Associates</a>
     </p>
   </div>
 </footer>

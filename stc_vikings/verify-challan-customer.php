@@ -63,6 +63,43 @@ function stc_challan_combination_label($sitename, $prLocation){
   return $source;
 }
 
+function stc_challan_item_type_labels(){
+  return array(
+    'Consumable' => 'Consumable',
+    'Tools & Tackles' => 'Tools & Track',
+    'PPE' => 'PPE',
+    'Supply' => 'Supply',
+  );
+}
+
+function stc_challan_normalize_item_type($type){
+  $type = trim((string) $type);
+  if($type === '') return '';
+  $labels = stc_challan_item_type_labels();
+  if(isset($labels[$type])) return $type;
+  $lower = strtolower($type);
+  if(in_array($lower, array('tools & track', 'tools & tackles', 'tools and tackles', 'tools'), true)){
+    return 'Tools & Tackles';
+  }
+  foreach($labels as $key => $label){
+    if(strcasecmp($key, $type) === 0 || strcasecmp($label, $type) === 0){
+      return $key;
+    }
+  }
+  return '';
+}
+
+function stc_challan_material_title($type){
+  $type = stc_challan_normalize_item_type($type);
+  $map = array(
+    'Consumable' => 'Consumable Materials',
+    'Tools & Tackles' => 'Returnable Materials',
+    'PPE' => 'PPE',
+    'Supply' => 'Supply Materials',
+  );
+  return $map[$type] ?? 'Consumable Materials';
+}
+
 function stc_challan_slot($value, $width){
   $value = trim((string) $value);
   if($value === '' || $value === '—' || $value === '-'){
@@ -92,8 +129,8 @@ function stc_challan_customer_to_lines($site_key){
   $site_key = strtoupper(trim(preg_replace('/\s+/', ' ', (string) $site_key)));
   // SITE NAME => [addressee, sitename, company+city, gate name]
   $map = array(
-    'TSL AMC' => array('The Head Security Work', 'MRSS3', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
-    'TATA STEEL AMC' => array('The Head Security Work', 'MRSS3', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
+    'TSL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
+    'TATA STEEL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
     'TINPLATE' => array('The Head Security Work', '', 'TATA STEEL TINPLATE DIVISION', ''),
     'BF RELINING & TSG GAMHARIA & OLD GAMHARIA' => array('The Head Security Work', '', 'TATA STEEL GAMHARIA', 'GAMHARIA'),
     'GOLMURI SUBSTATION' => array('The Head Security Work', 'GOLMURI SUBSTATION HVAC PROJECT', '', 'GOLMURI JAMSHEDPUR'),
@@ -215,7 +252,8 @@ function stc_customer_challan_document_html($meta, $opts = array()){
     }
   }
 
-  $titleMetaHtml = '<div class="title">2 COPY ENTRY CHALLAN<br>CONSUMABLE MATERIALS</div>'
+  $titleLine = !empty($meta['title_line']) ? $meta['title_line'] : 'Consumable Materials';
+  $titleMetaHtml = '<div class="title">2 COPY ENTRY CHALLAN<br>'.htmlspecialchars($titleLine).'</div>'
     .'<table class="meta" width="100%" cellspacing="0" cellpadding="0"><tr>'
     .'<td class="to" valign="top"><div class="lbl">To,</div>'.nl2br($toHtml).'</td>'
     .'<td class="right" valign="top">'
@@ -446,7 +484,7 @@ function stc_customer_challan_export_excel($meta){
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $row++;
   $sheet->mergeCells('A'.$row.':'.$lastCol.$row);
-  $sheet->setCellValue('A'.$row, 'CONSUMABLE MATERIALS');
+  $sheet->setCellValue('A'.$row, !empty($meta['title_line']) ? $meta['title_line'] : 'Consumable Materials');
   $sheet->getStyle('A'.$row)->getFont()->setBold(true)->setSize(12);
   $sheet->getStyle('A'.$row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
   $row += 2;
@@ -557,6 +595,8 @@ if(isset($_GET['date']) && $_GET['date'] != ''){
 
 $order_number = isset($_GET['order_number']) ? trim((string) $_GET['order_number']) : '';
 $site_label = isset($_GET['site']) ? trim((string) $_GET['site']) : '';
+$item_type = stc_challan_normalize_item_type(isset($_GET['item_type']) ? $_GET['item_type'] : '');
+$material_title = stc_challan_material_title($item_type);
 $date_esc = mysqli_real_escape_string($con, $date);
 
 $challanFrom = "
@@ -591,6 +631,9 @@ $challanFrom = "
 $filter_sql = '';
 if($order_number !== ''){
   $filter_sql .= " AND L.`stc_cust_super_requisition_list_order_number` = '".mysqli_real_escape_string($con, $order_number)."'";
+}
+if($item_type !== ''){
+  $filter_sql .= " AND I.`stc_cust_super_requisition_items_type` = '".mysqli_real_escape_string($con, $item_type)."'";
 }
 
 $rows = array();
@@ -697,6 +740,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
     'order_no' => $meta_order,
     'order_date' => $order_date_text,
     'vehicle_no' => $vehicle_no,
+    'title_line' => $material_title,
     'to_lines' => $toLines,
     'rows' => $rows,
     'blank_rows' => $blank_rows,
@@ -920,7 +964,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
   </head>
   <body<?php echo $embed ? ' class="gas-embed"' : ''; ?>>
     <div class="hidden-print">
-      <a class="btn btn-secondary" href="<?php echo htmlspecialchars('verify-challan.php?date='.urlencode($date).($order_number !== '' ? '&order_number='.urlencode($order_number) : '').($site_label !== '' ? '&site='.urlencode($site_label) : '')); ?>">Back</a>
+      <a class="btn btn-secondary" href="<?php echo htmlspecialchars('verify-challan.php?date='.urlencode($date).($item_type !== '' ? '&item_type='.urlencode($item_type) : '').($order_number !== '' ? '&order_number='.urlencode($order_number) : '').($site_label !== '' ? '&site='.urlencode($site_label) : '')); ?>">Back</a>
       <button type="button" id="printInvoice" class="btn btn-info"><i class="fas fa-print"></i> Print</button>
     </div>
 
@@ -936,7 +980,7 @@ if($export === 'pdf' || $export === 'excel' || $export === 'xlsx' || $export ===
                   <img class="gas-header" src="images/gas-header.jpg" alt="Global AC System">
                   <div class="gas-title">
                     2 COPY ENTRY CHALLAN<br>
-                    CONSUMABLE MATERIALS
+                    <?php echo htmlspecialchars($material_title); ?>
                   </div>
                   <div class="gas-meta">
                     <div class="gas-to">

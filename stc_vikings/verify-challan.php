@@ -63,6 +63,38 @@ function stc_challan_combination_label($sitename, $prLocation){
   return $source;
 }
 
+function stc_challan_item_type_labels(){
+  return array(
+    'Consumable' => 'Consumable',
+    'Tools & Tackles' => 'Tools & Track',
+    'PPE' => 'PPE',
+    'Supply' => 'Supply',
+  );
+}
+
+function stc_challan_normalize_item_type($type){
+  $type = trim((string) $type);
+  if($type === '') return '';
+  $labels = stc_challan_item_type_labels();
+  if(isset($labels[$type])) return $type;
+  $lower = strtolower($type);
+  if(in_array($lower, array('tools & track', 'tools & tackles', 'tools and tackles', 'tools'), true)){
+    return 'Tools & Tackles';
+  }
+  foreach($labels as $key => $label){
+    if(strcasecmp($key, $type) === 0 || strcasecmp($label, $type) === 0){
+      return $key;
+    }
+  }
+  return '';
+}
+
+function stc_challan_item_type_label($type){
+  $type = stc_challan_normalize_item_type($type);
+  $labels = stc_challan_item_type_labels();
+  return $labels[$type] ?? $type;
+}
+
 $date = '';
 if(isset($_GET['date']) && $_GET['date'] != ''){
   $date = date('Y-m-d', strtotime($_GET['date']));
@@ -88,6 +120,7 @@ if($chkCol && mysqli_num_rows($chkCol) == 0){
 
 $order_number = isset($_GET['order_number']) ? trim((string) $_GET['order_number']) : '';
 $site_label = isset($_GET['site']) ? trim((string) $_GET['site']) : '';
+$item_type = stc_challan_normalize_item_type(isset($_GET['item_type']) ? $_GET['item_type'] : '');
 $date_esc = mysqli_real_escape_string($con, $date);
 
 $challanFrom = "
@@ -109,6 +142,8 @@ $challanFrom = "
 
 $order_options = array();
 $site_options = array();
+$type_options = array();
+$type_rows = array();
 $siteSeen = array();
 $orderSeen = array();
 
@@ -116,13 +151,15 @@ $listQ = mysqli_query($con, "
   SELECT DISTINCT
     TRIM(COALESCE(L.`stc_cust_super_requisition_list_order_number`, '')) AS order_number,
     P.`stc_cust_project_title` AS sitename,
-    C.`stc_requisition_combiner_refrence` AS pr_location
+    C.`stc_requisition_combiner_refrence` AS pr_location,
+    I.`stc_cust_super_requisition_items_type` AS item_type
   ".$challanFrom."
 ");
 if($listQ){
   while($sr = mysqli_fetch_assoc($listQ)){
     $label = stc_challan_combination_label($sr['sitename'] ?? '', $sr['pr_location'] ?? '');
     $on = trim((string)($sr['order_number'] ?? ''));
+    $it = stc_challan_normalize_item_type($sr['item_type'] ?? '');
 
     if($label !== ''){
       $siteKey = strtoupper($label);
@@ -130,6 +167,9 @@ if($listQ){
         $siteSeen[$siteKey] = true;
         $site_options[] = array('sitename' => $label);
       }
+    }
+    if($it !== ''){
+      $type_rows[] = array('site' => $label, 'order' => $on, 'type' => $it);
     }
 
     if($on === '') continue;
@@ -154,9 +194,29 @@ if($order_number !== '' && !in_array($order_number, $order_options, true)){
   $order_number = '';
 }
 
+$typeSeen = array();
+foreach($type_rows as $tr){
+  $siteOk = ($site_label === '' || ($tr['site'] !== '' && strcasecmp($tr['site'], $site_label) === 0));
+  $orderOk = ($order_number === '' || ($tr['order'] !== '' && strcasecmp($tr['order'], $order_number) === 0));
+  if($siteOk && $orderOk){
+    $typeSeen[$tr['type']] = true;
+  }
+}
+foreach(stc_challan_item_type_labels() as $typeKey => $typeLabel){
+  if(isset($typeSeen[$typeKey])){
+    $type_options[] = $typeKey;
+  }
+}
+if($item_type !== '' && !in_array($item_type, $type_options, true)){
+  $item_type = '';
+}
+
 $filter_sql = '';
 if($order_number !== ''){
   $filter_sql .= " AND L.`stc_cust_super_requisition_list_order_number` = '".mysqli_real_escape_string($con, $order_number)."'";
+}
+if($item_type !== ''){
+  $filter_sql .= " AND I.`stc_cust_super_requisition_items_type` = '".mysqli_real_escape_string($con, $item_type)."'";
 }
 
 $selected_site_title = $site_label;
@@ -235,8 +295,10 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
     'pm_date' => $pm_date,
     'order_number' => $order_number,
     'site' => $site_label,
+    'item_type' => $item_type,
     'hide_extra_cols' => $hide_extra_cols,
     'order_options' => $order_options,
+    'type_options' => $type_options,
     'site_options' => array_map(function($s){ return $s['sitename']; }, $site_options),
     'rows' => $challan_rows
   ));
@@ -444,6 +506,18 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
       <a href="#" class="btn btn-success" id="stc-customer-format-btn" title="View customer format challan" style="margin-right:6px;">
         <i class="fas fa-file-alt"></i> Customer Format
       </a>
+      <div class="stc-dd" id="stc-dd-type">
+        <button type="button" class="btn stc-dd-toggle" title="Material Item Type">
+          <?php echo $item_type !== '' ? htmlspecialchars(stc_challan_item_type_label($item_type)) : 'All Types'; ?>
+        </button>
+        <input type="hidden" class="vitem-type" value="<?php echo htmlspecialchars($item_type); ?>">
+        <ul class="stc-dd-menu">
+          <li data-value="" class="<?php echo $item_type === '' ? 'is-active' : ''; ?>">All Types</li>
+          <?php foreach($type_options as $typeOpt){ ?>
+            <li data-value="<?php echo htmlspecialchars($typeOpt); ?>" class="<?php echo ($item_type === $typeOpt) ? 'is-active' : ''; ?>"><?php echo htmlspecialchars(stc_challan_item_type_label($typeOpt)); ?></li>
+          <?php } ?>
+        </ul>
+      </div>
       <div class="stc-dd" id="stc-dd-order">
         <button type="button" class="btn stc-dd-toggle" title="Order Number">
           <?php echo $order_number !== '' ? htmlspecialchars($order_number) : 'All Order Numbers'; ?>
@@ -601,19 +675,39 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
         function nl2brEsc(str){
           return escHtml(str).replace(/\r\n|\r|\n/g, '<br>');
         }
-        function challanFilterUrl(orderNo, siteLabel){
+        var typeLabels = {
+          'Consumable': 'Consumable',
+          'Tools & Tackles': 'Tools & Track',
+          'PPE': 'PPE',
+          'Supply': 'Supply'
+        };
+        function typeLabel(val){
+          return typeLabels[val] || val || 'All Types';
+        }
+        function challanFilterUrl(orderNo, siteLabel, itemType){
           var date = $('.vdate').val();
           if (typeof orderNo === 'undefined') orderNo = $('.vorder-number').val() || '';
           if (typeof siteLabel === 'undefined') siteLabel = $('.vsite').val() || '';
+          if (typeof itemType === 'undefined') itemType = $('.vitem-type').val() || '';
           var url = 'verify-challan.php?date=' + encodeURIComponent(date);
+          if (itemType) url += '&item_type=' + encodeURIComponent(itemType);
           if (orderNo) url += '&order_number=' + encodeURIComponent(orderNo);
           if (siteLabel) url += '&site=' + encodeURIComponent(siteLabel);
           return url;
         }
-        function updateBrowserUrl(orderNo, siteLabel){
+        function updateBrowserUrl(orderNo, siteLabel, itemType){
           if (window.history && window.history.pushState) {
-            window.history.pushState({challan:1}, '', challanFilterUrl(orderNo, siteLabel));
+            window.history.pushState({challan:1}, '', challanFilterUrl(orderNo, siteLabel, itemType));
           }
+        }
+        function renderTypeOptions(options, selected){
+          var html = '<li data-value="" class="'+(selected === '' ? 'is-active' : '')+'">All Types</li>';
+          (options || []).forEach(function(tp){
+            html += '<li data-value="'+escHtml(tp)+'" class="'+(selected === tp ? 'is-active' : '')+'">'+escHtml(typeLabel(tp))+'</li>';
+          });
+          $('#stc-dd-type .stc-dd-menu').html(html);
+          $('#stc-dd-type .stc-dd-toggle').text(selected !== '' ? typeLabel(selected) : 'All Types');
+          $('.vitem-type').val(selected || '');
         }
         function renderOrderOptions(options, selected){
           var html = '<li data-value="" class="'+(selected === '' ? 'is-active' : '')+'">All Order Numbers</li>';
@@ -682,19 +776,21 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
           }
           if(data.date) $('.vdate').val(data.date);
         }
-        function loadChallanRecords(orderNo, siteLabel, pushUrl){
+        function loadChallanRecords(orderNo, siteLabel, itemType, pushUrl){
           if (typeof orderNo === 'undefined') orderNo = $('.vorder-number').val() || '';
           if (typeof siteLabel === 'undefined') siteLabel = $('.vsite').val() || '';
-          if (pushUrl !== false) updateBrowserUrl(orderNo, siteLabel);
+          if (typeof itemType === 'undefined') itemType = $('.vitem-type').val() || '';
+          if (pushUrl !== false) updateBrowserUrl(orderNo, siteLabel, itemType);
           if (challanLoading) return;
           challanLoading = true;
-          var url = challanFilterUrl(orderNo, siteLabel);
+          var url = challanFilterUrl(orderNo, siteLabel, itemType);
           url += (url.indexOf('?') === -1 ? '?' : '&') + 'ajax=1';
           $('#verifyChallanTbody').css('opacity', 0.45);
           $.getJSON(url)
             .done(function(data){
               if(!data || !data.success) return;
               applyChallanMeta(data);
+              renderTypeOptions(data.type_options || [], data.item_type || '');
               renderOrderOptions(data.order_options || [], data.order_number || '');
               renderSiteOptions(data.site_options || [], data.site || '');
               renderChallanTable(data.rows || [], !!data.hide_extra_cols);
@@ -722,28 +818,36 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
           $('.stc-dd').removeClass('open');
         });
         $(document).on('click', '.stc-dd-menu', function(e){ e.stopPropagation(); });
+        $(document).on('click', '#stc-dd-type .stc-dd-menu li', function(){
+          var itemType = $(this).attr('data-value') || '';
+          $('.stc-dd').removeClass('open');
+          loadChallanRecords($('.vorder-number').val() || '', $('.vsite').val() || '', itemType, true);
+        });
         $(document).on('click', '#stc-dd-order .stc-dd-menu li', function(){
           var orderNo = $(this).attr('data-value') || '';
           var siteLabel = $('.vsite').val() || '';
+          var itemType = $('.vitem-type').val() || '';
           $('.stc-dd').removeClass('open');
-          loadChallanRecords(orderNo, siteLabel, true);
+          loadChallanRecords(orderNo, siteLabel, itemType, true);
         });
         $(document).on('click', '#stc-dd-site .stc-dd-menu li', function(){
           var siteLabel = $(this).attr('data-value') || '';
+          var itemType = $('.vitem-type').val() || '';
           $('.stc-dd').removeClass('open');
-          loadChallanRecords('', siteLabel, true);
+          loadChallanRecords('', siteLabel, itemType, true);
         });
         $('.filterbydate').on('click', function(e){
           e.preventDefault();
-          loadChallanRecords($('.vorder-number').val() || '', $('.vsite').val() || '', true);
+          loadChallanRecords($('.vorder-number').val() || '', $('.vsite').val() || '', $('.vitem-type').val() || '', true);
         });
         $(window).on('popstate', function(){
           var params = new URLSearchParams(window.location.search);
           var date = params.get('date') || $('.vdate').val();
           var orderNo = params.get('order_number') || '';
           var siteLabel = params.get('site') || '';
+          var itemType = params.get('item_type') || '';
           if(date) $('.vdate').val(date);
-          loadChallanRecords(orderNo, siteLabel, false);
+          loadChallanRecords(orderNo, siteLabel, itemType, false);
         });
 
         $('#stc-customer-format-btn').on('click', function(e){
