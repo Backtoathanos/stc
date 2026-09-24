@@ -356,7 +356,7 @@ if(isset($_GET['ppec_no'])){
                                   <td style="border:1px solid black" class="text-center">'.$_lubricationgloves.'</td>
                                   <td style="border:1px solid black" class="text-center">'.$_earmuff.'</td>
                                   <td style="border:1px solid black" class="text-center">'.$_singuard.'</td>
-                                  <td style="border:1px solid black" class="text-center"></td>
+                                  <td style="border:1px solid black" class="text-center">'.(isset($checksafetyrow['stc_safetyppec_ppes_remarks']) ? htmlspecialchars($checksafetyrow['stc_safetyppec_ppes_remarks']) : '').'</td>
                               </tr>
                         ';
                         $slgatentry++;

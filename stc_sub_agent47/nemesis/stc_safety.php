@@ -354,7 +354,89 @@ class witcher_supervisor extends tesseract{
 	}
 
 	// save ppe checklist
-	public function stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize){
+	public function stc_mark_attendance_from_tbm($emp_name, $location, $shift='', $gpno=''){
+		$emp_name = trim((string) $emp_name);
+		$location = trim((string) $location);
+		if ($emp_name === '' || $location === '' || $location === 'NA' || $location === '0') {
+			return;
+		}
+		$created_by = !empty($_SESSION['stc_agent_sub_id']) ? $_SESSION['stc_agent_sub_id'] : (isset($_SESSION['stc_agent_id']) ? $_SESSION['stc_agent_id'] : 0);
+		$today = date('Y-m-d');
+		$name_esc = mysqli_real_escape_string($this->stc_dbs, $emp_name);
+		$dup = mysqli_query($this->stc_dbs, "
+			SELECT `id` FROM `stc_epermit_enrollment`
+			WHERE DATE(`created_date`)='".$today."'
+			AND UCASE(TRIM(`emp_name`))=UCASE(TRIM('".$name_esc."'))
+			LIMIT 1
+		");
+		if ($dup && mysqli_num_rows($dup) > 0) {
+			return;
+		}
+		$emp_id = 0;
+		$empq = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_id`
+			FROM `stc_cust_pro_supervisor`
+			WHERE UCASE(TRIM(`stc_cust_pro_supervisor_fullname`))=UCASE(TRIM('".$name_esc."'))
+			LIMIT 1
+		");
+		if ($empq && ($emprow = mysqli_fetch_assoc($empq))) {
+			$emp_id = (int) $emprow['stc_cust_pro_supervisor_id'];
+		}
+		$loc_esc = mysqli_real_escape_string($this->stc_dbs, $location);
+		$dep_id = 0;
+		$depq = mysqli_query($this->stc_dbs, "
+			SELECT `stc_status_down_list_department_id`
+			FROM `stc_status_down_list_department`
+			WHERE `stc_status_down_list_department_loc_id`='".$loc_esc."'
+			LIMIT 1
+		");
+		if ($depq && ($deprow = mysqli_fetch_assoc($depq))) {
+			$dep_id = (int) $deprow['stc_status_down_list_department_id'];
+		}
+		if ($gpno === '' || $shift === '' || $shift === 'NA') {
+			$lastq = mysqli_query($this->stc_dbs, "
+				SELECT `gpno`, `shift`
+				FROM `stc_epermit_enrollment`
+				WHERE UCASE(TRIM(`emp_name`))=UCASE(TRIM('".$name_esc."'))
+				ORDER BY `id` DESC
+				LIMIT 1
+			");
+			if ($lastq && ($last = mysqli_fetch_assoc($lastq))) {
+				if ($gpno === '') {
+					$gpno = $last['gpno'];
+				}
+				if ($shift === '' || $shift === 'NA') {
+					$shift = $last['shift'];
+				}
+			}
+		}
+		if ($shift === '' || $shift === 'NA') {
+			$shift = 'E (General)';
+		}
+		mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_epermit_enrollment`(
+				`location`,
+				`dep_id`,
+				`emp_id`,
+				`emp_name`,
+				`gpno`,
+				`shift`,
+				`created_date`,
+				`created_by`
+			) VALUES (
+				'".$loc_esc."',
+				'".$dep_id."',
+				'".$emp_id."',
+				UCASE('".$name_esc."'),
+				UCASE('".mysqli_real_escape_string($this->stc_dbs, (string) $gpno)."'),
+				'".mysqli_real_escape_string($this->stc_dbs, (string) $shift)."',
+				'".date('Y-m-d H:i:s')."',
+				'".mysqli_real_escape_string($this->stc_dbs, (string) $created_by)."'
+			)
+		");
+	}
+
+	public function stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location='', $stc_shift='', $stc_gpno=''){
 		$optimusprime='';
 		$insertqry='';
 		$insertval='';
@@ -439,6 +521,14 @@ class witcher_supervisor extends tesseract{
 		$optimusprime_res=mysqli_query($this->stc_dbs, $optimusprime_qry);
 		if($optimusprime_res){
 			$optimusprime="success";
+			$location = trim((string) $stc_location);
+			if ($location === '' || $location === 'NA' || $location === '0') {
+				$locq = mysqli_query($this->stc_dbs, "SELECT `stc_safetytbm_loc_id` FROM `stc_safetytbm` WHERE `stc_safetytbm_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."' LIMIT 1");
+				if ($locq && ($locrow = mysqli_fetch_assoc($locq))) {
+					$location = (string) $locrow['stc_safetytbm_loc_id'];
+				}
+			}
+			$this->stc_mark_attendance_from_tbm($stc_emp_name, $location, $stc_shift, $stc_gpno);
 		}else{
 			$optimusprime="not success";
 		}
@@ -1553,7 +1643,7 @@ class witcher_ppec extends tesseract{
 	}
 
 	// save ppec
-	public function stc_save_ppec_ppe($stc_ppec_no, $stc_workmen, $stc_filter){
+	public function stc_save_ppec_ppe($stc_ppec_no, $stc_workmen, $stc_filter, $stc_remarks=''){
 		$optimusprime='';
 		$insertqry='';
 		$insertval='';
@@ -1644,11 +1734,13 @@ class witcher_ppec extends tesseract{
 				`stc_safetyppec_ppes_ppec_id`,
 			    `stc_safetyppec_ppes_workmen`,
 			    ".$insertqry."
+			    `stc_safetyppec_ppes_remarks`,
 			    `stc_safetyppec_ppes_created_by`
 			) VALUES (
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_ppec_no)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_workmen)."',
 				".$insertval."
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_remarks)."',
 				'".$_SESSION['stc_agent_sub_id']."'
 			)
 		";
@@ -1659,6 +1751,47 @@ class witcher_ppec extends tesseract{
 			$optimusprime="not success";
 		}
 		return $optimusprime;
+	}
+
+	public function stc_search_workmen($search){
+		$search = trim((string) $search);
+		$names = array();
+		if ($search === '') {
+			return $names;
+		}
+		$like = mysqli_real_escape_string($this->stc_dbs, $search);
+		$sql = "
+			SELECT name FROM (
+				SELECT DISTINCT TRIM(`stc_safetyppec_ppes_workmen`) AS name
+				FROM `stc_safetyppec_ppes`
+				WHERE `stc_safetyppec_ppes_workmen` <> ''
+				UNION
+				SELECT DISTINCT TRIM(`stc_safetytbm_checklist_empname`) AS name
+				FROM `stc_safetytbm_dailyfitppe_checklist`
+				WHERE `stc_safetytbm_checklist_empname` <> ''
+				UNION
+				SELECT DISTINCT TRIM(`stc_cust_pro_supervisor_fullname`) AS name
+				FROM `stc_cust_pro_supervisor`
+				WHERE `stc_cust_pro_supervisor_fullname` <> ''
+				UNION
+				SELECT DISTINCT TRIM(`emp_name`) AS name
+				FROM `stc_epermit_enrollment`
+				WHERE `emp_name` <> ''
+			) workmen_names
+			WHERE workmen_names.name LIKE '%".$like."%'
+			ORDER BY workmen_names.name ASC
+			LIMIT 25
+		";
+		$q = mysqli_query($this->stc_dbs, $sql);
+		if ($q) {
+			while ($row = mysqli_fetch_assoc($q)) {
+				$name = trim((string) $row['name']);
+				if ($name !== '') {
+					$names[] = $name;
+				}
+			}
+		}
+		return array_values(array_unique($names));
 	}
 }
 
@@ -2110,12 +2243,15 @@ if(isset($_POST['stc-safety-tbm-id'])){
 if(isset($_POST['stc_safety_savetbmppechecklist'])){
 	$stc_tbm_no=$_POST['stc_tbm_no'];
 	$stc_emp_name=$_POST['stc_emp_name'];
-	$stc_filter=$_POST['stc_filter'];
+	$stc_filter=isset($_POST['stc_filter']) && is_array($_POST['stc_filter']) ? $_POST['stc_filter'] : array();
 	$stc_uncheckedppe=isset($_POST['stc_uncheckedppe']) ? $_POST['stc_uncheckedppe'] : '';
 	$stc_uncheckedppereason=isset($_POST['stc_uncheckedppereason']) ? $_POST['stc_uncheckedppereason'] : '';
 	$stc_uncheckedppesize=isset($_POST['stc_uncheckedppesize']) ? $_POST['stc_uncheckedppesize'] : '';
+	$stc_location=isset($_POST['stc_tbm_location']) ? $_POST['stc_tbm_location'] : '';
+	$stc_shift=isset($_POST['stc_shift']) ? $_POST['stc_shift'] : '';
+	$stc_gpno=isset($_POST['stc_gpno']) ? $_POST['stc_gpno'] : '';
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize);
+	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location, $stc_shift, $stc_gpno);
 	echo $opobjsearchreq;
 }
 
@@ -2470,10 +2606,21 @@ if(isset($_POST['stc_safety_updateppec'])){
 if(isset($_POST['stc_safety_saveppecppe'])){
 	$stc_ppec_no=$_POST['stc_ppec_no'];
 	$stc_workmen=$_POST['stc_workmen'];
-	$stc_filter=$_POST['stc_filter'];
+	$stc_remarks=isset($_POST['stc_remarks']) ? $_POST['stc_remarks'] : '';
+	$stc_filter=isset($_POST['stc_filter']) && is_array($_POST['stc_filter']) ? $_POST['stc_filter'] : array();
 	$objsearchreq=new witcher_ppec();
-	$opobjsearchreq=$objsearchreq->stc_save_ppec_ppe($stc_ppec_no, $stc_workmen, $stc_filter);
+	$opobjsearchreq=$objsearchreq->stc_save_ppec_ppe($stc_ppec_no, $stc_workmen, $stc_filter, $stc_remarks);
 	echo $opobjsearchreq;
+}
+
+if(isset($_POST['stc_safety_searchworkmen'])){
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$objsearchreq = new witcher_ppec();
+	echo json_encode(array(
+		'ok' => true,
+		'names' => $objsearchreq->stc_search_workmen($search)
+	));
+	exit();
 }
 
 /*-------------------------------------For ppeck------------------------------------*/

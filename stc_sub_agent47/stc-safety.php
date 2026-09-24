@@ -72,6 +72,196 @@
       .bd-powertools-modal-lg .table {
         min-width: 980px;
       }
+      .bd-ppec-modal-lg .modal-dialog {
+        max-width: 96%;
+      }
+      .bd-ppec-modal-lg .ppec-entry-panel {
+        background: #f7f8fa;
+        border: 1px solid #e3e6ea;
+        border-radius: 6px;
+        padding: 14px 16px 16px;
+        margin-bottom: 14px;
+      }
+      .bd-ppec-modal-lg .ppec-entry-top {
+        display: grid;
+        grid-template-columns: minmax(180px, 1.1fr) minmax(220px, 1.6fr) 110px;
+        gap: 14px;
+        align-items: end;
+        margin-bottom: 14px;
+      }
+      .bd-ppec-modal-lg .stc-ppec-workmen-wrap {
+        position: relative;
+      }
+      .bd-ppec-modal-lg .stc-ppec-workmen-list {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        z-index: 20;
+        max-height: 220px;
+        overflow-y: auto;
+        margin: 2px 0 0;
+        padding: 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #d9dee6;
+        border-radius: 6px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+      }
+      .bd-ppec-modal-lg .stc-ppec-workmen-list li {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .bd-ppec-modal-lg .stc-ppec-workmen-list li:hover,
+      .bd-ppec-modal-lg .stc-ppec-workmen-list li.active {
+        background: #eef3fb;
+      }
+      .stc-emp-suggest-wrap {
+        position: relative;
+      }
+      .stc-emp-suggest-list {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        z-index: 20;
+        max-height: 220px;
+        overflow-y: auto;
+        margin: 2px 0 0;
+        padding: 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #d9dee6;
+        border-radius: 6px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+      }
+      .stc-emp-suggest-list li {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .stc-emp-suggest-list li:hover {
+        background: #eef3fb;
+      }
+      .stc-tbm-ppe-add-panel {
+        background: #f7f8fa;
+        border: 1px solid #e3e6ea;
+        border-radius: 6px;
+        padding: 14px 16px 16px;
+        margin-bottom: 14px;
+      }
+      .stc-tbm-ppe-add-top {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.4fr) 140px minmax(160px, 1fr) 110px;
+        gap: 14px;
+        align-items: end;
+        margin-bottom: 14px;
+      }
+      .stc-tbm-ppe-add-panel .form-group {
+        margin-bottom: 0;
+      }
+      .stc-tbm-ppe-add-panel label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .stc-tbm-ppe-add-btn {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .stc-tbm-ppe-check-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 10px;
+      }
+      .stc-tbm-ppe-check-grid label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 6px 10px;
+        background: #fff;
+        border: 1px solid #d9dee6;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      @media (max-width: 767px) {
+        .stc-tbm-ppe-add-top {
+          grid-template-columns: 1fr;
+        }
+      }
+      .bd-ppec-modal-lg .ppec-entry-panel .form-group {
+        margin-bottom: 0;
+      }
+      .bd-ppec-modal-lg .ppec-entry-panel label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: 6px;
+      }
+      .bd-ppec-modal-lg .ppec-check-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 10px;
+      }
+      .bd-ppec-modal-lg .ppec-check-grid label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 6px 10px;
+        background: #fff;
+        border: 1px solid #d9dee6;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        min-height: auto;
+      }
+      .bd-ppec-modal-lg .ppec-check-grid input {
+        margin: 0;
+      }
+      .bd-ppec-modal-lg .ppec-add-btn {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .bd-ppec-modal-lg .ppec-table-wrap {
+        overflow-x: auto;
+      }
+      .bd-ppec-modal-lg .ppec-table-wrap .table {
+        min-width: 1180px;
+        margin-bottom: 0;
+      }
+      .bd-ppec-modal-lg .ppec-table-wrap th,
+      .bd-ppec-modal-lg .ppec-table-wrap td {
+        font-size: 12px;
+        vertical-align: middle;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .bd-ppec-modal-lg .ppec-table-wrap th:first-child,
+      .bd-ppec-modal-lg .ppec-table-wrap td:first-child,
+      .bd-ppec-modal-lg .ppec-table-wrap th:last-child,
+      .bd-ppec-modal-lg .ppec-table-wrap td:last-child {
+        text-align: left;
+        white-space: normal;
+      }
+      @media (max-width: 767px) {
+        .bd-ppec-modal-lg .ppec-entry-top {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
 </head>
 <body>
@@ -1129,9 +1319,13 @@
                 e.preventDefault();
                 var stc_tbm_no=$('.stc-tbm-no').val();
                 var stc_tbm_location=$('#stc-tbtm-location').val();
-                var emp_name=$.trim($(this).closest('tr').find('td:eq(0)').text());
-                var filter = get_ppefilter($(this), 'checklistcb');
-                var uncheckedppe = [], uncheckedppereason = [], uncheckedppesize = []; 
+                var emp_name=$.trim($('#stc-tbtm-ppe-checklistempname').val());
+                var shift=$('#stc-tbtm-ppe-shift').val();
+                var gpno=$.trim($('#stc-tbtm-ppe-gpno').val() || $('#stc-tbtm-gatepassno').val() || '');
+                var filter = [];
+                $('.stc-tbm-ppe-add-panel .stc-tbm-ppe-cb:checked').each(function(){
+                    filter.push($(this).val());
+                });
                 if(stc_tbm_location=="NA"){
                     $('.saved-popup').remove();
                     alert("Select Location");
@@ -1139,65 +1333,54 @@
                     setTimeout(function() {
                         $('.saved-popup').toggle(700);
                     }, 5000);
-                }else{
-                    $(this).closest('tr').find('.checklistcb').each(function(){
-                        if(!$(this).prop('checked')){ 
-                            if($(this).parent().find('.uncheckedselect').val()=="Damage" || $(this).parent().find('.uncheckedselect').val()=="Not Issued"){
-                                uncheckedppe.push($(this).val()); 
-                                uncheckedppereason.push($(this).parent().find('.uncheckedselect').val());
-                                if($(this).val()=="Safety Shoes" || $(this).val()=="FR-Jacket/Trouser"){
-                                    uncheckedppesize.push($(this).parent().find('.uncheckedssize').val());
-                                }else{
-                                    uncheckedppesize.push(' ');
-                                }
-                            }
-                        } 
-                    });
-                    if(filter.length>0){
-                        var validation=0;
-                        $('.attendance-ppe-table tr').each(function(){
-                            var checkempname = $.trim($(this).find('td:eq(1)').text());
-                            if(checkempname === emp_name){
-                                validation = 1;
-                                return false;
-                            }
-                        });
-                        if(validation==0){
-                            if(confirm("Are you sure?")){
-                                $(this).closest('tr').remove();
-                                $.ajax({
-                                    url         : "nemesis/stc_safety.php",
-                                    method      : "POST",
-                                    data        : {
-                                        stc_safety_savetbmppechecklist:1,
-                                        stc_tbm_no:stc_tbm_no,
-                                        stc_emp_name:emp_name,
-                                        stc_filter:filter,
-                                        stc_uncheckedppe:uncheckedppe,
-                                        stc_uncheckedppereason:uncheckedppereason,
-                                        stc_uncheckedppesize:uncheckedppesize
-                                    },
-                                    success     : function(response_tbm){
-                                        // console.log(response_tbm);
-                                        var response=response_tbm.trim();
-                                        if(response=="success"){
-                                            alert("Record added.");
-                                            call_tbm_fields();
-                                            $('#stc-tbtm-ppe-checklistempname').val('');
-                                        }else{
-                                            alert("Something went wrong, please check and try again.");
-                                        }
-                                    }
-                                });
-                            }
-                        }else{
-                            $(this).closest('tr').remove();
-                            alert("Employee already exist.");
-                        }
-                    }else{
-                        alert("Please check ppe!!!");
-                    }
+                    return;
                 }
+                if(emp_name==''){
+                    alert("Please enter employees name!!!");
+                    return;
+                }
+                if(filter.length==0){
+                    alert("Please check ppe!!!");
+                    return;
+                }
+                var validation=0;
+                $('.attendance-ppe-table tr').each(function(){
+                    var checkempname = $.trim($(this).find('td:eq(1)').text());
+                    if(checkempname.toUpperCase() === emp_name.toUpperCase()){
+                        validation = 1;
+                        return false;
+                    }
+                });
+                if(validation==1){
+                    alert("Employee already exist.");
+                    return;
+                }
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_savetbmppechecklist:1,
+                        stc_tbm_no:stc_tbm_no,
+                        stc_emp_name:emp_name,
+                        stc_filter:filter,
+                        stc_tbm_location:stc_tbm_location,
+                        stc_shift:shift,
+                        stc_gpno:gpno
+                    },
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record added and attendance marked.");
+                            call_tbm_fields();
+                            $('#stc-tbtm-ppe-checklistempname').val('');
+                            $('#stc-tbtm-ppe-gpno').val('');
+                            $('.stc-emp-suggest-list').hide().empty();
+                            $('.stc-tbm-ppe-add-panel .stc-tbm-ppe-cb').prop('checked', true);
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
             });
 
             // filter tbm checkbox
@@ -2168,7 +2351,7 @@
                         var ppecppes=response_vhl.ppecppess;
                             
                         
-                        var ppecppes_entry_out='<tr><td colspan="22" class="text-center">Empty record</td></td>';
+                        var ppecppes_entry_out='<tr><td colspan="22" class="text-center">Empty record</td></tr>';
                         if(ppecppes.length>0){
                             ppecppes_entry_out='';
                             var sl=0;
@@ -2257,7 +2440,8 @@
                                 if(ppecppes[i].stc_safetyppec_ppes_singuard==1){
                                     singuard='<i class="fa fa-check" aria-hidden="true"></i>';
                                 }
-                                ppecppes_entry_out+='<tr><td>' + ppecppes[i].stc_safetyppec_ppes_workmen + '</td><td>' + helmet + '</td><td>' + shoes + '</td><td>' + hvjacket + '</td><td>' + safetygoggles + '</td><td>' + frjacket + '</td><td>' + earplug + '</td><td>' + cottongloves + '</td><td>' + nosemask + '</td><td>' + faceshieldcovid19 + '</td><td>' + apron + '</td><td>' + faceshield + '</td><td>' + cuttinggoogles + '</td><td>' + leathergloves + '</td><td>' + legguard + '</td><td>' + handsleeve + '</td><td>' + safetyharness + '</td><td>' + rubbergloves + '</td><td>' + lubricationgloves + '</td><td>' + earmuff + '</td><td>' + singuard + '</td></tr>';
+                                var remarks = ppecppes[i].stc_safetyppec_ppes_remarks || '';
+                                ppecppes_entry_out+='<tr><td>' + ppecppes[i].stc_safetyppec_ppes_workmen + '</td><td>' + helmet + '</td><td>' + shoes + '</td><td>' + hvjacket + '</td><td>' + safetygoggles + '</td><td>' + frjacket + '</td><td>' + earplug + '</td><td>' + cottongloves + '</td><td>' + nosemask + '</td><td>' + faceshieldcovid19 + '</td><td>' + apron + '</td><td>' + faceshield + '</td><td>' + cuttinggoogles + '</td><td>' + leathergloves + '</td><td>' + legguard + '</td><td>' + handsleeve + '</td><td>' + safetyharness + '</td><td>' + rubbergloves + '</td><td>' + lubricationgloves + '</td><td>' + earmuff + '</td><td>' + singuard + '</td><td>' + remarks + '</td></tr>';
                             }
                         }
                         $('.stc-ppec-ppes-res').html(ppecppes_entry_out);
@@ -2355,6 +2539,7 @@
                 e.preventDefault();
                 var stc_ppec_no=$('.stc-ppec-no').val();
                 var workmen=$('#stc-ppec-ppe-workmen').val();
+                var remarks=$('#stc-ppec-ppe-remarks').val();
                 var filter = get_filter('checklistppecb2');
                 if(workmen!=''){
                      $.ajax({
@@ -2364,6 +2549,7 @@
                             stc_safety_saveppecppe:1,
                             stc_ppec_no:stc_ppec_no,
                             stc_workmen:workmen,
+                            stc_remarks:remarks,
                             stc_filter:filter
                         },
                         success     : function(response_tbm){
@@ -2373,6 +2559,8 @@
                                 alert("Record added.");
                                 call_ppec_fields();
                                 $('#stc-ppec-ppe-workmen').val('');
+                                $('#stc-ppec-ppe-remarks').val('');
+                                $('.stc-ppec-workmen-list').hide().empty();
                                 $('.checklistppecb2').prop('checked', false);
                             }else{
                                 alert("Something went wrong, please check and try again.");
@@ -2394,6 +2582,57 @@
                 return filter;
             }
 
+            var workmenSearchTimer = null;
+            function hideSuggestList($list){
+                ($list && $list.length ? $list : $('.stc-ppec-workmen-list, .stc-emp-suggest-list')).hide().empty();
+            }
+            function renderSuggestList($list, names){
+                if(!names || !names.length){
+                    hideSuggestList($list);
+                    return;
+                }
+                var html = '';
+                $.each(names, function(_, name){
+                    html += '<li>'+$('<div/>').text(name).html()+'</li>';
+                });
+                $list.html(html).show();
+            }
+            function searchEmployeeNames(search, $list){
+                $.ajax({
+                    url: 'nemesis/stc_safety.php',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: { stc_safety_searchworkmen: 1, search: search },
+                    success: function(res){
+                        renderSuggestList($list, res && res.names ? res.names : []);
+                    },
+                    error: function(){
+                        hideSuggestList($list);
+                    }
+                });
+            }
+            $('body').delegate('#stc-ppec-ppe-workmen, #stc-tbtm-ppe-checklistempname', 'keyup', function(){
+                var $input = $(this);
+                var search = $.trim($input.val());
+                var $list = $input.siblings('ul');
+                clearTimeout(workmenSearchTimer);
+                if(search.length < 1){
+                    hideSuggestList($list);
+                    return;
+                }
+                workmenSearchTimer = setTimeout(function(){
+                    searchEmployeeNames(search, $list);
+                }, 250);
+            });
+            $('body').delegate('.stc-ppec-workmen-list li, .stc-emp-suggest-list li', 'click', function(){
+                $(this).closest('div').find('input[type=text]').val($(this).text());
+                hideSuggestList($(this).closest('ul'));
+            });
+            $(document).on('click', function(e){
+                if(!$(e.target).closest('.stc-ppec-workmen-wrap, .stc-emp-suggest-wrap').length){
+                    hideSuggestList();
+                }
+            });
         });
     </script>
     <script>
@@ -3673,51 +3912,42 @@
                                         <h5 class="card-title">Daily PPE and Fitness Checklist</h5>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
-                                        <h5 class="card-title">Employee's Name</h5>
-                                        <div class="position-relative form-group">
-                                            <table class="table table-bordered table-responsive">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Employee Name</th>
-                                                        <th>Helmet</th>
-                                                        <th>Nose Mask</th>
-                                                        <th>Safety Goggle</th>
-                                                        <th>Hand Gloves</th>
-                                                        <th>FR-Jacket/Trouser</th>
-                                                        <th>Safety Shoes</th>
-                                                        <th>Earplug</th>
-                                                        <th>Leg Guard</th>
-                                                        <th>Physically fit for duty</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php 
-                                                        $date=date('Y-m-d');
-                                                        $result=mysqli_query($con, "SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` WHERE DATE(`created_date`)='".$date."' AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."') ORDER BY `emp_name` ASC");
-
-                                                        if(mysqli_num_rows($result)>0){
-                                                            $i = 1;
-                                                            while($resultrow=mysqli_fetch_assoc($result)){
-                                                                echo '<tr>';
-                                                                echo '<td>'.$resultrow['emp_name'].'</td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'h" value="Safety Helmet"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'n" value="Nose Mask"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'s" value="Safety Goggle"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'hg" value="Hand Gloves"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'fj" value="FR-Jacket/Trouser"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'ss" value="Safety Shoes"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'e" value="Earplug"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'lg" value="Leg Guard"></td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'p" value="Physically fit for duty"></td>';
-                                                                echo '<td><a href="#" class="form-control stc-tbtm-ppe-checklistadd btn btn-success">Add</a></td>';
-                                                                echo '</tr>';
-                                                                $i++;
-                                                            }
-                                                        }
-                                                    ?>                                                        
-                                                </tbody>
-                                            </table>
+                                        <div class="stc-tbm-ppe-add-panel">
+                                            <div class="stc-tbm-ppe-add-top">
+                                                <div class="form-group stc-emp-suggest-wrap">
+                                                    <label>Employee Name</label>
+                                                    <input type="text" class="form-control" id="stc-tbtm-ppe-checklistempname" placeholder="Type employee name" autocomplete="off">
+                                                    <ul class="stc-emp-suggest-list"></ul>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Shift</label>
+                                                    <select class="form-control" id="stc-tbtm-ppe-shift">
+                                                        <option>A</option>
+                                                        <option>B</option>
+                                                        <option>C</option>
+                                                        <option selected>E (General)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>GP/SP No</label>
+                                                    <input type="text" class="form-control" id="stc-tbtm-ppe-gpno" placeholder="Enter GP/SP No">
+                                                </div>
+                                                <a href="#" class="btn btn-success stc-tbm-ppe-add-btn stc-tbtm-ppe-checklistadd">Add</a>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Daily PPE</label>
+                                                <div class="stc-tbm-ppe-check-grid">
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Helmet" checked> Helmet</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Nose Mask" checked> Nose Mask</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Goggle" checked> Safety Goggle</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Hand Gloves" checked> Hand Gloves</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="FR-Jacket/Trouser" checked> FR-Jacket/Trouser</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Shoes" checked> Safety Shoes</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Earplug" checked> Earplug</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Leg Guard" checked> Leg Guard</label>
+                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Physically fit for duty" checked> Physically fit for duty</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
@@ -4918,67 +5148,74 @@
                                             <input type="text" class="form-control stc-ppec-fields" id="stc-ppec-safetysup" placeholder="Enter Safety Supervisor/ Officer">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Name of Workmen</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-ppec-ppe-workmen" placeholder="Enter Name of Workmen">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="ppec-entry-panel">
+                                            <div class="ppec-entry-top">
+                                                <div class="form-group stc-ppec-workmen-wrap">
+                                                    <label>Name of Workmen</label>
+                                                    <input type="text" class="form-control" id="stc-ppec-ppe-workmen" placeholder="Type name of workmen" autocomplete="off">
+                                                    <ul class="stc-ppec-workmen-list"></ul>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Remarks</label>
+                                                    <input type="text" class="form-control" id="stc-ppec-ppe-remarks" placeholder="Enter remarks">
+                                                </div>
+                                                <a href="#" class="btn btn-success ppec-add-btn stc-ppec-ppe-add">Add</a>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Site Entry</label>
+                                                <div class="ppec-check-grid">
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Helmet"> Helmet</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Shoe"> Shoe</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="HV jacket"> HV Jacket</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="safety googles"> Safety Goggles</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="F R Jacket"> FR Jacket</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Ear plug"> Ear Plug</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Cotten gloves"> Cotton Gloves</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Mask"> Mask</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Face Shield 1"> Face Shield 1</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Apron"> Apron</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Face Shield"> Face Shield</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Cutting Gooles"> Cutting Goggles</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Leather Gloves"> Leather Gloves</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Leg Guard"> Leg Guard</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Hand Sleeve"> Hand Sleeve</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Safety Harness"> Safety Harness</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Rubber Gloves"> Rubber Gloves</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Lubrication Gloves"> Lubrication Gloves</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Ear Muff"> Ear Muff</label>
+                                                    <label><input type="checkbox" class="checklistppecb2" value="Sin Guard"> Shin Guard</label>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-12 col-xl-6">
-                                        <h5 class="card-title">Site Entry</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistppecb2" value="Helmet"> Helmet
-                                            <input type="checkbox" class="checklistppecb2" value="Shoe"> Shoe
-                                            <input type="checkbox" class="checklistppecb2" value="HV jacket"> H V jacket
-                                            <input type="checkbox" class="checklistppecb2" value="safety googles"> safety googles
-                                            <input type="checkbox" class="checklistppecb2" value="F R Jacket"> F R Jacket
-                                            <input type="checkbox" class="checklistppecb2" value="Ear plug"> Ear Plug <br>
-                                            <input type="checkbox" class="checklistppecb2" value="Cotten gloves"> Cotten gloves
-                                            <input type="checkbox" class="checklistppecb2" value="Mask"> Mask
-                                            <input type="checkbox" class="checklistppecb2" value="Face Shield 1"> Face Shield 1
-                                            <input type="checkbox" class="checklistppecb2" value="Apron"> Apron
-                                            <input type="checkbox" class="checklistppecb2" value="Face Shield"> Face Shield
-                                            <input type="checkbox" class="checklistppecb2" value="Cutting Gooles"> Cutting Googles
-                                            <input type="checkbox" class="checklistppecb2" value="Leather Gloves"> Leather Gloves
-                                            <input type="checkbox" class="checklistppecb2" value="Leg Guard"> Leg Guard
-                                            <input type="checkbox" class="checklistppecb2" value="Hand Sleeve"> Hand Sleeve
-                                            <input type="checkbox" class="checklistppecb2" value="Safety Harness"> Safety Harness
-                                            <input type="checkbox" class="checklistppecb2" value="Rubber Gloves"> Rubber Gloves
-                                            <input type="checkbox" class="checklistppecb2" value="Lubrication Gloves"> Lubrication Gloves
-                                            <input type="checkbox" class="checklistppecb2" value="Ear Muff"> Ear puff
-                                            <input type="checkbox" class="checklistppecb2" value="Sin Guard"> Sin Guard
-                                        </div>
-                                    </div>                                    
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <a href="#" class="form-control stc-ppec-ppe-add btn btn-success">Add</a>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
-                                        <div class="position-relative form-group">
-                                            <table class="table table-hover table-bordered table-responsive">
+                                        <div class="ppec-table-wrap">
+                                            <table class="table table-hover table-bordered">
                                                 <thead>
                                                     <tr>
-                                                        <td class="card-title">Name of Workmen</td>
-                                                        <td class="card-title">Helmet</td>
-                                                        <td class="card-title">Shoe</td>
-                                                        <td class="card-title">H V jacket</td>
-                                                        <td class="card-title">safety googles</td>
-                                                        <td class="card-title">F R Jacket</td>
-                                                        <td class="card-title">Ear Plug</td>
-                                                        <td class="card-title">Cotten gloves</td>
-                                                        <td class="card-title">Mask</td>
-                                                        <td class="card-title">Face Shield 1</td>
-                                                        <td class="card-title">Apron</td>
-                                                        <td class="card-title">Face Shield</td>
-                                                        <td class="card-title">Cutting Googles</td>
-                                                        <td class="card-title">Leather Gloves</td>
-                                                        <td class="card-title">Leg Guard</td>
-                                                        <td class="card-title">Hand Sleeve</td>
-                                                        <td class="card-title">Safety Harness</td>
-                                                        <td class="card-title">Rubber Gloves</td>
-                                                        <td class="card-title">Lubrication Gloves</td>
-                                                        <td class="card-title">Ear puff</td>
-                                                        <td class="card-title">Sin Guard</td>
-
+                                                        <th>Name of Workmen</th>
+                                                        <th>Helmet</th>
+                                                        <th>Shoe</th>
+                                                        <th>HV Jacket</th>
+                                                        <th>Safety Goggles</th>
+                                                        <th>FR Jacket</th>
+                                                        <th>Ear Plug</th>
+                                                        <th>Cotton Gloves</th>
+                                                        <th>Mask</th>
+                                                        <th>Face Shield 1</th>
+                                                        <th>Apron</th>
+                                                        <th>Face Shield</th>
+                                                        <th>Cutting Goggles</th>
+                                                        <th>Leather Gloves</th>
+                                                        <th>Leg Guard</th>
+                                                        <th>Hand Sleeve</th>
+                                                        <th>Safety Harness</th>
+                                                        <th>Rubber Gloves</th>
+                                                        <th>Lubrication Gloves</th>
+                                                        <th>Ear Muff</th>
+                                                        <th>Shin Guard</th>
+                                                        <th>Remarks</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="stc-ppec-ppes-res"></tbody>
