@@ -436,7 +436,7 @@ class witcher_supervisor extends tesseract{
 		");
 	}
 
-	public function stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location='', $stc_shift='', $stc_gpno=''){
+	public function stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location='', $stc_shift='', $stc_gpno='', $stc_toolboxattended='Yes'){
 		$optimusprime='';
 		$insertqry='';
 		$insertval='';
@@ -509,11 +509,13 @@ class witcher_supervisor extends tesseract{
 			INSERT INTO `stc_safetytbm_dailyfitppe_checklist`(
 				`stc_safetytbm_checklist_tbmid`,
 				`stc_safetytbm_checklist_empname`,
+				`stc_safetytbm_checklist_toolboxattended`,
 				".$insertqry."
 				`stc_safetytbm_checklist_created_by`
 			) VALUES (
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_emp_name)."',
+				'".mysqli_real_escape_string($this->stc_dbs, ($stc_toolboxattended === 'No' ? 'No' : 'Yes'))."',
 				".$insertval."
 				'".$_SESSION['stc_agent_sub_id']."'
 			)
@@ -2250,8 +2252,9 @@ if(isset($_POST['stc_safety_savetbmppechecklist'])){
 	$stc_location=isset($_POST['stc_tbm_location']) ? $_POST['stc_tbm_location'] : '';
 	$stc_shift=isset($_POST['stc_shift']) ? $_POST['stc_shift'] : '';
 	$stc_gpno=isset($_POST['stc_gpno']) ? $_POST['stc_gpno'] : '';
+	$stc_toolboxattended=isset($_POST['stc_toolboxattended']) ? $_POST['stc_toolboxattended'] : 'Yes';
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location, $stc_shift, $stc_gpno);
+	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize, $stc_location, $stc_shift, $stc_gpno, $stc_toolboxattended);
 	echo $opobjsearchreq;
 }
 

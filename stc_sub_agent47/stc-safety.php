@@ -1022,35 +1022,12 @@
                             var sl=0;
                             for(var i=0; i<tbm_ppe_checklist.length; i++){                                
                                 sl++;
-                                var hardhat='X';
-                                var SafetyGoggle='X';
-                                var NoseMask='X';
-                                var HandGloves='X';
-                                var FR_Jacket_Trouser='X';
-                                var SafetyShoes='X';
-                                var earplug='X';
-                                var legguard='X';
                                 var PhysicallyfitforDuty='X';
-                                if(tbm_ppe_checklist[i].stc_safetytbm_checklist_hardhat==1){
-                                    hardhat='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyGoggle==1){
-                                    SafetyGoggle='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_NoseMask==1){
-                                    NoseMask='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_HandGloves==1){
-                                    HandGloves='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_FR_Jacket_Trouser==1){
-                                    FR_Jacket_Trouser='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyShoes==1){
-                                    SafetyShoes='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_earplug==1){
-                                    earplug='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_legguard==1){
-                                    legguard='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_PhysicallyfitforDuty==1){
+                                if(tbm_ppe_checklist[i].stc_safetytbm_checklist_PhysicallyfitforDuty==1){
                                     PhysicallyfitforDuty='<i class="fa fa-check" aria-hidden="true"></i>';
                                 }
-                                tbm_ppe_checklist_out+='<tr><td>' + sl + '</td><td>' + tbm_ppe_checklist[i].stc_safetytbm_checklist_empname + '</td><td class="text-center">' + hardhat + '</td><td class="text-center">' + SafetyGoggle + '</td><td class="text-center">' + NoseMask + '</td><td class="text-center">' + HandGloves + '</td><td class="text-center">' + FR_Jacket_Trouser + '</td><td class="text-center">' + SafetyShoes + '</td><td class="text-center">' + earplug + '</td><td class="text-center">' + legguard + '</td><td class="text-center">' + PhysicallyfitforDuty + '</td><td class="text-center"></td></tr>';
+                                var toolboxAttended = tbm_ppe_checklist[i].stc_safetytbm_checklist_toolboxattended || '';
+                                tbm_ppe_checklist_out+='<tr><td>' + sl + '</td><td>' + tbm_ppe_checklist[i].stc_safetytbm_checklist_empname + '</td><td class="text-center">' + PhysicallyfitforDuty + '</td><td class="text-center">' + toolboxAttended + '</td><td class="text-center"></td></tr>';
                             }
                         }else{
                             tbm_ppe_checklist_out+='<tr><td>Empty record</td></td>';
@@ -1322,6 +1299,7 @@
                 var emp_name=$.trim($('#stc-tbtm-ppe-checklistempname').val());
                 var shift=$('#stc-tbtm-ppe-shift').val();
                 var gpno=$.trim($('#stc-tbtm-ppe-gpno').val() || $('#stc-tbtm-gatepassno').val() || '');
+                var toolboxattended=$('#stc-tbtm-ppe-toolboxattended').val() || 'Yes';
                 var filter = [];
                 $('.stc-tbm-ppe-add-panel .stc-tbm-ppe-cb:checked').each(function(){
                     filter.push($(this).val());
@@ -1365,7 +1343,8 @@
                         stc_filter:filter,
                         stc_tbm_location:stc_tbm_location,
                         stc_shift:shift,
-                        stc_gpno:gpno
+                        stc_gpno:gpno,
+                        stc_toolboxattended:toolboxattended
                     },
                     success     : function(response_tbm){
                         var response=response_tbm.trim();
@@ -1374,6 +1353,7 @@
                             call_tbm_fields();
                             $('#stc-tbtm-ppe-checklistempname').val('');
                             $('#stc-tbtm-ppe-gpno').val('');
+                            $('#stc-tbtm-ppe-toolboxattended').val('Yes');
                             $('.stc-emp-suggest-list').hide().empty();
                             $('.stc-tbm-ppe-add-panel .stc-tbm-ppe-cb').prop('checked', true);
                         }else{
@@ -3937,16 +3917,25 @@
                                             <div class="form-group">
                                                 <label>Daily PPE</label>
                                                 <div class="stc-tbm-ppe-check-grid">
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Helmet" checked> Helmet</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Nose Mask" checked> Nose Mask</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Goggle" checked> Safety Goggle</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Hand Gloves" checked> Hand Gloves</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="FR-Jacket/Trouser" checked> FR-Jacket/Trouser</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Shoes" checked> Safety Shoes</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Earplug" checked> Earplug</label>
-                                                    <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Leg Guard" checked> Leg Guard</label>
+                                                    <div style="display:none;">
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Helmet" checked> Helmet</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Nose Mask" checked> Nose Mask</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Goggle" checked> Safety Goggle</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Hand Gloves" checked> Hand Gloves</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="FR-Jacket/Trouser" checked> FR-Jacket/Trouser</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Safety Shoes" checked> Safety Shoes</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Earplug" checked> Earplug</label>
+                                                        <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Leg Guard" checked> Leg Guard</label>
+                                                    </div>
                                                     <label><input type="checkbox" class="checklistcb stc-tbm-ppe-cb" value="Physically fit for duty" checked> Physically fit for duty</label>
                                                 </div>
+                                            </div>
+                                            <div class="form-group" style="max-width:220px;margin-top:12px;">
+                                                <label>Tool Box Attended</label>
+                                                <select class="form-control" id="stc-tbtm-ppe-toolboxattended">
+                                                    <option value="Yes" selected>Yes</option>
+                                                    <option value="No">No</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -3956,21 +3945,14 @@
                                                 <tr>
                                                     <th class="text-center">Sl no.</th>
                                                     <th class="text-center">Employee’s Name</th>
-                                                    <th class="text-center">Helmet</th>
-                                                    <th class="text-center">Safety Goggle</th>
-                                                    <th class="text-center">Nose Mask</th>
-                                                    <th class="text-center">Hand Gloves</th>
-                                                    <th class="text-center">FR-Jacket/Trouser</th>
-                                                    <th class="text-center">Safety Shoes</th>
-                                                    <th class="text-center">Earplug</th>
-                                                    <th class="text-center">Leg Guard</th>
                                                     <th class="text-center">Physically fit for duty</th>
+                                                    <th class="text-center">Tool Box Attended</th>
                                                     <th class="text-center">Emp. Signature</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="stc-tbtm-ppe-checklist-show-table attendance-ppe-table">
                                                 <tr>
-                                                    <td colspan="6">Empty record</td>
+                                                    <td colspan="5">Empty record</td>
                                                 </tr>
                                             </tbody>
                                         </table>
