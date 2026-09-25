@@ -1769,14 +1769,14 @@ XLSX;
 						<td class="text-center">'.$slno.'</td>
 						<td>'.$row['stc_school_student_studid'].'</td>
 						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
-						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
+						<td class="text-center">'.(!empty($row['stc_school_student_dob']) && ($student_dob = strtotime((string) $row['stc_school_student_dob'])) ? date('d-m-Y', $student_dob) : '').'</td>
 						<td>'.$row['stc_school_student_gender'].'</td>
 						<td class="text-center">'.$bgroup_display($row['stc_school_student_bloodgroup']).'</td>
 						<td>'.$row['stc_school_student_email'].'</td>
 						<td>'.$row['stc_school_student_contact'].'</td>
 						<td>'.$row['stc_school_student_address'].'</td>
 						<td class="text-center">'.ucfirst(strtolower($row['stc_school_student_religion'])).'</td>
-						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_student_admissiondate'])).'</td>
+						<td class="text-center">'.(!empty($row['stc_school_student_admissiondate']) && ($student_admission = strtotime((string) $row['stc_school_student_admissiondate'])) ? date('d-m-Y', $student_admission) : '').'</td>
 						<td>'.$row['stc_school_class_title'].'</td>
 						<td>'.$row['stc_school_student_guardianname'].'</td>
 						<td>'.$row['stc_school_student_remarks'].'</td>

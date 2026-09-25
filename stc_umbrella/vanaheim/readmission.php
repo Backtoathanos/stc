@@ -182,6 +182,9 @@ class StcSchoolReadmission extends tesseract
 			$this->json_out(array('status' => 'empty', 'message' => 'Enter a valid admission amount.'));
 		}
 		$allowed_schools = array('SGMS', 'SHS', 'SIS', 'SMS');
+		if (preg_match('/^(SGMS|SHS|SIS|SMS)/i', $studid, $school_match)) {
+			$school = strtoupper($school_match[1]);
+		}
 		if (!in_array($school, $allowed_schools, true)) {
 			$this->json_out(array('status' => 'empty', 'message' => 'Select a valid school.'));
 		}
@@ -312,7 +315,9 @@ class StcSchoolReadmission extends tesseract
 		$final = $row['stc_school_readmission_final_amount'];
 		return array(
 			'id' => (int) $row['stc_school_readmission_id'],
-			'school' => (string) $row['stc_school_readmission_school'],
+			'school' => preg_match('/^(SGMS|SHS|SIS|SMS)/i', (string) $row['stc_school_readmission_studid'], $school_match)
+				? strtoupper($school_match[1])
+				: (string) $row['stc_school_readmission_school'],
 			'studid' => (string) $row['stc_school_readmission_studid'],
 			'name' => trim($row['stc_school_readmission_firstname'].' '.$row['stc_school_readmission_lastname']),
 			'contact' => (string) $row['stc_school_readmission_contact'],

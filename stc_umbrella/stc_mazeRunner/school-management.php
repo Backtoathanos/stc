@@ -201,6 +201,7 @@
                         </div>
                         <div class="stc-admit-subpane" data-pane="new"<?php echo $stc_admit_inner_tab === 'new' ? '' : ' style="display:none;"'; ?>>
                         <form id="stc-admit-form" autocomplete="off">
+                          <input type="hidden" id="stc-admit-id" value="0" />
                           <div class="card mb-4">
                             <div class="card-header"><h4 class="mb-0">Student details</h4></div>
                             <div class="card-body">
@@ -340,6 +341,7 @@
                                 </div>
                                 <div class="col-md-12">
                                   <button type="button" class="btn btn-success stc-admit-save-btn">Submit admission</button>
+                                  <button type="button" class="btn btn-default stc-admit-cancel-edit" style="display:none;">Cancel edit</button>
                                 </div>
                               </div>
                             </div>
@@ -369,10 +371,11 @@
                                       <th class="text-right">Final amount</th>
                                       <th>Status</th>
                                       <th>Created</th>
+                                      <th class="text-center">Action</th>
                                     </tr>
                                   </thead>
                                   <tbody class="stc-admit-list-body">
-                                    <tr><td colspan="9" class="text-center text-muted">Loading...</td></tr>
+                                    <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
                                   </tbody>
                                 </table>
                               </div>
@@ -2506,6 +2509,10 @@
               }
               var d = res.data || {};
               $('#stc-readmit-student-pk').val(d.student_pk || 0);
+              var schoolCode = (studid.toUpperCase().match(/^(SGMS|SHS|SIS|SMS)/) || [])[1];
+              if (schoolCode) {
+                $('#stc-readmit-school').val(schoolCode);
+              }
               $('#stc-readmit-firstname').val(d.firstname || '');
               $('#stc-readmit-lastname').val(d.lastname || '');
               $('#stc-readmit-dob').val(d.dob || '');
@@ -2641,11 +2648,11 @@
                 return;
               }
               if (res.status !== 'success') {
-                $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
+                $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
                 return;
               }
               if (!res.data || !res.data.length) {
-                $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">No admission requests yet.</td></tr>');
+                $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">No admission requests yet.</td></tr>');
                 return;
               }
               var html = '';
@@ -2660,19 +2667,82 @@
                 html += '<td class="text-right">' + stcReadmitMoney(r.final_amount) + '</td>';
                 html += '<td class="text-center">' + stcReadmitStatusBadge(r.status) + '</td>';
                 html += '<td>' + (r.created_date || '') + '</td>';
+                html += '<td class="text-center"><button type="button" class="btn btn-info btn-sm stc-admit-edit" data-id="' + r.id + '">Edit</button></td>';
                 html += '</tr>';
               });
               $('.stc-admit-list-body').html(html);
             },
             error: function() {
-              $('.stc-admit-list-body').html('<tr><td colspan="9" class="text-center text-muted">Could not reach server.</td></tr>');
+              $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">Could not reach server.</td></tr>');
             }
           });
         }
 
+        function stcAdmitResetForm() {
+          $('#stc-admit-id').val(0);
+          $('#stc-admit-form')[0].reset();
+          $('.stc-admit-save-btn').text('Submit admission');
+          $('.stc-admit-cancel-edit').hide();
+        }
+        function stcAdmitFillForm(d) {
+          $('#stc-admit-id').val(d.id || 0);
+          $('#stc-admit-school').val(d.school || 'SIS');
+          $('#stc-admit-studid').val(d.studid || '');
+          $('#stc-admit-classroom').val(d.classroomid || 0);
+          $('#stc-admit-firstname').val(d.firstname || '');
+          $('#stc-admit-lastname').val(d.lastname || '');
+          $('#stc-admit-dob').val((d.dob && d.dob !== '0000-00-00') ? d.dob : '');
+          $('.stc-admit-gender').prop('checked', false);
+          var gender = d.gender || 'Male';
+          $('.stc-admit-gender[value="' + gender + '"]').prop('checked', true);
+          if (!$('.stc-admit-gender:checked').length) {
+            $('.stc-admit-gender[value="Male"]').prop('checked', true);
+          }
+          $('#stc-admit-bloodgroup').val(d.bloodgroup || '0');
+          $('#stc-admit-email').val(d.email || '');
+          $('#stc-admit-contact').val(d.contact || '');
+          $('#stc-admit-address').val(d.address || '');
+          $('#stc-admit-religion').val(d.religion || '');
+          $('#stc-admit-admissiondate').val((d.admissiondate && d.admissiondate !== '0000-00-00') ? d.admissiondate : '');
+          $('#stc-admit-guardian').val(d.guardianname || '');
+          $('#stc-admit-student-remarks').val(d.student_remarks || '');
+          $('#stc-admit-amount').val(d.amount || '');
+          $('.stc-admit-save-btn').text('Update admission');
+          $('.stc-admit-cancel-edit').show();
+          $('html, body').animate({ scrollTop: $('#stc-admit-form').offset().top - 80 }, 300);
+        }
+        $(document).on('click', '.stc-admit-edit', function(e) {
+          e.preventDefault();
+          var id = $(this).data('id');
+          $.ajax({
+            url: '../vanaheim/admission.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: { stc_admit_get: 1, id: id },
+            success: function(res) {
+              if (!res || res.status === 'reload') {
+                window.location.reload();
+                return;
+              }
+              if (res.status !== 'success' || !res.data) {
+                stcReadmitAlert('Not found', (res && res.message) ? res.message : 'Could not open admission.', 'warning');
+                return;
+              }
+              stcAdmitFillForm(res.data);
+            },
+            error: function() {
+              stcReadmitAlert('Error', 'Could not open admission.', 'error');
+            }
+          });
+        });
+        $(document).on('click', '.stc-admit-cancel-edit', function(e) {
+          e.preventDefault();
+          stcAdmitResetForm();
+        });
         $(document).on('click', '.stc-admit-save-btn', function(e) {
           e.preventDefault();
           var $btn = $(this);
+          var editId = Number($('#stc-admit-id').val() || 0);
           var studid = ($('#stc-admit-studid').val() || '').trim();
           var firstname = ($('#stc-admit-firstname').val() || '').trim();
           var lastname = ($('#stc-admit-lastname').val() || '').trim();
@@ -2689,29 +2759,35 @@
           }
           if ($btn.prop('disabled')) return;
           $btn.prop('disabled', true);
+          var payload = {
+            school: $('#stc-admit-school').val(),
+            studid: studid,
+            firstname: firstname,
+            lastname: lastname,
+            dob: $('#stc-admit-dob').val(),
+            gender: $('.stc-admit-gender:checked').val(),
+            bloodgroup: $('#stc-admit-bloodgroup').val(),
+            email: $('#stc-admit-email').val(),
+            contact: contact,
+            address: $('#stc-admit-address').val(),
+            religion: $('#stc-admit-religion').val(),
+            admissiondate: $('#stc-admit-admissiondate').val(),
+            classroomid: $('#stc-admit-classroom').val(),
+            guardianname: guardian,
+            student_remarks: $('#stc-admit-student-remarks').val(),
+            amount: amount
+          };
+          if (editId > 0) {
+            payload.stc_admit_update = 1;
+            payload.id = editId;
+          } else {
+            payload.stc_admit_save = 1;
+          }
           $.ajax({
             url: '../vanaheim/admission.php',
             method: 'POST',
             dataType: 'JSON',
-            data: {
-              stc_admit_save: 1,
-              school: $('#stc-admit-school').val(),
-              studid: studid,
-              firstname: firstname,
-              lastname: lastname,
-              dob: $('#stc-admit-dob').val(),
-              gender: $('.stc-admit-gender:checked').val(),
-              bloodgroup: $('#stc-admit-bloodgroup').val(),
-              email: $('#stc-admit-email').val(),
-              contact: contact,
-              address: $('#stc-admit-address').val(),
-              religion: $('#stc-admit-religion').val(),
-              admissiondate: $('#stc-admit-admissiondate').val(),
-              classroomid: $('#stc-admit-classroom').val(),
-              guardianname: guardian,
-              student_remarks: $('#stc-admit-student-remarks').val(),
-              amount: amount
-            },
+            data: payload,
             success: function(res) {
               $btn.prop('disabled', false);
               if (!res || res.status === 'reload') {
@@ -2719,8 +2795,8 @@
                 return;
               }
               if (res.status === 'success') {
-                stcReadmitAlert('Submitted', res.message || 'Admission submitted.', 'success');
-                $('#stc-admit-form')[0].reset();
+                stcReadmitAlert(editId > 0 ? 'Updated' : 'Submitted', res.message || (editId > 0 ? 'Admission updated.' : 'Admission submitted.'), 'success');
+                stcAdmitResetForm();
                 load_admissions();
                 return;
               }

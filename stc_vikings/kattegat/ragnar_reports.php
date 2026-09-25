@@ -4258,7 +4258,9 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
       $bg = (string)($row['stc_school_readmission_bloodgroup'] ?? '');
       return array(
          'id' => (int)$row['stc_school_readmission_id'],
-         'school' => (string)$row['stc_school_readmission_school'],
+         'school' => preg_match('/^(SGMS|SHS|SIS|SMS)/i', (string)$row['stc_school_readmission_studid'], $school_match)
+            ? strtoupper($school_match[1])
+            : (string)$row['stc_school_readmission_school'],
          'student_pk' => (int)$row['stc_school_readmission_student_pk'],
          'studid' => (string)$row['stc_school_readmission_studid'],
          'firstname' => (string)$row['stc_school_readmission_firstname'],
@@ -4341,9 +4343,10 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
          LIMIT 300
       ");
       $rows = array();
+      $fee = new ragnarReportsSchoolStdFee();
       if($qry){
          while($row = mysqli_fetch_assoc($qry)){
-            $rows[] = $this->map_row($row);
+            $rows[] = $fee->attach($this->map_row($row));
          }
       }
       return array('status' => 'success', 'data' => $rows);
@@ -4355,7 +4358,8 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
       if(!$row){
          return array('status' => 'notfound', 'message' => 'Readmission not found.');
       }
-      return array('status' => 'success', 'data' => $this->map_row($row));
+      $fee = new ragnarReportsSchoolStdFee();
+      return array('status' => 'success', 'data' => $fee->attach($this->map_row($row)));
    }
 
    private function apply_student($row){
@@ -4627,9 +4631,10 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
          LIMIT 300
       ");
       $rows = array();
+      $fee = new ragnarReportsSchoolStdFee();
       if($qry){
          while($row = mysqli_fetch_assoc($qry)){
-            $rows[] = $this->map_row($row);
+            $rows[] = $fee->attach($this->map_row($row));
          }
       }
       return array('status' => 'success', 'data' => $rows);
@@ -4641,7 +4646,8 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
       if(!$row){
          return array('status' => 'notfound', 'message' => 'Admission not found.');
       }
-      return array('status' => 'success', 'data' => $this->map_row($row));
+      $fee = new ragnarReportsSchoolStdFee();
+      return array('status' => 'success', 'data' => $fee->attach($this->map_row($row)));
    }
 
    private function apply_student($row){
@@ -5589,6 +5595,235 @@ if(isset($_POST['stc_school_fee_add_monthly_target'])){
    echo $out;
 }
 
+class ragnarReportsSchoolStdFee extends tesseract{
+   private $cache = null;
+
+   private function esc($value){
+      return mysqli_real_escape_string($this->stc_dbs, (string)$value);
+   }
+
+   public function ensure_table(){
+      mysqli_query($this->stc_dbs, "
+         CREATE TABLE IF NOT EXISTS `stc_school_std_fee` (
+            `stc_school_std_fee_id` int(11) NOT NULL AUTO_INCREMENT,
+            `stc_school_std_fee_school` varchar(20) NOT NULL DEFAULT '',
+            `stc_school_std_fee_class` varchar(80) NOT NULL DEFAULT '',
+            `stc_school_std_fee_classroomid` int(11) NOT NULL DEFAULT 0,
+            `stc_school_std_fee_admission` decimal(12,2) NOT NULL DEFAULT 0.00,
+            `stc_school_std_fee_readmission` decimal(12,2) NOT NULL DEFAULT 0.00,
+            `stc_school_std_fee_tuition` decimal(12,2) NOT NULL DEFAULT 0.00,
+            `stc_school_std_fee_updated_by` int(11) NOT NULL DEFAULT 0,
+            `stc_school_std_fee_updated_date` datetime DEFAULT NULL,
+            PRIMARY KEY (`stc_school_std_fee_id`),
+            UNIQUE KEY `school_class` (`stc_school_std_fee_school`,`stc_school_std_fee_class`)
+         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      ");
+      $this->seed_if_empty();
+   }
+
+   private function seed_if_empty(){
+      $chk = mysqli_query($this->stc_dbs, "SELECT `stc_school_std_fee_id` FROM `stc_school_std_fee` LIMIT 1");
+      if($chk && mysqli_num_rows($chk) > 0){
+         return;
+      }
+      $seed = array(
+         array('SGMS', 'V', 45000, 8200, 5500),
+         array('SGMS', 'VI', 40000, 8200, 6000),
+         array('SGMS', 'VII', 35000, 8200, 6500),
+         array('SGMS', 'VIII', 30000, 8200, 7000),
+         array('SGMS', 'IX, X', 25000, 8200, 7500),
+         array('SGMS', 'XI, XII (Arts)', 25000, 12500, 8000),
+         array('SGMS', 'XI, XII (Sci)', 25000, 12500, 8000)
+      );
+      foreach($seed as $row){
+         mysqli_query($this->stc_dbs, "
+            INSERT IGNORE INTO `stc_school_std_fee`(
+               `stc_school_std_fee_school`, `stc_school_std_fee_class`,
+               `stc_school_std_fee_admission`, `stc_school_std_fee_readmission`, `stc_school_std_fee_tuition`
+            ) VALUES (
+               '".$this->esc($row[0])."', '".$this->esc($row[1])."',
+               '".$this->esc(number_format($row[2], 2, '.', ''))."',
+               '".$this->esc(number_format($row[3], 2, '.', ''))."',
+               '".$this->esc(number_format($row[4], 2, '.', ''))."'
+            )
+         ");
+      }
+   }
+
+   private function map_row($row){
+      return array(
+         'id' => (int)$row['stc_school_std_fee_id'],
+         'school' => (string)$row['stc_school_std_fee_school'],
+         'classroom' => (string)$row['stc_school_std_fee_class'],
+         'classroomid' => (int)$row['stc_school_std_fee_classroomid'],
+         'admission' => (float)$row['stc_school_std_fee_admission'],
+         'readmission' => (float)$row['stc_school_std_fee_readmission'],
+         'tuition' => (float)$row['stc_school_std_fee_tuition']
+      );
+   }
+
+   public function all_rows(){
+      $this->ensure_table();
+      if($this->cache !== null){
+         return $this->cache;
+      }
+      $rows = array();
+      $qry = mysqli_query($this->stc_dbs, "
+         SELECT * FROM `stc_school_std_fee`
+         ORDER BY `stc_school_std_fee_school` ASC, `stc_school_std_fee_id` ASC
+      ");
+      if($qry){
+         while($row = mysqli_fetch_assoc($qry)){
+            $rows[] = $this->map_row($row);
+         }
+      }
+      $this->cache = $rows;
+      return $rows;
+   }
+
+   public function stc_list($school = ''){
+      $rows = $this->all_rows();
+      $school = strtoupper(trim((string)$school));
+      if($school !== '' && $school !== 'ALL'){
+         $rows = array_values(array_filter($rows, function($r) use ($school){
+            return strtoupper($r['school']) === $school;
+         }));
+      }
+      return array('status' => 'success', 'data' => $rows);
+   }
+
+   public function stc_classes(){
+      $out = array();
+      $qry = mysqli_query($this->stc_dbs, "
+         SELECT `stc_school_class_id`, `stc_school_class_title`
+         FROM `stc_school_class`
+         ORDER BY `stc_school_class_title` ASC
+      ");
+      if($qry){
+         while($row = mysqli_fetch_assoc($qry)){
+            $out[] = array(
+               'id' => (int)$row['stc_school_class_id'],
+               'title' => (string)$row['stc_school_class_title']
+            );
+         }
+      }
+      return array('status' => 'success', 'data' => $out);
+   }
+
+   public function stc_save($id, $school, $classroom, $classroomid, $admission, $readmission, $tuition){
+      $this->ensure_table();
+      $school = strtoupper(trim((string)$school));
+      $classroom = trim((string)$classroom);
+      $classroomid = (int)$classroomid;
+      $admission = (float)$admission;
+      $readmission = (float)$readmission;
+      $tuition = (float)$tuition;
+      $allowed = array('SGMS', 'SHS', 'SIS', 'SMS');
+      if(!in_array($school, $allowed, true) || $classroom === ''){
+         return array('status' => 'empty', 'message' => 'Select school and class.');
+      }
+      $now = date('Y-m-d H:i:s');
+      $by = (int)($_SESSION['stc_empl_id'] ?? 0);
+      $id = (int)$id;
+      if($id > 0){
+         $ok = mysqli_query($this->stc_dbs, "
+            UPDATE `stc_school_std_fee` SET
+               `stc_school_std_fee_school`='".$this->esc($school)."',
+               `stc_school_std_fee_class`='".$this->esc($classroom)."',
+               `stc_school_std_fee_classroomid`='".$classroomid."',
+               `stc_school_std_fee_admission`='".$this->esc(number_format($admission, 2, '.', ''))."',
+               `stc_school_std_fee_readmission`='".$this->esc(number_format($readmission, 2, '.', ''))."',
+               `stc_school_std_fee_tuition`='".$this->esc(number_format($tuition, 2, '.', ''))."',
+               `stc_school_std_fee_updated_by`='".$by."',
+               `stc_school_std_fee_updated_date`='".$this->esc($now)."'
+            WHERE `stc_school_std_fee_id`='".$id."'
+         ");
+      } else {
+         $ok = mysqli_query($this->stc_dbs, "
+            INSERT INTO `stc_school_std_fee`(
+               `stc_school_std_fee_school`, `stc_school_std_fee_class`, `stc_school_std_fee_classroomid`,
+               `stc_school_std_fee_admission`, `stc_school_std_fee_readmission`, `stc_school_std_fee_tuition`,
+               `stc_school_std_fee_updated_by`, `stc_school_std_fee_updated_date`
+            ) VALUES (
+               '".$this->esc($school)."', '".$this->esc($classroom)."', '".$classroomid."',
+               '".$this->esc(number_format($admission, 2, '.', ''))."',
+               '".$this->esc(number_format($readmission, 2, '.', ''))."',
+               '".$this->esc(number_format($tuition, 2, '.', ''))."',
+               '".$by."', '".$this->esc($now)."'
+            )
+            ON DUPLICATE KEY UPDATE
+               `stc_school_std_fee_classroomid`=VALUES(`stc_school_std_fee_classroomid`),
+               `stc_school_std_fee_admission`=VALUES(`stc_school_std_fee_admission`),
+               `stc_school_std_fee_readmission`=VALUES(`stc_school_std_fee_readmission`),
+               `stc_school_std_fee_tuition`=VALUES(`stc_school_std_fee_tuition`),
+               `stc_school_std_fee_updated_by`=VALUES(`stc_school_std_fee_updated_by`),
+               `stc_school_std_fee_updated_date`=VALUES(`stc_school_std_fee_updated_date`)
+         ");
+      }
+      if(!$ok){
+         return array('status' => 'wrong', 'message' => 'Could not save charges.');
+      }
+      $this->cache = null;
+      return array('status' => 'success', 'message' => 'Charges saved.');
+   }
+
+   public function stc_delete($id){
+      $this->ensure_table();
+      $id = (int)$id;
+      if($id <= 0){
+         return array('status' => 'empty', 'message' => 'Select a charge row.');
+      }
+      mysqli_query($this->stc_dbs, "DELETE FROM `stc_school_std_fee` WHERE `stc_school_std_fee_id`='".$id."'");
+      $this->cache = null;
+      return array('status' => 'success', 'message' => 'Charge removed.');
+   }
+
+   private function norm($value){
+      $value = strtolower(trim((string)$value));
+      $value = preg_replace('/\bclass\b/', '', $value);
+      $value = preg_replace('/[^a-z0-9]+/', '', $value);
+      return $value;
+   }
+
+   public function lookup($school, $classroomid, $classroom){
+      $school = strtoupper(trim((string)$school));
+      $classroomid = (int)$classroomid;
+      $classNorm = $this->norm($classroom);
+      $empty = array('admission' => null, 'readmission' => null, 'tuition' => null);
+      if($school === ''){
+         return $empty;
+      }
+      foreach($this->all_rows() as $row){
+         if(strtoupper($row['school']) !== $school){
+            continue;
+         }
+         if($classroomid > 0 && (int)$row['classroomid'] === $classroomid){
+            return $row;
+         }
+         $feeNorm = $this->norm($row['classroom']);
+         if($classNorm !== '' && $feeNorm !== '' && ($classNorm === $feeNorm || strpos($classNorm, $feeNorm) !== false || strpos($feeNorm, $classNorm) !== false)){
+            return $row;
+         }
+         $tokens = preg_split('/[,\s\/]+/', strtolower($row['classroom']));
+         foreach($tokens as $token){
+            $token = $this->norm($token);
+            if($token !== '' && $classNorm !== '' && ($token === $classNorm || strpos($classNorm, $token) !== false)){
+               return $row;
+            }
+         }
+      }
+      return $empty;
+   }
+
+   public function attach($row){
+      $hit = $this->lookup($row['school'] ?? '', $row['classroomid'] ?? 0, $row['classroom'] ?? '');
+      $row['std_admission_fee'] = $hit['admission'];
+      $row['std_readmission_fee'] = $hit['readmission'];
+      $row['std_tuition_fee'] = $hit['tuition'];
+      return $row;
+   }
+}
+
 if(isset($_POST['stc_school_readmission_list'])){
    $obj = new ragnarReportsViewSchoolReadmission();
    echo json_encode($obj->stc_list($_POST['status'] ?? 'all', $_POST['search'] ?? ''));
@@ -5627,5 +5862,33 @@ if(isset($_POST['stc_school_admission_decide'])){
       $_POST['final_amount'] ?? 0,
       $_POST['boss_remarks'] ?? ''
    ));
+}
+
+if(isset($_POST['stc_school_std_fee_list'])){
+   $obj = new ragnarReportsSchoolStdFee();
+   echo json_encode($obj->stc_list($_POST['school'] ?? 'all'));
+}
+
+if(isset($_POST['stc_school_std_fee_classes'])){
+   $obj = new ragnarReportsSchoolStdFee();
+   echo json_encode($obj->stc_classes());
+}
+
+if(isset($_POST['stc_school_std_fee_save'])){
+   $obj = new ragnarReportsSchoolStdFee();
+   echo json_encode($obj->stc_save(
+      $_POST['id'] ?? 0,
+      $_POST['school'] ?? '',
+      $_POST['classroom'] ?? '',
+      $_POST['classroomid'] ?? 0,
+      $_POST['admission'] ?? 0,
+      $_POST['readmission'] ?? 0,
+      $_POST['tuition'] ?? 0
+   ));
+}
+
+if(isset($_POST['stc_school_std_fee_delete'])){
+   $obj = new ragnarReportsSchoolStdFee();
+   echo json_encode($obj->stc_delete($_POST['id'] ?? 0));
 }
 ?>

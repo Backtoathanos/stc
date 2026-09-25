@@ -1612,6 +1612,9 @@ STCAuthHelper::checkAuth();?>
                                                 <span style="display:inline-block;padding:3px 12px;background:#d9edf7;margin-right:8px;border:1px solid #bcdff1;">New</span>
                                                 <span style="display:inline-block;padding:3px 12px;background:#fff3cd;border:1px solid #f0e0a8;">Readmission</span>
                                             </p>
+                                            <p class="text-center" style="margin:10px 0 0;">
+                                                <button type="button" class="btn btn-primary stc-std-fee-open">Add / Update Charges</button>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="col-md-2 col-sm-12">
@@ -1660,6 +1663,9 @@ STCAuthHelper::checkAuth();?>
                                                             <th>Name</th>
                                                             <th>Class</th>
                                                             <th>Last status</th>
+                                                            <th class="text-right">New Admission Fee</th>
+                                                            <th class="text-right">Re-Admission Fee</th>
+                                                            <th class="text-right">Tuition Fee</th>
                                                             <th class="text-right">Proposed amount</th>
                                                             <th class="text-right">Final amount</th>
                                                             <th>Status</th>
@@ -1669,7 +1675,7 @@ STCAuthHelper::checkAuth();?>
                                                         </tr>
                                                     </thead>
                                                     <tbody class="stc-admit-report-body">
-                                                        <tr><td colspan="13" class="text-center text-muted">Click Find to load admissions.</td></tr>
+                                                        <tr><td colspan="16" class="text-center text-muted">Click Find to load admissions.</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -2602,7 +2608,7 @@ STCAuthHelper::checkAuth();?>
             }
             function renderSchoolAdmitRows(rows){
                 if(!rows.length){
-                    $('.stc-admit-report-body').html('<tr><td colspan="13" class="text-center text-muted">No admission requests found.</td></tr>');
+                    $('.stc-admit-report-body').html('<tr><td colspan="16" class="text-center text-muted">No admission requests found.</td></tr>');
                     return;
                 }
                 var html = '';
@@ -2621,6 +2627,9 @@ STCAuthHelper::checkAuth();?>
                     html += '<td>'+(r.name||'')+'</td>';
                     html += '<td>'+(r.classroom||'—')+'</td>';
                     html += '<td>'+(r.last_status||'—')+'</td>';
+                    html += '<td class="text-right">'+stcReadmitMoney(r.std_admission_fee)+'</td>';
+                    html += '<td class="text-right">'+stcReadmitMoney(r.std_readmission_fee)+'</td>';
+                    html += '<td class="text-right">'+stcReadmitMoney(r.std_tuition_fee)+'</td>';
                     html += '<td class="text-right">'+stcReadmitMoney(r.amount)+'</td>';
                     html += '<td class="text-right">'+stcReadmitMoney(r.final_amount)+'</td>';
                     html += '<td class="text-center">'+stcReadmitBadge(r.status)+'</td>';
@@ -2635,7 +2644,7 @@ STCAuthHelper::checkAuth();?>
                 var status = $('.stc-admit-filter-status').val();
                 var search = $('.stc-admit-filter-search').val();
                 var kind = $('.stc-admit-filter-kind').val() || 'all';
-                $('.stc-admit-report-body').html('<tr><td colspan="13" class="text-center text-muted">Loading...</td></tr>');
+                $('.stc-admit-report-body').html('<tr><td colspan="16" class="text-center text-muted">Loading...</td></tr>');
                 var pending = 2;
                 var newRows = [];
                 var reRows = [];
@@ -2802,6 +2811,119 @@ STCAuthHelper::checkAuth();?>
             $('body').delegate('.stc-admit-find', 'click', function(e){
                 e.preventDefault();
                 loadSchoolAdmissions();
+            });
+            function stcStdFeeResetForm(){
+                $('.stc-std-fee-id').val(0);
+                $('.stc-std-fee-school').val('SGMS');
+                $('.stc-std-fee-class').val('');
+                $('.stc-std-fee-classid').val(0);
+                $('.stc-std-fee-admission').val('');
+                $('.stc-std-fee-readmission').val('');
+                $('.stc-std-fee-tuition').val('');
+            }
+            function loadStdFeeRows(){
+                var school = $('.stc-std-fee-filter-school').val() || 'all';
+                $('.stc-std-fee-body').html('<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>');
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: { stc_school_std_fee_list: 1, school: school },
+                    success: function(res){
+                        var rows = (res && res.data) ? res.data : [];
+                        if(!rows.length){
+                            $('.stc-std-fee-body').html('<tr><td colspan="6" class="text-center text-muted">No charges yet. Add a class fee.</td></tr>');
+                            return;
+                        }
+                        var html = '';
+                        rows.forEach(function(r){
+                            html += '<tr>';
+                            html += '<td>'+(r.school||'')+'</td>';
+                            html += '<td>'+(r.classroom||'')+'</td>';
+                            html += '<td class="text-right">'+stcReadmitMoney(r.admission)+'</td>';
+                            html += '<td class="text-right">'+stcReadmitMoney(r.readmission)+'</td>';
+                            html += '<td class="text-right">'+stcReadmitMoney(r.tuition)+'</td>';
+                            html += '<td class="text-center">';
+                            html += '<button type="button" class="btn btn-info btn-xs stc-std-fee-edit" data-id="'+r.id+'" data-school="'+(r.school||'')+'" data-class="'+(r.classroom||'')+'" data-classid="'+(r.classroomid||0)+'" data-admission="'+r.admission+'" data-readmission="'+r.readmission+'" data-tuition="'+r.tuition+'">Edit</button> ';
+                            html += '<button type="button" class="btn btn-danger btn-xs stc-std-fee-del" data-id="'+r.id+'">Delete</button>';
+                            html += '</td></tr>';
+                        });
+                        $('.stc-std-fee-body').html(html);
+                    },
+                    error: function(){
+                        $('.stc-std-fee-body').html('<tr><td colspan="6" class="text-center text-danger">Could not load charges.</td></tr>');
+                    }
+                });
+            }
+            $('body').delegate('.stc-std-fee-open', 'click', function(e){
+                e.preventDefault();
+                stcStdFeeResetForm();
+                loadStdFeeRows();
+                $('.stc-school-std-fee-modal').modal('show');
+            });
+            $('body').delegate('.stc-std-fee-filter-school', 'change', function(){
+                loadStdFeeRows();
+            });
+            $('body').delegate('.stc-std-fee-edit', 'click', function(){
+                $('.stc-std-fee-id').val($(this).data('id'));
+                $('.stc-std-fee-school').val($(this).data('school'));
+                $('.stc-std-fee-class').val($(this).data('class'));
+                $('.stc-std-fee-classid').val($(this).data('classid') || 0);
+                $('.stc-std-fee-admission').val($(this).data('admission'));
+                $('.stc-std-fee-readmission').val($(this).data('readmission'));
+                $('.stc-std-fee-tuition').val($(this).data('tuition'));
+            });
+            $('body').delegate('.stc-std-fee-reset', 'click', function(e){
+                e.preventDefault();
+                stcStdFeeResetForm();
+            });
+            $('body').delegate('.stc-std-fee-save', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: {
+                        stc_school_std_fee_save: 1,
+                        id: $('.stc-std-fee-id').val(),
+                        school: $('.stc-std-fee-school').val(),
+                        classroom: $('.stc-std-fee-class').val(),
+                        classroomid: $('.stc-std-fee-classid').val() || 0,
+                        admission: $('.stc-std-fee-admission').val(),
+                        readmission: $('.stc-std-fee-readmission').val(),
+                        tuition: $('.stc-std-fee-tuition').val()
+                    },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not save charges.');
+                            return;
+                        }
+                        stcStdFeeResetForm();
+                        loadStdFeeRows();
+                        loadSchoolAdmissions();
+                    },
+                    error: function(){
+                        alert('Could not save charges.');
+                    }
+                });
+            });
+            $('body').delegate('.stc-std-fee-del', 'click', function(e){
+                e.preventDefault();
+                if(!confirm('Delete this charge row?')) return;
+                $.ajax({
+                    url: 'kattegat/ragnar_reports.php',
+                    method: 'post',
+                    dataType: 'JSON',
+                    data: { stc_school_std_fee_delete: 1, id: $(this).data('id') },
+                    success: function(res){
+                        if(!res || res.status !== 'success'){
+                            alert((res && res.message) ? res.message : 'Could not delete.');
+                            return;
+                        }
+                        loadStdFeeRows();
+                        loadSchoolAdmissions();
+                    }
+                });
             });
             $('body').delegate('.stc-admit-open', 'click', function(e){
                 e.preventDefault();
@@ -3813,6 +3935,84 @@ STCAuthHelper::checkAuth();?>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger stc-readmit-reject">Reject</button>
         <button type="button" class="btn btn-success stc-readmit-accept">Accept &amp; lock amount</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade stc-school-std-fee-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">School class charges</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" class="stc-std-fee-id" value="0">
+        <input type="hidden" class="stc-std-fee-classid" value="0">
+        <div class="row">
+          <div class="col-md-3">
+            <span>School</span>
+            <select class="form-control stc-std-fee-school">
+              <option value="SGMS">SGMS</option>
+              <option value="SHS">SHS</option>
+              <option value="SIS">SIS</option>
+              <option value="SMS">SMS</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <span>Class</span>
+            <input type="text" class="form-control stc-std-fee-class" placeholder="V / IX, X / XI, XII (Sci)">
+          </div>
+          <div class="col-md-2">
+            <span>Admission Fee</span>
+            <input type="number" min="0" step="0.01" class="form-control stc-std-fee-admission" placeholder="Yearly">
+          </div>
+          <div class="col-md-2">
+            <span>Re-Admission Fee</span>
+            <input type="number" min="0" step="0.01" class="form-control stc-std-fee-readmission" placeholder="Yearly">
+          </div>
+          <div class="col-md-2">
+            <span>Tuition Fee</span>
+            <input type="number" min="0" step="0.01" class="form-control stc-std-fee-tuition" placeholder="Monthly">
+          </div>
+          <div class="col-md-12" style="margin-top:10px;">
+            <button type="button" class="btn btn-success stc-std-fee-save">Save charges</button>
+            <button type="button" class="btn btn-default stc-std-fee-reset">New row</button>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-3">
+            <span>Show school</span>
+            <select class="form-control stc-std-fee-filter-school">
+              <option value="all">All</option>
+              <option value="SGMS">SGMS</option>
+              <option value="SHS">SHS</option>
+              <option value="SIS">SIS</option>
+              <option value="SMS">SMS</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive" style="margin-top:10px;">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>Class</th>
+                <th class="text-right">Admission Fee</th>
+                <th class="text-right">Re-Admission Fee</th>
+                <th class="text-right">Tuition Fee</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody class="stc-std-fee-body">
+              <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>

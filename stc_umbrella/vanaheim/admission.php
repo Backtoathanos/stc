@@ -232,21 +232,169 @@ class StcSchoolAdmission extends tesseract
 			'id' => (int) $row['stc_school_admission_id'],
 			'school' => (string) $row['stc_school_admission_school'],
 			'studid' => (string) $row['stc_school_admission_studid'],
+			'firstname' => (string) $row['stc_school_admission_firstname'],
+			'lastname' => (string) $row['stc_school_admission_lastname'],
 			'name' => trim($row['stc_school_admission_firstname'].' '.$row['stc_school_admission_lastname']),
+			'dob' => (string) $row['stc_school_admission_dob'],
+			'gender' => (string) $row['stc_school_admission_gender'],
+			'bloodgroup' => (string) $row['stc_school_admission_bloodgroup'],
+			'email' => (string) $row['stc_school_admission_email'],
 			'contact' => (string) $row['stc_school_admission_contact'],
+			'address' => (string) $row['stc_school_admission_address'],
+			'religion' => (string) $row['stc_school_admission_religion'],
+			'admissiondate' => (string) $row['stc_school_admission_admissiondate'],
+			'classroomid' => (int) $row['stc_school_admission_classroomid'],
 			'classroom' => (string) ($row['stc_school_class_title'] ?? ''),
+			'guardianname' => (string) $row['stc_school_admission_guardianname'],
+			'student_remarks' => (string) $row['stc_school_admission_student_remarks'],
 			'amount' => (float) $row['stc_school_admission_amount'],
 			'final_amount' => $final === null || $final === '' ? null : (float) $final,
 			'status' => $status,
+			'student_pk' => (int) $row['stc_school_admission_student_pk'],
 			'created_by' => (string) ($row['stc_school_user_fullName'] ?? ''),
 			'created_date' => (string) $row['stc_school_admission_created_date'],
 		);
+	}
+
+	public function get($id)
+	{
+		$this->require_school_user();
+		$this->ensure_table();
+		$id = (int) $id;
+		$qry = mysqli_query($this->stc_dbs, "
+			SELECT
+				r.*,
+				c.`stc_school_class_title`,
+				u.`stc_school_user_fullName`
+			FROM `stc_school_admission` r
+			LEFT JOIN `stc_school_class` c ON c.`stc_school_class_id` = r.`stc_school_admission_classroomid`
+			LEFT JOIN `stc_school` u ON u.`stc_school_user_id` = r.`stc_school_admission_created_by`
+			WHERE r.`stc_school_admission_id`='".$id."'
+			LIMIT 1
+		");
+		if (!$qry || mysqli_num_rows($qry) < 1) {
+			$this->json_out(array('status' => 'notfound', 'message' => 'Admission not found.'));
+		}
+		$this->json_out(array('status' => 'success', 'data' => $this->map_row(mysqli_fetch_assoc($qry))));
+	}
+
+	public function update($p)
+	{
+		$this->require_school_user();
+		$this->ensure_table();
+		$id = (int) ($p['id'] ?? 0);
+		if ($id <= 0) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Select an admission to edit.'));
+		}
+		$cur = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_school_admission`
+			WHERE `stc_school_admission_id`='".$id."'
+			LIMIT 1
+		");
+		if (!$cur || mysqli_num_rows($cur) < 1) {
+			$this->json_out(array('status' => 'notfound', 'message' => 'Admission not found.'));
+		}
+		$old = mysqli_fetch_assoc($cur);
+
+		$school = trim((string) ($p['school'] ?? ''));
+		$studid = trim((string) ($p['studid'] ?? ''));
+		$firstname = trim((string) ($p['firstname'] ?? ''));
+		$lastname = trim((string) ($p['lastname'] ?? ''));
+		$dob = $this->null_date($p['dob'] ?? '');
+		$gender = trim((string) ($p['gender'] ?? ''));
+		$bloodgroup = trim((string) ($p['bloodgroup'] ?? ''));
+		$email = trim((string) ($p['email'] ?? ''));
+		$contact = trim((string) ($p['contact'] ?? ''));
+		$address = trim((string) ($p['address'] ?? ''));
+		$religion = trim((string) ($p['religion'] ?? ''));
+		$admissiondate = $this->null_date($p['admissiondate'] ?? '');
+		$classroomid = (int) ($p['classroomid'] ?? 0);
+		$guardianname = trim((string) ($p['guardianname'] ?? ''));
+		$student_remarks = trim((string) ($p['student_remarks'] ?? ''));
+		$amount = (float) ($p['amount'] ?? 0);
+
+		if ($school === '' || $studid === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '') {
+			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, student ID, name, contact, guardian and admission amount.'));
+		}
+		if ($amount <= 0) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Enter a valid admission amount.'));
+		}
+		$allowed_schools = array('SGMS', 'SHS', 'SIS', 'SMS');
+		if (!in_array($school, $allowed_schools, true)) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Select a valid school.'));
+		}
+
+		$dup = mysqli_query($this->stc_dbs, "
+			SELECT `stc_school_admission_id`
+			FROM `stc_school_admission`
+			WHERE `stc_school_admission_studid`='".$this->esc($studid)."'
+			  AND `stc_school_admission_id`<>'".$id."'
+			  AND `stc_school_admission_status`='pending'
+			LIMIT 1
+		");
+		if ($dup && mysqli_num_rows($dup) > 0) {
+			$this->json_out(array('status' => 'duplicate', 'message' => 'Another pending admission already uses this student ID.'));
+		}
+
+		$ok = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_school_admission` SET
+				`stc_school_admission_school`='".$this->esc($school)."',
+				`stc_school_admission_studid`='".$this->esc($studid)."',
+				`stc_school_admission_firstname`='".$this->esc($firstname)."',
+				`stc_school_admission_lastname`='".$this->esc($lastname)."',
+				`stc_school_admission_dob`=".$this->sql_date($dob).",
+				`stc_school_admission_gender`='".$this->esc($gender)."',
+				`stc_school_admission_bloodgroup`='".$this->esc($bloodgroup)."',
+				`stc_school_admission_email`='".$this->esc($email)."',
+				`stc_school_admission_contact`='".$this->esc($contact)."',
+				`stc_school_admission_address`='".$this->esc($address)."',
+				`stc_school_admission_religion`='".$this->esc($religion)."',
+				`stc_school_admission_admissiondate`=".$this->sql_date($admissiondate).",
+				`stc_school_admission_classroomid`='".$classroomid."',
+				`stc_school_admission_guardianname`='".$this->esc($guardianname)."',
+				`stc_school_admission_student_remarks`='".$this->esc($student_remarks)."',
+				`stc_school_admission_amount`='".$this->esc(number_format($amount, 2, '.', ''))."'
+			WHERE `stc_school_admission_id`='".$id."'
+		");
+		if (!$ok) {
+			$this->json_out(array('status' => 'wrong', 'message' => 'Could not update admission.'));
+		}
+
+		$pk = (int) $old['stc_school_admission_student_pk'];
+		if ($pk > 0 && (string) $old['stc_school_admission_status'] === 'accepted') {
+			mysqli_query($this->stc_dbs, "
+				UPDATE `stc_school_student` SET
+					`stc_school_student_studid`='".$this->esc($studid)."',
+					`stc_school_student_firstname`='".$this->esc($firstname)."',
+					`stc_school_student_lastname`='".$this->esc($lastname)."',
+					`stc_school_student_dob`=".$this->sql_date($dob).",
+					`stc_school_student_gender`='".$this->esc($gender)."',
+					`stc_school_student_bloodgroup`='".$this->esc($bloodgroup)."',
+					`stc_school_student_email`='".$this->esc($email)."',
+					`stc_school_student_contact`='".$this->esc($contact)."',
+					`stc_school_student_address`='".$this->esc($address)."',
+					`stc_school_student_religion`='".$this->esc($religion)."',
+					`stc_school_student_admissiondate`=".$this->sql_date($admissiondate).",
+					`stc_school_student_classroomid`='".$classroomid."',
+					`stc_school_student_guardianname`='".$this->esc($guardianname)."',
+					`stc_school_student_remarks`='".$this->esc($student_remarks)."'
+				WHERE `stc_school_student_id`='".$pk."'
+			");
+		}
+
+		$this->json_out(array('status' => 'success', 'message' => 'Admission updated.', 'id' => $id));
 	}
 
 	public function handle()
 	{
 		if (isset($_POST['stc_admit_save'])) {
 			$this->save($_POST);
+		}
+		if (isset($_POST['stc_admit_update'])) {
+			$this->update($_POST);
+		}
+		if (isset($_POST['stc_admit_get'])) {
+			$this->get($_POST['id'] ?? 0);
 		}
 		if (isset($_POST['stc_admit_list'])) {
 			$this->list_rows($_POST['search'] ?? '');
