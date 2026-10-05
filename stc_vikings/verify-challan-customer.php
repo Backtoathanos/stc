@@ -129,8 +129,8 @@ function stc_challan_customer_to_lines($site_key){
   $site_key = strtoupper(trim(preg_replace('/\s+/', ' ', (string) $site_key)));
   // SITE NAME => [addressee, sitename, company+city, gate name]
   $map = array(
-    'TSL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
-    'TATA STEEL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'SAKCHI GATE'),
+    'TSL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'JMD GATE'),
+    'TATA STEEL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'JMD GATE'),
     'TINPLATE' => array('The Head Security Work', '', 'TATA STEEL TINPLATE DIVISION', ''),
     'BF RELINING & TSG GAMHARIA & OLD GAMHARIA' => array('The Head Security Work', '', 'TATA STEEL GAMHARIA', 'GAMHARIA'),
     'GOLMURI SUBSTATION' => array('The Head Security Work', 'GOLMURI SUBSTATION HVAC PROJECT', '', 'GOLMURI JAMSHEDPUR'),
