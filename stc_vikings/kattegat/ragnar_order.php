@@ -5993,7 +5993,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 			) ";
 		}
 		if($pending_only){
-			$where .= " AND I.`stc_cust_super_requisition_list_items_status`='9' ";
+			$where .= " AND (
+				I.`stc_cust_super_requisition_list_items_status`='9'
+				OR IFNULL(R.dispatched_qty, 0) < I.`stc_cust_super_requisition_list_items_approved_qty`
+			) ";
 		}
 
 		$total = 0;
@@ -6014,6 +6017,13 @@ class ragnarCallDailyRequisitions extends tesseract{
 					ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
 				INNER JOIN `stc_requisition_combiner` C
 					ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+				LEFT JOIN (
+					SELECT
+						`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec`
+					GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+				) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
 				".$where."
 			");
 			if($count_q){
@@ -6196,7 +6206,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 			) ";
 		}
 		if($pending_only){
-			$where .= " AND I.`stc_cust_super_requisition_list_items_status`='9' ";
+			$where .= " AND (
+				I.`stc_cust_super_requisition_list_items_status`='9'
+				OR IFNULL(R.dispatched_qty, 0) < I.`stc_cust_super_requisition_list_items_approved_qty`
+			) ";
 		}
 		$total = 0;
 		$count_q = mysqli_query($this->stc_dbs, "
@@ -6208,6 +6221,13 @@ class ragnarCallDailyRequisitions extends tesseract{
 			INNER JOIN `stc_agents` A ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
 			INNER JOIN `stc_requisition_combiner_req` CR ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
 			INNER JOIN `stc_requisition_combiner` C ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			LEFT JOIN (
+				SELECT
+					`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+					SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+				FROM `stc_cust_super_requisition_list_items_rec`
+				GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+			) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
 			".$where."
 		");
 		if($count_q){
