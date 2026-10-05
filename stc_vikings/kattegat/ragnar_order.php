@@ -5953,7 +5953,7 @@ if(isset($_POST['call_tool_trackertrack'])){
 }
 // Daily requisitions (AJAX)
 class ragnarCallDailyRequisitions extends tesseract{
-	public function stc_call_daily_requisitions($search = '', $page = 1, $limit = 25, $datefrom = '', $dateto = '', $pr_name = '', $skip_count = false){
+	public function stc_call_daily_requisitions($search = '', $page = 1, $limit = 25, $datefrom = '', $dateto = '', $pr_name = '', $skip_count = false, $pending_only = false){
 		$page = (int)$page;
 		$limit = (int)$limit;
 		if($page < 1){ $page = 1; }
@@ -5991,6 +5991,9 @@ class ragnarCallDailyRequisitions extends tesseract{
 				C.`stc_requisition_combiner_refrence` = '".$pr_esc."' OR C.`stc_requisition_combiner_refrence` LIKE '%".$pr_esc."%'
 				OR P.`stc_cust_project_title` = '".$pr_esc."' OR P.`stc_cust_project_title` LIKE '%".$pr_esc."%'
 			) ";
+		}
+		if($pending_only){
+			$where .= " AND I.`stc_cust_super_requisition_list_items_status`='9' ";
 		}
 
 		$total = 0;
@@ -6160,7 +6163,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 	}
 
 	/** Count only - for parallel load (skip_count on main request) */
-	public function stc_call_daily_requisition_count($search = '', $limit = 25, $datefrom = '', $dateto = '', $pr_name = ''){
+	public function stc_call_daily_requisition_count($search = '', $limit = 25, $datefrom = '', $dateto = '', $pr_name = '', $pending_only = false){
 		$limit = (int)$limit;
 		if($limit < 1 || $limit > 200){ $limit = 25; }
 		$datefrom = $datefrom == '' ? date('Y-m-d', strtotime('-7 days')) : $datefrom;
@@ -6191,6 +6194,9 @@ class ragnarCallDailyRequisitions extends tesseract{
 				C.`stc_requisition_combiner_refrence` = '".$pr_esc."' OR C.`stc_requisition_combiner_refrence` LIKE '%".$pr_esc."%'
 				OR P.`stc_cust_project_title` = '".$pr_esc."' OR P.`stc_cust_project_title` LIKE '%".$pr_esc."%'
 			) ";
+		}
+		if($pending_only){
+			$where .= " AND I.`stc_cust_super_requisition_list_items_status`='9' ";
 		}
 		$total = 0;
 		$count_q = mysqli_query($this->stc_dbs, "
@@ -7574,13 +7580,14 @@ if(isset($_POST['stc_call_daily_requisitions'])){
 	$datefrom = isset($_POST['datefrom']) ? $_POST['datefrom'] : '';
 	$dateto = isset($_POST['dateto']) ? $_POST['dateto'] : '';
 	$pr_name = isset($_POST['pr_name']) ? trim((string)$_POST['pr_name']) : '';
+	$pending_only = isset($_POST['pending_only']) && $_POST['pending_only'] == '1';
 	$skip_count = isset($_POST['skip_count']) && $_POST['skip_count'] == '1';
 
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_call_daily_requisitions($search, $page, $limit, $datefrom, $dateto, $pr_name, $skip_count);
+		$odin_req_out = $odin_req->stc_call_daily_requisitions($search, $page, $limit, $datefrom, $dateto, $pr_name, $skip_count, $pending_only);
 		echo json_encode($odin_req_out);
 	}
 }
@@ -7591,11 +7598,12 @@ if(isset($_POST['stc_call_daily_requisition_count'])){
 	$datefrom = isset($_POST['datefrom']) ? $_POST['datefrom'] : '';
 	$dateto = isset($_POST['dateto']) ? $_POST['dateto'] : '';
 	$pr_name = isset($_POST['pr_name']) ? trim((string)$_POST['pr_name']) : '';
+	$pending_only = isset($_POST['pending_only']) && $_POST['pending_only'] == '1';
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_call_daily_requisition_count($search, $limit, $datefrom, $dateto, $pr_name);
+		$odin_req_out = $odin_req->stc_call_daily_requisition_count($search, $limit, $datefrom, $dateto, $pr_name, $pending_only);
 		echo json_encode($odin_req_out);
 	}
 }

@@ -37,8 +37,76 @@ include("kattegat/role_check.php");
       cursor: pointer;
       border-bottom: 1px solid #eee;
     }
-    .dr-pr-list li:hover, .dr-pr-list li.dr-pr-selected {
-      background: #f0f8ff;
+    .dr-pending-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 38px;
+      margin: 0;
+      padding: 0 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      color: #4a5568;
+      transition: border-color .2s, background .2s, box-shadow .2s, color .2s;
+      position: relative;
+      top: 18px;
+    }
+    .dr-pending-toggle:hover {
+      border-color: #a0aec0;
+    }
+    .dr-pending-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .dr-pending-switch {
+      position: relative;
+      flex-shrink: 0;
+      width: 42px;
+      height: 22px;
+      background: #cbd5e0;
+      border-radius: 999px;
+      transition: background .2s;
+    }
+    .dr-pending-switch:after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.25);
+      transition: transform .2s;
+    }
+    .dr-pending-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    .dr-pending-text .fa {
+      color: #e53e3e;
+    }
+    #dr-pending-only:checked + .dr-pending-switch {
+      background: #e53e3e;
+    }
+    #dr-pending-only:checked + .dr-pending-switch:after {
+      transform: translateX(20px);
+    }
+    .dr-pending-toggle.is-on,
+    .dr-pending-toggle:has(#dr-pending-only:checked) {
+      border-color: #fc8181;
+      background: #fff5f5;
+      color: #c53030;
+      box-shadow: inset 0 0 0 1px rgba(229, 62, 62, .12);
     }
     /* Adhoc Balance modal design */
     #dailyReqBalanceModal .modal-content {
@@ -251,6 +319,14 @@ include("kattegat/role_check.php");
                   <div class="col-md-3 col-sm-8" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Search</label>
                     <input type="text" class="form-control" id="dr-search" placeholder="Project, supervisor, req#, item...">
+                  </div>
+                  <div class="col-md-2 col-sm-6" style="margin-bottom: 6px;">
+                    <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Status</label>
+                    <label class="dr-pending-toggle" for="dr-pending-only">
+                      <input type="checkbox" id="dr-pending-only">
+                      <span class="dr-pending-switch"></span>
+                      <span class="dr-pending-text"><i class="fa fa-clock-o"></i> Pending only</span>
+                    </label>
                   </div>
                   <div class="col-md-2 col-sm-4" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
@@ -654,6 +730,7 @@ include("kattegat/role_check.php");
         var datefrom = $('#dr-datefrom').val() || '';
         var dateto = $('#dr-dateto').val() || '';
         var prName = $('#dr-pr-name').val() ? $('#dr-pr-name').val().trim() : '';
+        var pendingOnly = $('#dr-pending-only').is(':checked') ? '1' : '0';
         var isFirstPage = !page || page <= 1;
 
         // Data request (skip count for faster initial display)
@@ -668,6 +745,7 @@ include("kattegat/role_check.php");
             datefrom: datefrom,
             dateto: dateto,
             pr_name: prName,
+            pending_only: pendingOnly,
             skip_count: skipCount ? '1' : '0'
           },
           dataType: 'json',
@@ -748,7 +826,8 @@ include("kattegat/role_check.php");
               limit: perPage,
               datefrom: datefrom,
               dateto: dateto,
-              pr_name: prName
+              pr_name: prName,
+              pending_only: pendingOnly
             },
             dataType: 'json',
             success: function (res) {
@@ -811,6 +890,11 @@ include("kattegat/role_check.php");
 
       $('#dr-search-btn').on('click', function (e) {
         e.preventDefault();
+        runSearch();
+      });
+
+      $('#dr-pending-only').on('change', function () {
+        $(this).closest('.dr-pending-toggle').toggleClass('is-on', this.checked);
         runSearch();
       });
 
