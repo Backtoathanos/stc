@@ -317,10 +317,19 @@ if(isset($_GET['pro_id'])){
                                         style="max-height: 120px; width: auto;">
                                 </a>
                             </div>
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
                                 <div style="font-size: 18px; margin-bottom: 20px;" class="">
                                     <p><strong>Project:</strong>
                                         <?php echo $get_stc_purchase_product['stc_cust_project_title']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                <div style="font-size: 18px; margin-bottom: 20px;" class="">
+                                    <p><strong>Duration:</strong>
+                                        <?php echo date('d-m-Y', strtotime($dateFrom)); ?>
+                                        to
+                                        <?php echo date('d-m-Y', strtotime($dateTo)); ?>
                                     </p>
                                 </div>
                             </div>
@@ -342,19 +351,7 @@ if(isset($_GET['pro_id'])){
                                                     <?php echo $get_stc_purchase_product['stc_cust_project_responsive_person']; ?>
                                                 </b></h4>
                                         </div>
-                                        <div
-                                            style="font-size: 16px; margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3989c6; border-radius: 5px;">
-                                            <p style="margin: 0; font-style: italic; color: #555;">
-                                                <strong>"Excellence in project management is not just about meeting
-                                                    deadlines, but about
-                                                    delivering value that exceeds expectations and builds lasting
-                                                    partnerships."</strong>
-                                            </p>
-                                            <p
-                                                style="margin: 10px 0 0 0; text-align: right; color: #666; font-size: 14px;">
-                                                - STC Associates
-                                            </p>
-                                        </div>
+                                        
                                     </div>
                                     <!-- Requisitions for Current Month -->
                                     <div class="row" style="margin-top: 30px;">

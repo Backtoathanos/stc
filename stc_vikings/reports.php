@@ -558,7 +558,7 @@ STCAuthHelper::checkAuth();?>
                                             </select>
                                         </div>
                                     </div>       
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12 stc-mrd-dept-wrap">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="stc-mrd-dept"
@@ -3081,27 +3081,60 @@ STCAuthHelper::checkAuth();?>
     <script>
         $(document).ready(function(){
 
-            // call location for mrd
-            $('body').delegate('#stc-mrd-customer', 'change', function(e){
-                e.preventDefault();
-                var customer_id = $(this).val();
+            function stcMrdIsProject(){
+                return String($('#stc-mrd-tojob').val()) === '1';
+            }
+
+            function stcMrdToggleDept(){
+                if(stcMrdIsProject()){
+                    $('.stc-mrd-dept-wrap').hide();
+                    $('#stc-mrd-dept').html('<option value="NA">Select</option>');
+                }else{
+                    $('.stc-mrd-dept-wrap').show();
+                }
+            }
+
+            function stcMrdLoadLocations(){
+                var customer_id = $('#stc-mrd-customer').val();
+                if(!customer_id || customer_id === 'NA'){
+                    $('#stc-mrd-location').html('<option value="NA">Please Select Customer First</option>');
+                    $('#stc-mrd-dept').html('<option value="NA">Please Select Location First</option>');
+                    return;
+                }
                 $.ajax({
                     url     : "kattegat/ragnar_reports.php",
                     method  : "post",
                     data    : {
                         stc_mrd_call_location:1,
-                        customer_id:customer_id
+                        customer_id:customer_id,
+                        tojob:$('#stc-mrd-tojob').val()
                     },
                     success : function(response){
-                        // console.log(response);
                         $('#stc-mrd-location').html(response);
+                        $('#stc-mrd-dept').html('<option value="NA">Please Select Location First</option>');
                     }
                 });
+            }
+
+            stcMrdToggleDept();
+
+            $('body').delegate('#stc-mrd-tojob', 'change', function(){
+                stcMrdToggleDept();
+                stcMrdLoadLocations();
+            });
+
+            // call location for mrd
+            $('body').delegate('#stc-mrd-customer', 'change', function(e){
+                e.preventDefault();
+                stcMrdLoadLocations();
             });
 
             // call department for mrd
             $('body').delegate('#stc-mrd-location', 'change', function(e){
                 e.preventDefault();
+                if(stcMrdIsProject()){
+                    return;
+                }
                 var location = $(this).val();
                 $.ajax({
                     url     : "kattegat/ragnar_reports.php",
@@ -3111,7 +3144,6 @@ STCAuthHelper::checkAuth();?>
                         location:location
                     },
                     success : function(response){
-                        // console.log(response);
                         $('#stc-mrd-dept').html(response);
                     }
                 });
@@ -3130,8 +3162,8 @@ STCAuthHelper::checkAuth();?>
                 var tojob = $("#stc-mrd-tojob").val();
                 var customer = $("#stc-mrd-customer").val();
                 var location = $("#stc-mrd-location").val();
-                var dept = $("#stc-mrd-dept option:selected").text();
-                var pro_id = $("#stc-mrd-dept").val();
+                var dept = stcMrdIsProject() ? 'NA' : $("#stc-mrd-dept option:selected").text();
+                var pro_id = stcMrdIsProject() ? location : $("#stc-mrd-dept").val();
                 var tomaterial = $("#stc-mrd-tomaterial").val();
                 var page = page || 1; // Current page, default to 1
                 var limit = 10; // Number of records per page

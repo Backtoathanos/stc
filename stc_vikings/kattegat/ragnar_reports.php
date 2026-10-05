@@ -4759,8 +4759,25 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
 class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 
    // call mrd location
-   public function stc_mrd_location_call($customer_id){
+   public function stc_mrd_location_call($customer_id, $tojob='NA'){
       $odin='<option value="NA">Select</option>';
+      if($tojob=="1"){
+         $odin_get_locqry=mysqli_query($this->stc_dbs, "
+            SELECT `stc_cust_project_id`, `stc_cust_project_title`
+            FROM `stc_cust_project`
+            WHERE `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $customer_id)."'
+            AND (LOWER(`stc_cust_project_type`)='project' OR `stc_cust_project_type`='' OR `stc_cust_project_type` IS NULL)
+            ORDER BY `stc_cust_project_title` ASC
+         ");
+         if($odin_get_locqry && mysqli_num_rows($odin_get_locqry)>0){
+            foreach($odin_get_locqry as $odin_get_locrow){
+               $odin.='<option value="'.$odin_get_locrow['stc_cust_project_id'].'">'.htmlspecialchars($odin_get_locrow['stc_cust_project_title'], ENT_QUOTES, 'UTF-8').'</option>';
+            }
+         }else{
+            $odin.='<option value="NA">Project not found.</option>';
+         }
+         return $odin;
+      }
       $odin_get_locqry=mysqli_query($this->stc_dbs, "
          SELECT DISTINCT `stc_status_down_list_department_location` 
          FROM `stc_status_down_list_department` 
@@ -4819,11 +4836,17 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
       if($tojob=="2"){
          $filter_query.=" AND R.stc_cust_super_requisition_list_sdlid<>0";
       }
+      if($tojob=="1"){
+         $filter_query.=" AND (R.stc_cust_super_requisition_list_sdlid=0 OR R.stc_cust_super_requisition_list_sdlid IS NULL)";
+         $filter_query.=" AND (LOWER(P.`stc_cust_project_type`)='project' OR P.`stc_cust_project_type`='' OR P.`stc_cust_project_type` IS NULL)";
+      }
       if($customer!="NA"){
          $filter_query.=" AND stc_cust_project_cust_id='".mysqli_real_escape_string($this->stc_dbs, $customer)."'";
       }
       $sdl_joiner='';
-      if(($tojob=="1" || $tojob=="NA") && $dept!="NA" && $pro_id!="NA"){
+      if($tojob=="1" && $location!="NA" && $location!=""){
+         $filter_query.=" AND P.`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
+      }else if(($tojob=="NA") && $dept!="NA" && $pro_id!="NA"){
          $filter_query.=" AND P.`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'";
       }else if($tojob=="2" && $dept!="NA" && $pro_id!="NA"){
          if($location!="NA"){
@@ -5522,10 +5545,11 @@ if(isset($_POST['stc_find_school_attendance'])){
 if(isset($_POST['stc_mrd_call_location'])){
    $out='';
    $customer_id=$_POST['customer_id'];
+   $tojob=isset($_POST['tojob']) ? $_POST['tojob'] : 'NA';
 
    $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
 
-   $out=$bjorneschoolfee->stc_mrd_location_call($customer_id);
+   $out=$bjorneschoolfee->stc_mrd_location_call($customer_id, $tojob);
    echo $out;
 }
 
