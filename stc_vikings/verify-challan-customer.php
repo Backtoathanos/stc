@@ -125,45 +125,127 @@ function stc_challan_is_tata_steel_amc($site_label, $to_site, $to_lines = array(
   return false;
 }
 
-function stc_challan_customer_to_lines($site_key){
-  $site_key = strtoupper(trim(preg_replace('/\s+/', ' ', (string) $site_key)));
-  // SITE NAME => [addressee, sitename, company+city, gate name]
-  $map = array(
-    'TSL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'JMD GATE'),
-    'TATA STEEL AMC' => array('The Head Security Work', '', 'TATA STEEL JAMSHEDPUR', 'JMD GATE'),
-    'TINPLATE' => array('The Head Security Work', '', 'TATA STEEL TINPLATE DIVISION', ''),
-    'BF RELINING & TSG GAMHARIA & OLD GAMHARIA' => array('The Head Security Work', '', 'TATA STEEL GAMHARIA', 'GAMHARIA'),
-    'GOLMURI SUBSTATION' => array('The Head Security Work', 'GOLMURI SUBSTATION HVAC PROJECT', '', 'GOLMURI JAMSHEDPUR'),
-    'O&M' => array('The Head Security Work', 'ECR building of COB#6A&6B', 'TATA STEEL JAMSHEDPUR', ''),
-    'XLRI' => array('The Head Security Work', '', 'XLRI, JAMSHEDPUR', ''),
-    'COKE OVEN' => array('The Head Security Work', '', 'TATA STEEL LTD. JSR.', 'JMD GATE'),
+function stc_challan_ensure_customer_address_table($con){
+  static $done = false;
+  if($done || !$con){
+    return;
+  }
+  mysqli_query($con, "
+    CREATE TABLE IF NOT EXISTS `stc_challan_customer_address` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `project_id` int(11) NOT NULL DEFAULT 0,
+      `site_key` varchar(160) NOT NULL DEFAULT '',
+      `addresse` varchar(255) NOT NULL DEFAULT '',
+      `sitenamecity` varchar(500) NOT NULL DEFAULT '',
+      `gatename` varchar(255) NOT NULL DEFAULT '',
+      `createdby` int(11) NOT NULL DEFAULT 0,
+      `createddate` datetime DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `project_id` (`project_id`),
+      KEY `site_key` (`site_key`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  ");
+  $chk = @mysqli_query($con, "SHOW COLUMNS FROM `stc_challan_customer_address` LIKE 'site_key'");
+  if($chk && mysqli_num_rows($chk) === 0){
+    @mysqli_query($con, "ALTER TABLE `stc_challan_customer_address` ADD COLUMN `site_key` varchar(160) NOT NULL DEFAULT '' AFTER `project_id`");
+  }
+  $done = true;
+}
+
+function stc_challan_customer_address_lines_from_row($row){
+  if(!$row){
+    return null;
+  }
+  $parts = array(
+    trim((string) ($row['addresse'] ?? '')),
   );
-  $parts = null;
-  if(isset($map[$site_key])){
-    $parts = $map[$site_key];
-  }else{
-    foreach($map as $key => $val){
-      if($site_key !== '' && (strpos($site_key, $key) !== false || strpos($key, $site_key) !== false)){
-        $parts = $val;
-        break;
+  $siteCity = trim((string) ($row['sitenamecity'] ?? ''));
+  if($siteCity !== ''){
+    foreach(preg_split('/\r\n|\r|\n/', $siteCity) as $part){
+      $part = trim((string) $part);
+      if($part !== ''){
+        $parts[] = $part;
       }
     }
   }
-  if($parts === null){
-    return array(
-      'The Head Security Work',
-      'TATA STEEL LTD. JSR.',
-      'JMD GATE',
-    );
+  $gate = trim((string) ($row['gatename'] ?? ''));
+  if($gate !== ''){
+    $parts[] = $gate;
   }
   $lines = array();
   foreach($parts as $part){
-    $part = trim((string) $part);
     if($part !== ''){
       $lines[] = $part;
     }
   }
-  return $lines ? $lines : array('The Head Security Work');
+  return $lines ? $lines : null;
+}
+
+function stc_challan_customer_to_lines($site_key, $project_id = 0){
+  global $con;
+  $site_key = strtoupper(trim(preg_replace('/\s+/', ' ', (string) $site_key)));
+  $project_id = (int) $project_id;
+  $default = array(
+    'The Head Security Work',
+    'TATA STEEL LTD. JSR.',
+    'JMD GATE',
+  );
+
+  if($con){
+    stc_challan_ensure_customer_address_table($con);
+    $row = null;
+    if($project_id > 0){
+      $q = mysqli_query($con, "
+        SELECT `addresse`, `sitenamecity`, `gatename`
+        FROM `stc_challan_customer_address`
+        WHERE `project_id` = '".$project_id."'
+        ORDER BY `id` DESC
+        LIMIT 1
+      ");
+      if($q && mysqli_num_rows($q) > 0){
+        $row = mysqli_fetch_assoc($q);
+      }
+    }
+    if(!$row && $site_key !== ''){
+      $esc = mysqli_real_escape_string($con, $site_key);
+      $q = mysqli_query($con, "
+        SELECT `addresse`, `sitenamecity`, `gatename`
+        FROM `stc_challan_customer_address`
+        WHERE UPPER(TRIM(`site_key`)) = '".$esc."'
+           OR UPPER(TRIM(`site_key`)) LIKE '%".$esc."%'
+           OR '".$esc."' LIKE CONCAT('%', UPPER(TRIM(`site_key`)), '%')
+        ORDER BY
+          CASE WHEN UPPER(TRIM(`site_key`)) = '".$esc."' THEN 0 ELSE 1 END,
+          `id` DESC
+        LIMIT 1
+      ");
+      if($q && mysqli_num_rows($q) > 0){
+        $row = mysqli_fetch_assoc($q);
+      }
+    }
+    if(!$row && $site_key !== ''){
+      $esc = mysqli_real_escape_string($con, $site_key);
+      $q = mysqli_query($con, "
+        SELECT a.`addresse`, a.`sitenamecity`, a.`gatename`
+        FROM `stc_challan_customer_address` a
+        INNER JOIN `stc_cust_project` p
+          ON p.`stc_cust_project_id` = a.`project_id`
+        WHERE a.`project_id` > 0
+          AND UPPER(p.`stc_cust_project_title`) LIKE '%".$esc."%'
+        ORDER BY a.`id` DESC
+        LIMIT 1
+      ");
+      if($q && mysqli_num_rows($q) > 0){
+        $row = mysqli_fetch_assoc($q);
+      }
+    }
+    $lines = stc_challan_customer_address_lines_from_row($row);
+    if($lines){
+      return $lines;
+    }
+  }
+
+  return $default;
 }
 
 function stc_challan_row_sitename($row){
@@ -643,6 +725,7 @@ $to_address = '';
 $meta_order = $order_number;
 $order_date_from = '';
 $order_date_to = '';
+$challan_project_id = 0;
 
 $sql = mysqli_query($con, "
   SELECT
@@ -650,6 +733,7 @@ $sql = mysqli_query($con, "
     COALESCE(NULLIF(TRIM(ADH.`adhoc_name`), ''), I.`stc_cust_super_requisition_list_items_title`) AS item_desc,
     I.`stc_cust_super_requisition_list_items_unit` AS unit,
     I.`stc_cust_super_requisition_list_id` AS item_id,
+    P.`stc_cust_project_id` AS project_id,
     P.`stc_cust_project_title` AS sitename,
     P.`stc_cust_project_address` AS project_address,
     CU.`stc_customer_name` AS customer_name,
@@ -671,6 +755,9 @@ if($sql && mysqli_num_rows($sql) > 0){
     $row['display_site'] = $displaySite;
     $row['combination_name'] = $combinationName;
     $rows[] = $row;
+    if($challan_project_id <= 0 && (int) ($row['project_id'] ?? 0) > 0){
+      $challan_project_id = (int) $row['project_id'];
+    }
     if($to_customer === '' && trim((string) ($row['customer_name'] ?? '')) !== ''){
       $to_customer = trim($row['customer_name']);
     }
@@ -728,7 +815,7 @@ if($order_date_from !== '' && $order_date_to !== '' && $order_date_from !== $ord
 $blank_rows = max(0, 22 - count($rows));
 $embed = isset($_GET['embed']) && $_GET['embed'] !== '0' && $_GET['embed'] !== '';
 
-$toLines = stc_challan_customer_to_lines($site_label !== '' ? $site_label : $to_site);
+$toLines = stc_challan_customer_to_lines($site_label !== '' ? $site_label : $to_site, $challan_project_id);
 $vehicle_no = 'JH05 CG 7026';
 
 $export = isset($_GET['export']) ? strtolower(trim((string) $_GET['export'])) : '';
