@@ -246,6 +246,7 @@ class SchoolController extends Controller
                 <a href="javascript:void(0)" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
             '; 
             $data_arr[] = array(
+                "checkbox" => '<input type="checkbox" class="fee-row-check" value="'.$id.'">',
                 "stc_school_fee_id" => $id,
                 "stc_school_fee_date" => $date,
                 "stc_school_fee_which_school" => $stc_school_fee_which_school,
@@ -283,7 +284,14 @@ class SchoolController extends Controller
 
     // delete through ajax
     function feedelete(Request $request){
-        $delete =  BranchSchoolFee::destroy($request->id);
+        $raw = $request->ids !== null && $request->ids !== '' ? $request->ids : $request->id;
+        if(is_array($raw)){
+            $ids = $raw;
+        }else{
+            $ids = explode(',', (string) $raw);
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        $delete = $ids ? BranchSchoolFee::destroy($ids) : 0;
         if($delete){
             $response = [
                 'status'=>'ok',
@@ -373,6 +381,7 @@ class SchoolController extends Controller
                 <a href="javascript:void(0)" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
             '; 
             $data_arr[] = array(
+                "checkbox" => '<input type="checkbox" class="canteen-row-check" value="'.$id.'">',
                 "stc_school_canteen_id" => $id,
                 "stc_school_canteen_date" => $date,
                 "stc_school_canteen_school" => $schoolHtml,
@@ -426,7 +435,14 @@ class SchoolController extends Controller
 
     // delete through ajax
     function canteendelete(Request $request){
-        $delete =  BranchSchoolCanteen::destroy($request->id);
+        $raw = $request->ids !== null && $request->ids !== '' ? $request->ids : $request->id;
+        if(is_array($raw)){
+            $ids = $raw;
+        }else{
+            $ids = explode(',', (string) $raw);
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        $delete = $ids ? BranchSchoolCanteen::destroy($ids) : 0;
         if($delete){
             $response = [
                 'status'=>'ok',

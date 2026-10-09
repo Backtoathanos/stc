@@ -65,9 +65,15 @@
             <div class="card">
                 <!-- /.card-header -->
                 <div class="card-body">
+                  <div class="mb-2">
+                    <button type="button" class="btn btn-danger btn-sm" id="fee-delete-selected" disabled>
+                      <i class="fas fa-trash"></i> Delete selected
+                    </button>
+                  </div>
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th class="text-center"><input type="checkbox" id="fee-check-all" title="Select all on this page"></th>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
                             <th class="text-center"><b>School</b></th>
@@ -96,6 +102,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
+                            <th class="text-center"></th>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
                             <th class="text-center"><b>School</b></th>
@@ -165,7 +172,9 @@
           processing: true,
           serverSide: true,
           ajax: "{{ url('/branch/school/fee/list') }}",
+          order: [[2, 'desc']],
           columns: [
+                { data: 'checkbox', orderable: false, searchable: false },
                 { data: 'stc_school_fee_id' },
                 { data: 'stc_school_fee_date' },
                 { data: 'stc_school_fee_which_school' },
@@ -190,10 +199,10 @@
                 { data: 'actionData' }
           ],
           columnDefs: [
-            { "targets": 0, "className": "text-center", width : '4%'},
-            { "targets": 1, "className": "text-right", width : '10%' },
-            { "targets": 2, "className": "text-center", },
-            { "targets": 3, "className": "text-right", },
+            { "targets": 0, "className": "text-center", width : '3%', orderable: false },
+            { "targets": 1, "className": "text-center", width : '4%'},
+            { "targets": 2, "className": "text-right", width : '10%' },
+            { "targets": 3, "className": "text-center", },
             { "targets": 4, "className": "text-right", },
             { "targets": 5, "className": "text-right", },
             { "targets": 6, "className": "text-right", },
@@ -208,13 +217,51 @@
             { "targets": 15, "className": "text-right", },
             { "targets": 16, "className": "text-right", },
             { "targets": 17, "className": "text-right", },
-            { "targets": 18, "className": "text-center", },
+            { "targets": 18, "className": "text-right", },
             { "targets": 19, "className": "text-center", },
             { "targets": 20, "className": "text-center", },
-            { orderable: false, targets: 21 },
+            { "targets": 21, "className": "text-center", },
+            { orderable: false, targets: 22 },
           ]
         });
+        $('#example1').off('draw.dt.fee').on('draw.dt.fee', function(){
+          $('#fee-check-all').prop('checked', false);
+          refreshFeeDeleteBtn();
+        });
       }
+
+      function feeSelectedIds(){
+        var ids = [];
+        $('.fee-row-check:checked').each(function(){
+          ids.push($(this).val());
+        });
+        return ids;
+      }
+      function refreshFeeDeleteBtn(){
+        var n = feeSelectedIds().length;
+        $('#fee-delete-selected').prop('disabled', n === 0).html('<i class="fas fa-trash"></i> '+(n ? 'Delete selected ('+n+')' : 'Delete selected'));
+      }
+      $('body').on('change', '#fee-check-all', function(){
+        $('.fee-row-check').prop('checked', this.checked);
+        refreshFeeDeleteBtn();
+      });
+      $('body').on('change', '.fee-row-check', function(){
+        var all = $('.fee-row-check').length;
+        var checked = $('.fee-row-check:checked').length;
+        $('#fee-check-all').prop('checked', all > 0 && all === checked);
+        refreshFeeDeleteBtn();
+      });
+      $('#fee-delete-selected').on('click', function(){
+        var ids = feeSelectedIds();
+        if(!ids.length) return;
+        $('#delete_id').val(ids.join(','));
+        $('#delete-modal').modal('show');
+      });
+      $('#delete-modal').on('show.bs.modal', function(){
+        var ids = ($('#delete_id').val() || '').split(',').filter(function(v){ return v !== ''; });
+        var n = ids.length || 1;
+        $(this).find('.modal-body p').first().text('Are you sure you want to delete '+n+' record(s)?');
+      });
 
       // delete function
       $('.delete-schoolmc-btn').on('click', function(e){

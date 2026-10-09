@@ -65,9 +65,15 @@
             <div class="card">
                 <!-- /.card-header -->
                 <div class="card-body">
+                  <div class="mb-2">
+                    <button type="button" class="btn btn-danger btn-sm" id="canteen-delete-selected" disabled>
+                      <i class="fas fa-trash"></i> Delete selected
+                    </button>
+                  </div>
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th class="text-center"><input type="checkbox" id="canteen-check-all" title="Select all on this page"></th>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
                             <th class="text-center"><b>School</b></th>
@@ -83,6 +89,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
+                            <th class="text-center"></th>
                             <th class="text-center"><b>Id</b></th>
                             <th class="text-center"><b>Date</b></th>
                             <th class="text-center"><b>School</b></th>
@@ -139,7 +146,9 @@
           processing: true,
           serverSide: true,
           ajax: "{{ url('/branch/school/canteen/list') }}",
+          order: [[2, 'desc']],
           columns: [
+                { data: 'checkbox', orderable: false, searchable: false },
                 { data: 'stc_school_canteen_id' },
                 { data: 'stc_school_canteen_date' },
                 { data: 'stc_school_canteen_school' },
@@ -151,18 +160,57 @@
                 { data: 'actionData' }
           ],
           columnDefs: [
-            { "targets": 0, "className": "text-center", width : '4%'},
-            { "targets": 1, "className": "text-center", width : '10%' },
-            { "targets": 2, "className": "text-center", },
+            { "targets": 0, "className": "text-center", width : '3%', orderable: false },
+            { "targets": 1, "className": "text-center", width : '4%'},
+            { "targets": 2, "className": "text-center", width : '10%' },
             { "targets": 3, "className": "text-center", },
             { "targets": 4, "className": "text-center", },
-            { "targets": 5, "className": "text-right", },
-            { "targets": 6, "className": "text-left", },
-            { "targets": 7, "className": "text-center", },
-            { orderable: false, targets: 8 },
+            { "targets": 5, "className": "text-center", },
+            { "targets": 6, "className": "text-right", },
+            { "targets": 7, "className": "text-left", },
+            { "targets": 8, "className": "text-center", },
+            { orderable: false, targets: 9 },
           ]
         });
+        $('#example1').off('draw.dt.canteen').on('draw.dt.canteen', function(){
+          $('#canteen-check-all').prop('checked', false);
+          refreshCanteenDeleteBtn();
+        });
       }
+
+      function canteenSelectedIds(){
+        var ids = [];
+        $('.canteen-row-check:checked').each(function(){
+          ids.push($(this).val());
+        });
+        return ids;
+      }
+      function refreshCanteenDeleteBtn(){
+        var n = canteenSelectedIds().length;
+        $('#canteen-delete-selected').prop('disabled', n === 0).html('<i class="fas fa-trash"></i> '+(n ? 'Delete selected ('+n+')' : 'Delete selected'));
+      }
+
+      $('body').on('change', '#canteen-check-all', function(){
+        $('.canteen-row-check').prop('checked', this.checked);
+        refreshCanteenDeleteBtn();
+      });
+      $('body').on('change', '.canteen-row-check', function(){
+        var all = $('.canteen-row-check').length;
+        var checked = $('.canteen-row-check:checked').length;
+        $('#canteen-check-all').prop('checked', all > 0 && all === checked);
+        refreshCanteenDeleteBtn();
+      });
+      $('#canteen-delete-selected').on('click', function(){
+        var ids = canteenSelectedIds();
+        if(!ids.length) return;
+        $('#delete_id').val(ids.join(','));
+        $('#delete-modal').modal('show');
+      });
+      $('#delete-modal').on('show.bs.modal', function(){
+        var ids = ($('#delete_id').val() || '').split(',').filter(function(v){ return v !== ''; });
+        var n = ids.length || 1;
+        $(this).find('.modal-body p').first().text('Are you sure you want to delete '+n+' record(s)?');
+      });
 
       // display for edit modal
       $('body').delegate('.edit-canteen-btn','click', function(){

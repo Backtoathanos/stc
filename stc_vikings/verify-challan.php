@@ -95,6 +95,206 @@ function stc_challan_item_type_label($type){
   return $labels[$type] ?? $type;
 }
 
+function stc_challan_ensure_address_table($con){
+  mysqli_query($con, "
+    CREATE TABLE IF NOT EXISTS `stc_challan_customer_address` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `project_id` int(11) NOT NULL DEFAULT 0,
+      `site_key` varchar(160) NOT NULL DEFAULT '',
+      `addresse` varchar(255) NOT NULL DEFAULT '',
+      `sitenamecity` varchar(500) NOT NULL DEFAULT '',
+      `gatename` varchar(255) NOT NULL DEFAULT '',
+      `createdby` int(11) NOT NULL DEFAULT 0,
+      `createddate` datetime DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `project_id` (`project_id`),
+      KEY `site_key` (`site_key`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  ");
+  $chk = @mysqli_query($con, "SHOW COLUMNS FROM `stc_challan_customer_address` LIKE 'site_key'");
+  if($chk && mysqli_num_rows($chk) === 0){
+    @mysqli_query($con, "ALTER TABLE `stc_challan_customer_address` ADD COLUMN `site_key` varchar(160) NOT NULL DEFAULT '' AFTER `project_id`");
+  }
+}
+
+function stc_challan_address_groups($con, $search){
+  $search = trim((string) $search);
+  $where = '';
+  if($search !== ''){
+    $esc = mysqli_real_escape_string($con, $search);
+    $where = " WHERE P.`stc_cust_project_title` LIKE '%".$esc."%'
+      OR C.`stc_requisition_combiner_refrence` LIKE '%".$esc."%'";
+  }
+  $q = mysqli_query($con, "
+    SELECT DISTINCT
+      P.`stc_cust_project_id` AS project_id,
+      P.`stc_cust_project_title` AS project_title,
+      C.`stc_requisition_combiner_refrence` AS pr_location
+    FROM `stc_cust_project` P
+    INNER JOIN `stc_cust_super_requisition_list` L
+      ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+    INNER JOIN `stc_requisition_combiner_req` CR
+      ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+    INNER JOIN `stc_requisition_combiner` C
+      ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+    ".$where."
+    ORDER BY P.`stc_cust_project_title` ASC
+    LIMIT 800
+  ");
+  $groups = array();
+  if($q){
+    while($row = mysqli_fetch_assoc($q)){
+      $label = stc_challan_combination_label($row['project_title'], $row['pr_location']);
+      if($label === '') continue;
+      $key = strtoupper($label);
+      if(!isset($groups[$key])){
+        $groups[$key] = array(
+          'site_key' => $label,
+          'project_id' => (int) $row['project_id'],
+          'projects' => array(),
+        );
+      }
+      $pid = (int) $row['project_id'];
+      if(!isset($groups[$key]['projects'][$pid])){
+        $groups[$key]['projects'][$pid] = array(
+          'id' => $pid,
+          'title' => (string) $row['project_title'],
+        );
+      }
+    }
+  }
+  $out = array();
+  foreach($groups as $g){
+    $g['projects'] = array_values($g['projects']);
+    $g['project_count'] = count($g['projects']);
+    $out[] = $g;
+  }
+  usort($out, function($a, $b){
+    return strcasecmp($a['site_key'], $b['site_key']);
+  });
+  return $out;
+}
+
+if(isset($_POST['stc_challan_address_list']) || isset($_POST['stc_challan_address_save'])){
+  header('Content-Type: application/json; charset=UTF-8');
+  if(empty($_SESSION['stc_empl_id'])){
+    echo json_encode(array('ok' => false, 'message' => 'Please login again.'));
+    exit;
+  }
+  stc_challan_ensure_address_table($con);
+
+  if(isset($_POST['stc_challan_address_save'])){
+    $site_key = trim(preg_replace('/\s+/', ' ', (string) ($_POST['site_key'] ?? '')));
+    $addresse = trim((string) ($_POST['addresse'] ?? ''));
+    $sitenamecity = trim((string) ($_POST['sitenamecity'] ?? ''));
+    $gatename = trim((string) ($_POST['gatename'] ?? ''));
+    $project_id = (int) ($_POST['project_id'] ?? 0);
+    if($site_key === '' || $addresse === ''){
+      echo json_encode(array('ok' => false, 'message' => 'Site name and addressee are required.'));
+      exit;
+    }
+    $escKey = mysqli_real_escape_string($con, $site_key);
+    $existing = mysqli_query($con, "
+      SELECT `id` FROM `stc_challan_customer_address`
+      WHERE UPPER(TRIM(`site_key`)) = '".mysqli_real_escape_string($con, strtoupper($site_key))."'
+      ORDER BY `id` ASC
+    ");
+    $ids = array();
+    if($existing){
+      while($er = mysqli_fetch_assoc($existing)){
+        $ids[] = (int) $er['id'];
+      }
+    }
+    $by = (int) $_SESSION['stc_empl_id'];
+    if($ids){
+      $keep = $ids[0];
+      mysqli_query($con, "
+        UPDATE `stc_challan_customer_address` SET
+          `project_id` = '".$project_id."',
+          `site_key` = '".$escKey."',
+          `addresse` = '".mysqli_real_escape_string($con, $addresse)."',
+          `sitenamecity` = '".mysqli_real_escape_string($con, $sitenamecity)."',
+          `gatename` = '".mysqli_real_escape_string($con, $gatename)."',
+          `createdby` = '".$by."'
+        WHERE `id` = '".$keep."'
+      ");
+      if(count($ids) > 1){
+        $drop = array_slice($ids, 1);
+        mysqli_query($con, "DELETE FROM `stc_challan_customer_address` WHERE `id` IN (".implode(',', $drop).")");
+      }
+      echo json_encode(array('ok' => true, 'message' => 'Address updated. Same combiner name uses this one row.', 'id' => $keep));
+      exit;
+    }
+    mysqli_query($con, "
+      INSERT INTO `stc_challan_customer_address`
+        (`project_id`, `site_key`, `addresse`, `sitenamecity`, `gatename`, `createdby`, `createddate`)
+      VALUES (
+        '".$project_id."',
+        '".$escKey."',
+        '".mysqli_real_escape_string($con, $addresse)."',
+        '".mysqli_real_escape_string($con, $sitenamecity)."',
+        '".mysqli_real_escape_string($con, $gatename)."',
+        '".$by."',
+        '".date('Y-m-d H:i:s')."'
+      )
+    ");
+    echo json_encode(array('ok' => true, 'message' => 'Address saved once for this combiner name.', 'id' => (int) mysqli_insert_id($con)));
+    exit;
+  }
+
+  $search = isset($_POST['search']) ? (string) $_POST['search'] : '';
+  $groups = stc_challan_address_groups($con, $search);
+  $addr = array();
+  $aq = mysqli_query($con, "
+    SELECT `id`, `project_id`, `site_key`, `addresse`, `sitenamecity`, `gatename`
+    FROM `stc_challan_customer_address`
+    WHERE TRIM(`site_key`) <> ''
+    ORDER BY `id` ASC
+  ");
+  if($aq){
+    while($ar = mysqli_fetch_assoc($aq)){
+      $k = strtoupper(trim($ar['site_key']));
+      if(!isset($addr[$k])){
+        $addr[$k] = $ar;
+      }
+    }
+  }
+  $rows = array();
+  $seen = array();
+  foreach($groups as $g){
+    $k = strtoupper($g['site_key']);
+    $seen[$k] = true;
+    $saved = isset($addr[$k]) ? $addr[$k] : null;
+    $rows[] = array(
+      'site_key' => $g['site_key'],
+      'project_id' => $g['project_id'],
+      'project_count' => $g['project_count'],
+      'projects' => $g['projects'],
+      'id' => $saved ? (int) $saved['id'] : 0,
+      'addresse' => $saved ? (string) $saved['addresse'] : '',
+      'sitenamecity' => $saved ? (string) $saved['sitenamecity'] : '',
+      'gatename' => $saved ? (string) $saved['gatename'] : '',
+    );
+  }
+  if($search === ''){
+    foreach($addr as $k => $saved){
+      if(isset($seen[$k])) continue;
+      $rows[] = array(
+        'site_key' => (string) $saved['site_key'],
+        'project_id' => (int) $saved['project_id'],
+        'project_count' => 0,
+        'projects' => array(),
+        'id' => (int) $saved['id'],
+        'addresse' => (string) $saved['addresse'],
+        'sitenamecity' => (string) $saved['sitenamecity'],
+        'gatename' => (string) $saved['gatename'],
+      );
+    }
+  }
+  echo json_encode(array('ok' => true, 'data' => $rows));
+  exit;
+}
+
 $date = '';
 if(isset($_GET['date']) && $_GET['date'] != ''){
   $date = date('Y-m-d', strtotime($_GET['date']));
@@ -498,6 +698,142 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
           background: #bbbed4;
         }
       }
+      #stcChallanAddressModal .modal-content {
+        background: #fff;
+        color: #1a202c;
+        border: 0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #stcChallanAddressModal .modal-header {
+        background: #1f4e79;
+        color: #fff;
+        border: 0;
+        padding: 12px 16px;
+      }
+      #stcChallanAddressModal .modal-title { color: #fff; font-weight: 600; }
+      #stcChallanAddressModal .close { color: #fff; opacity: .9; text-shadow: none; }
+      #stcChallanAddressModal .modal-body { background: #f7fafc; padding: 16px; }
+      #stcChallanAddressModal .stc-addr-note {
+        margin: 0 0 12px;
+        color: #4a5568;
+        font-size: 13px;
+      }
+      #stcChallanAddressModal .stc-addr-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      #stcChallanAddressModal label {
+        display: block;
+        margin: 0 0 4px;
+        color: #2d3748;
+        font-weight: 600;
+        font-size: 12px;
+      }
+      #stcChallanAddressModal .form-control,
+      #stcChallanAddressModal select.form-control,
+      #stcChallanAddressModal textarea.form-control {
+        background: #fff !important;
+        color: #1a202c !important;
+        border: 1px solid #cbd5e0 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        height: 36px;
+        padding: 6px 10px;
+      }
+      #stcChallanAddressModal textarea.form-control {
+        height: 72px;
+        resize: vertical;
+      }
+      #stcChallanAddressModal .form-control::placeholder { color: #a0aec0; }
+      #stcChallanAddressModal #stc-addr-projects {
+        min-height: 18px;
+        margin-top: 6px;
+        color: #4a5568;
+        font-size: 12px;
+      }
+      #stcChallanAddressModal .stc-addr-combo { position: relative; }
+      #stcChallanAddressModal .stc-addr-suggest {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        z-index: 20;
+        max-height: 220px;
+        overflow-y: auto;
+        margin: 2px 0 0;
+        padding: 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.12);
+      }
+      #stcChallanAddressModal .stc-addr-suggest li {
+        padding: 8px 10px;
+        cursor: pointer;
+        color: #1a202c;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 13px;
+      }
+      #stcChallanAddressModal .stc-addr-suggest li:hover,
+      #stcChallanAddressModal .stc-addr-suggest li.is-active {
+        background: #ebf8ff;
+      }
+      #stcChallanAddressModal .stc-addr-suggest .stc-addr-sub {
+        display: block;
+        color: #718096;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      #stcChallanAddressModal .stc-addr-actions { margin-top: 22px; }
+      #stcChallanAddressModal #stc-addr-find,
+      #stcChallanAddressModal #stc-addr-save {
+        background: #2b6cb0;
+        border-color: #2b6cb0;
+        color: #fff;
+        height: 36px;
+      }
+      #stcChallanAddressModal #stc-addr-clear {
+        background: #fff;
+        border: 1px solid #cbd5e0;
+        color: #2d3748;
+        height: 36px;
+      }
+      #stcChallanAddressModal .stc-addr-list {
+        max-height: 260px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      #stcChallanAddressModal .table { margin: 0; background: #fff; }
+      #stcChallanAddressModal .table th,
+      #stcChallanAddressModal .table td {
+        background: #fff !important;
+        color: #1a202c !important;
+        border-color: #e2e8f0 !important;
+        vertical-align: middle;
+      }
+      #stcChallanAddressModal .table th {
+        background: #edf2f7 !important;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      #stcChallanAddressModal .stc-addr-pill {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      #stcChallanAddressModal .stc-addr-pill.is-saved { background: #c6f6d5; color: #276749; }
+      #stcChallanAddressModal .stc-addr-pill.is-empty { background: #feebc8; color: #9c4221; }
     </style>
   </head>
 
@@ -505,6 +841,9 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
     <div class="text-right hidden-print" style="margin:10px;">
       <a href="#" class="btn btn-success" id="stc-customer-format-btn" title="View customer format challan" style="margin-right:6px;">
         <i class="fas fa-file-alt"></i> Customer Format
+      </a>
+      <a href="#" class="btn btn-warning" id="stc-challan-address-btn" title="Add or update customer challan address" style="margin-right:6px;">
+        <i class="fas fa-map-marker"></i> Site Address
       </a>
       <div class="stc-dd" id="stc-dd-type">
         <button type="button" class="btn stc-dd-toggle" title="Material Item Type">
@@ -629,6 +968,73 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
                 ?>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="stcChallanAddressModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document" style="max-width:920px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Customer challan address</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <p class="stc-addr-note">One address is saved per requisition combiner name. Projects that share that name use the same row.</p>
+            <div class="stc-addr-card">
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Search combiner / project</label>
+                  <div class="stc-addr-combo">
+                    <input type="text" class="form-control" id="stc-addr-search" placeholder="Type combiner name or project title" autocomplete="off">
+                    <ul class="stc-addr-suggest" id="stc-addr-suggest"></ul>
+                  </div>
+                  <div id="stc-addr-projects"></div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <div class="col-md-6">
+                  <label>Addressee</label>
+                  <input type="text" class="form-control" id="stc-addr-addresse" placeholder="The Head Security Work">
+                </div>
+                <div class="col-md-6">
+                  <label>Selected combiner</label>
+                  <input type="text" class="form-control" id="stc-addr-picked" readonly placeholder="Pick a name from the list">
+                </div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <div class="col-md-5">
+                  <label>Site name / city</label>
+                  <textarea class="form-control" id="stc-addr-city" rows="2" placeholder="Site and city, one per line"></textarea>
+                </div>
+                <div class="col-md-4">
+                  <label>Gate name</label>
+                  <input type="text" class="form-control" id="stc-addr-gate" placeholder="JMD GATE">
+                </div>
+                <div class="col-md-3 stc-addr-actions">
+                  <button type="button" class="btn btn-block" id="stc-addr-save">Save</button>
+                  <button type="button" class="btn btn-block" id="stc-addr-clear" style="margin-top:6px;">Clear</button>
+                </div>
+              </div>
+            </div>
+            <div class="stc-addr-list">
+              <table class="table table-bordered table-condensed">
+                <thead>
+                  <tr>
+                    <th>Combiner name</th>
+                    <th class="text-center">Projects</th>
+                    <th>Addressee</th>
+                    <th>Gate</th>
+                    <th class="text-center">Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="stc-addr-body">
+                  <tr><td colspan="6" class="text-center text-muted">Open to load.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -919,6 +1325,156 @@ if(isset($_GET['ajax']) && $_GET['ajax'] !== '' && $_GET['ajax'] !== '0'){
           });
         }
         bindTableSearch();
+
+        var addrRows = [];
+        var addrPick = -1;
+        function fillAddrForm(row){
+          if(!row){
+            addrPick = -1;
+            $('#stc-addr-addresse, #stc-addr-city, #stc-addr-gate, #stc-addr-picked').val('');
+            $('#stc-addr-projects').text('');
+            return;
+          }
+          $('#stc-addr-picked').val(row.site_key || '');
+          $('#stc-addr-addresse').val(row.addresse || '');
+          $('#stc-addr-city').val(row.sitenamecity || '');
+          $('#stc-addr-gate').val(row.gatename || '');
+          var names = (row.projects || []).map(function(p){ return p.title; });
+          var extra = row.project_count > names.length ? ' and ' + (row.project_count - names.length) + ' more' : '';
+          $('#stc-addr-projects').text(names.length
+            ? (row.project_count + ' project(s) share this combiner name: ' + names.slice(0, 4).join(', ') + extra)
+            : 'Saved by combiner name. Search to see linked projects.');
+        }
+        function showAddrSuggest(rows){
+          var html = '';
+          (rows || []).forEach(function(r, i){
+            var saved = !!(r.id && r.addresse);
+            html += '<li data-i="'+i+'">'
+              + escHtml(r.site_key)
+              + '<span class="stc-addr-sub">'+(r.project_count || 0)+' project(s)'+(saved ? ' · saved' : '')+'</span>'
+              + '</li>';
+          });
+          if(!html) html = '<li class="stc-addr-empty">No match</li>';
+          $('#stc-addr-suggest').html(html).show();
+        }
+        function renderAddr(rows, showList){
+          addrRows = rows || [];
+          var html = '';
+          addrRows.forEach(function(r, i){
+            var saved = !!(r.id && r.addresse);
+            html += '<tr>'
+              + '<td>'+escHtml(r.site_key)+'</td>'
+              + '<td class="text-center">'+(r.project_count || 0)+'</td>'
+              + '<td>'+escHtml(r.addresse || '—')+'</td>'
+              + '<td>'+escHtml(r.gatename || '—')+'</td>'
+              + '<td class="text-center"><span class="stc-addr-pill '+(saved ? 'is-saved' : 'is-empty')+'">'+(saved ? 'Saved' : 'Not set')+'</span></td>'
+              + '<td class="text-center"><button type="button" class="btn btn-info btn-xs stc-addr-edit" data-i="'+i+'">Edit</button></td>'
+              + '</tr>';
+          });
+          if(!html) html = '<tr><td colspan="6" class="text-center text-muted">No combiner names found.</td></tr>';
+          $('#stc-addr-body').html(html);
+          if(showList) showAddrSuggest(addrRows);
+        }
+        function loadAddr(search, showList){
+          $('#stc-addr-body').html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+          $.ajax({
+            url: 'verify-challan.php',
+            method: 'POST',
+            dataType: 'json',
+            data: { stc_challan_address_list: 1, search: search || '' },
+            success: function(res){
+              if(!res || !res.ok){
+                $('#stc-addr-suggest').hide();
+                $('#stc-addr-body').html('<tr><td colspan="6" class="text-center text-danger">'+(res && res.message ? escHtml(res.message) : 'Could not load.')+'</td></tr>');
+                return;
+              }
+              renderAddr(res.data || [], !!showList);
+            },
+            error: function(){
+              $('#stc-addr-suggest').hide();
+              $('#stc-addr-body').html('<tr><td colspan="6" class="text-center text-danger">Could not load.</td></tr>');
+            }
+          });
+        }
+        var addrSearchTimer = null;
+        $('#stc-challan-address-btn').on('click', function(e){
+          e.preventDefault();
+          $('#stcChallanAddressModal').modal('show');
+          loadAddr('', false);
+        });
+        $('#stc-addr-search').on('input', function(){
+          var q = $(this).val() || '';
+          addrPick = -1;
+          clearTimeout(addrSearchTimer);
+          if(!q.trim()){
+            $('#stc-addr-suggest').hide();
+            return;
+          }
+          addrSearchTimer = setTimeout(function(){ loadAddr(q, true); }, 250);
+        });
+        $('#stc-addr-search').on('focus', function(){
+          if(($(this).val() || '').trim() && addrRows.length) showAddrSuggest(addrRows);
+        });
+        $(document).on('click', '#stc-addr-suggest li[data-i]', function(){
+          var i = parseInt($(this).data('i'), 10);
+          addrPick = i;
+          $('#stc-addr-search').val(addrRows[i].site_key || '');
+          $('#stc-addr-suggest').hide();
+          fillAddrForm(addrRows[i]);
+        });
+        $(document).on('click', function(e){
+          if(!$(e.target).closest('.stc-addr-combo').length) $('#stc-addr-suggest').hide();
+        });
+        $(document).on('click', '.stc-addr-edit', function(){
+          var i = parseInt($(this).data('i'), 10);
+          addrPick = i;
+          $('#stc-addr-search').val(addrRows[i].site_key || '');
+          $('#stc-addr-suggest').hide();
+          fillAddrForm(addrRows[i]);
+        });
+        $('#stc-addr-clear').on('click', function(){
+          $('#stc-addr-search').val('');
+          $('#stc-addr-suggest').hide();
+          fillAddrForm(null);
+        });
+        $('#stc-addr-save').on('click', function(){
+          var row = addrPick < 0 ? null : addrRows[addrPick];
+          if(!row){
+            alert('Select a combiner name first.');
+            return;
+          }
+          var addresse = ($('#stc-addr-addresse').val() || '').trim();
+          if(!addresse){
+            alert('Enter addressee.');
+            return;
+          }
+          var $btn = $(this).prop('disabled', true);
+          $.ajax({
+            url: 'verify-challan.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+              stc_challan_address_save: 1,
+              site_key: row.site_key,
+              project_id: row.project_id || 0,
+              addresse: addresse,
+              sitenamecity: $('#stc-addr-city').val() || '',
+              gatename: $('#stc-addr-gate').val() || ''
+            },
+            success: function(res){
+              $btn.prop('disabled', false);
+              if(!res || !res.ok){
+                alert((res && res.message) || 'Not saved.');
+                return;
+              }
+              loadAddr($('#stc-addr-search').val() || '');
+            },
+            error: function(){
+              $btn.prop('disabled', false);
+              alert('Could not save.');
+            }
+          });
+        });
       });
     </script>
   </body>
