@@ -398,7 +398,8 @@ input[type=checkbox]:not(old):checked + label > span:before {
   display: inline-block;
   width: auto; }
 
-label {
+.signup-form label,
+.signin-form label {
   position: absolute;
   left: 0;
   top: 50%;

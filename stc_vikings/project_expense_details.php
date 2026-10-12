@@ -8,6 +8,31 @@ if(isset($_GET['pro_id'])){
     $str = substr("0000{$num}", -$str_length);
 
     include "../MCU/db.php";
+    if (!function_exists('stc_rent_bill_line')) {
+        function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_per_day, $item_type, $rec_date, $date_from, $date_to){
+            $qty = (float)$qty;
+            $sale_rate = round((float)$sale_rate, 2);
+            $rent_per_day = round((float)$rent_per_day, 2);
+            $is_tools = stripos((string)$item_type, 'tool') !== false;
+            if ((int)$returnable === 1 && $rent_per_day > 0 && $is_tools) {
+                $start = strtotime(substr((string)$rec_date, 0, 10));
+                $from = strtotime(substr((string)$date_from, 0, 10));
+                $to = strtotime(substr((string)$date_to, 0, 10));
+                $today = strtotime(date('Y-m-d'));
+                $win_start = max($start ?: 0, $from ?: 0);
+                $win_end = min($to ?: $today, $today);
+                $days = ($win_start && $win_end >= $win_start) ? (int)floor(($win_end - $win_start) / 86400) + 1 : 0;
+                return array('rate' => $rent_per_day, 'total' => round($qty * $rent_per_day * $days, 2), 'days' => $days, 'rent' => true);
+            }
+            return array('rate' => $sale_rate, 'total' => round($qty * $sale_rate, 2), 'days' => 0, 'rent' => false);
+        }
+    }
+    foreach (array('stc_product_returnable' => 'TINYINT(1) NOT NULL DEFAULT 0', 'stc_product_rent_per_day' => 'DECIMAL(12,2) NOT NULL DEFAULT 0') as $col => $def) {
+        $cq = mysqli_query($con, "SHOW COLUMNS FROM `stc_product` LIKE '".$col."'");
+        if ($cq && mysqli_num_rows($cq) === 0) {
+            mysqli_query($con, "ALTER TABLE `stc_product` ADD `".$col."` ".$def);
+        }
+    }
     $checkpurchaseorder=mysqli_query($con, "
       SELECT * FROM `stc_cust_project`
       WHERE `stc_cust_project_id`='".mysqli_real_escape_string($con, $_GET['pro_id'])."'
@@ -391,7 +416,10 @@ if(isset($_GET['pro_id'])){
                                                         B.stc_cust_super_requisition_list_items_unit as unit,
                                                         A.stc_cust_super_requisition_list_items_rec_recqty as qty,
                                                         E.stc_purchase_product_adhoc_rate as rate,
-                                                        A.stc_cust_super_requisition_list_items_rec_date as rec_date
+                                                        A.stc_cust_super_requisition_list_items_rec_date as rec_date,
+                                                        IFNULL(P.stc_product_returnable, 0) AS returnable,
+                                                        IFNULL(P.stc_product_rent_per_day, 0) AS rent_per_day,
+                                                        B.stc_cust_super_requisition_items_type AS item_type
                                                         FROM stc_cust_super_requisition_list_items_rec A 
                                                         INNER JOIN stc_cust_super_requisition_list_items B
                                                         ON A.stc_cust_super_requisition_list_items_rec_list_item_id = B.stc_cust_super_requisition_list_id
@@ -401,8 +429,9 @@ if(isset($_GET['pro_id'])){
                                                         ON C.stc_cust_super_requisition_list_project_id = D.stc_cust_project_id
                                                         INNER JOIN stc_purchase_product_adhoc E
                                                         ON A.stc_cust_super_requisition_list_items_rec_list_poaid = E.stc_purchase_product_adhoc_id
+                                                        LEFT JOIN stc_product P ON P.stc_product_id = E.stc_purchase_product_adhoc_productid
                                                         WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$dateFrom."' AND '".$dateTo."'
-                                                        AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' AND E.stc_purchase_product_adhoc_rate > 0
+                                                        AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' AND (E.stc_purchase_product_adhoc_rate > 0 OR (IFNULL(P.stc_product_returnable,0)=1 AND IFNULL(P.stc_product_rent_per_day,0)>0))
                                                         ORDER BY D.stc_cust_project_title, B.stc_cust_super_requisition_list_items_title ASC
                                                     ";
                                                     // echo $query;
@@ -413,8 +442,21 @@ if(isset($_GET['pro_id'])){
 
                                                     if ($requisition_query) {
                                                         while ($req_row = mysqli_fetch_assoc($requisition_query)) {
-                                                            $rate = round((float) $req_row['rate'], 2);
-                                                            $total = round((float) $req_row['qty'] * $rate, 2);
+                                                            $bill = stc_rent_bill_line(
+                                                                $req_row['qty'],
+                                                                $req_row['rate'],
+                                                                $req_row['returnable'],
+                                                                $req_row['rent_per_day'],
+                                                                $req_row['item_type'],
+                                                                $req_row['rec_date'],
+                                                                $dateFrom,
+                                                                $dateTo
+                                                            );
+                                                            $rate = $bill['rate'];
+                                                            $total = $bill['total'];
+                                                            if ($bill['rent']) {
+                                                                $req_row['item_name'] .= ' (rent x '.$bill['days'].' day'.($bill['days'] == 1 ? '' : 's').')';
+                                                            }
                                                             $req_row['rate'] = $rate;
                                                             $req_row['total'] = $total;
                                                             $rows[] = $req_row;

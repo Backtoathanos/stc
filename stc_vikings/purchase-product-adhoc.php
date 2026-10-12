@@ -1780,6 +1780,14 @@ include("kattegat/role_check.php");
                                             title="Product buy history"
                                             aria-label="Product buy history"
                                           ><i class="fa fa-search" aria-hidden="true"></i></a>
+                                          <a
+                                            class="btn btn-outline-success"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-tools-rent"
+                                            href="javascript:void(0)"
+                                            title="Returnable tools rent"
+                                            aria-label="Returnable tools rent"
+                                          ><i class="fa fa-wrench" aria-hidden="true"></i></a>
                                         </div>
 
                                         <button
@@ -7214,6 +7222,165 @@ include("kattegat/role_check.php");
         </div>
     </div>
 </div>
+<div class="modal fade bd-modal-tools-rent" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:960px;width:96%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dispatched tools rent</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="stc-tools-rent-bar" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <input type="text" class="form-control" id="stc-tools-rent-search" placeholder="Search product, site, or date…" autocomplete="off" style="flex:1;">
+                    <button type="button" class="btn btn-sm btn-outline-success" id="stc-tools-rent-excel" title="Export Excel" aria-label="Export Excel"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="stc-tools-rent-pdf" title="Download PDF" aria-label="Download PDF"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></button>
+                </div>
+                <div class="table-responsive" style="max-height:420px;overflow:auto;">
+                    <table class="table table-bordered table-sm" id="stc-tools-rent-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Site</th>
+                                <th>Qty</th>
+                                <th>Month</th>
+                                <th>Dispatch</th>
+                                <th>Days</th>
+                                <th>Rent/day</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stc-tools-rent-body">
+                            <tr class="stc-tools-rent-empty"><td colspan="8">Open this window to load dispatched tools.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-rent-edit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set daily rent</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p id="stc-rent-product-name" style="font-weight:600;margin-bottom:12px;"></p>
+                <input type="hidden" id="stc-rent-product-id">
+                <div class="form-group">
+                    <span class="stc-mersync-label">Rent / day</span>
+                    <input type="number" min="0" step="0.01" class="form-control" id="stc-rent-per-day" placeholder="10">
+                </div>
+                <div><label style="position:static;transform:none;"><input type="checkbox" id="stc-rent-returnable"> Returnable</label></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="stc-rent-save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function($){
+  var toolsRentRows = [];
+  function esc(v){ return $('<div>').text(v == null ? '' : v).html(); }
+  function money(v){ return parseFloat(v || 0).toFixed(2); }
+  function rentMonth(days){
+    var n = parseFloat(days || 0);
+    if(!n || n < 0) return '0.00';
+    return (n / 30).toFixed(2);
+  }
+  function visibleRentRows(){
+    var q = $.trim($('#stc-tools-rent-search').val()).toLowerCase();
+    return $.grep(toolsRentRows, function(r){
+      if(!q) return true;
+      var blob = [r.item_name, r.stc_product_name, r.project_title, rentMonth(r.days), r.rec_date].join(' ').toLowerCase();
+      return blob.indexOf(q) !== -1;
+    });
+  }
+  function paintToolsRent(){
+    var rows = visibleRentRows();
+    if(!toolsRentRows.length){
+      $('#stc-tools-rent-body').html('<tr class="stc-tools-rent-empty"><td colspan="8">No dispatched returnable tools yet.</td></tr>');
+      return;
+    }
+    if(!rows.length){
+      $('#stc-tools-rent-body').html('<tr class="stc-tools-rent-empty"><td colspan="8">No tools match this search.</td></tr>');
+      return;
+    }
+    var html = '';
+    var total = 0;
+    $.each(rows, function(_, r){
+      total += parseFloat(r.amount || 0);
+      html += '<tr><td>'+esc(r.item_name || r.stc_product_name)+'</td>'
+        + '<td>'+esc(r.project_title || '')+'</td>'
+        + '<td class="text-right">'+money(r.qty)+'</td>'
+        + '<td class="text-right">'+esc(rentMonth(r.days))+'</td>'
+        + '<td>'+esc(r.rec_date || '')+'</td>'
+        + '<td class="text-right">'+(r.days || 0)+'</td>'
+        + '<td class="text-right">'+money(r.stc_product_rent_per_day)+'</td>'
+        + '<td class="text-right">'+money(r.amount)+'</td></tr>';
+    });
+    html += '<tr><td colspan="7" class="text-right"><strong>Total</strong></td><td class="text-right"><strong>'+money(total)+'</strong></td></tr>';
+    $('#stc-tools-rent-body').html(html);
+  }
+  function loadToolsRent(){
+    $('#stc-tools-rent-body').html('<tr class="stc-tools-rent-empty"><td colspan="8">Loading…</td></tr>');
+    $.post('kattegat/ragnar_purchase.php', { stc_tools_rent_list: 1 }, function(rows){
+      toolsRentRows = $.isArray(rows) ? rows : [];
+      paintToolsRent();
+    }, 'json');
+  }
+  $('.bd-modal-tools-rent').on('shown.bs.modal', loadToolsRent);
+  $('#stc-tools-rent-search').on('input', paintToolsRent);
+  $('#stc-tools-rent-excel').on('click', function(){
+    if(!$.fn.table2excel){ alert('Excel export is not available.'); return; }
+    var $clone = $('#stc-tools-rent-table').clone();
+    $clone.find('.stc-tools-rent-empty').closest('tr').remove();
+    var $wrap = $('<div style="display:none;"/>').append($clone);
+    $('body').append($wrap);
+    $clone.table2excel({
+      filename: 'tools-rent-' + new Date().toISOString().slice(0, 10) + '.xls',
+      name: 'Tools rent'
+    });
+    $wrap.remove();
+  });
+  $('#stc-tools-rent-pdf').on('click', function(){
+    if(!visibleRentRows().length){ alert('No tools to export.'); return; }
+    var q = $.trim($('#stc-tools-rent-search').val());
+    window.open('tools-rent-print.php' + (q ? '?q=' + encodeURIComponent(q) : ''), '_blank');
+  });
+  $(document).on('click', '.stc-poa-rent-edit', function(){
+    $('#stc-rent-product-id').val($(this).data('product-id'));
+    $('#stc-rent-product-name').text($(this).data('product-name'));
+    $('#stc-rent-per-day').val($(this).data('rent'));
+    $('#stc-rent-returnable').prop('checked', String($(this).data('returnable')) === '1');
+    $('.bd-modal-rent-edit').modal('show');
+  });
+  $('#stc-rent-save').on('click', function(){
+    var productId = $('#stc-rent-product-id').val();
+    if(!productId){
+      alert('Open Set rent from a product row first.');
+      return;
+    }
+    $.post('kattegat/ragnar_purchase.php', {
+      stc_product_rent_save: 1,
+      product_id: productId,
+      returnable: $('#stc-rent-returnable').is(':checked') ? 1 : 0,
+      rent_per_day: $('#stc-rent-per-day').val()
+    }, function(msg){
+      if(String(msg).indexOf('saved') === 0){
+        $('.bd-modal-rent-edit').modal('hide');
+        if(typeof window.stcPoaReload === 'function'){ window.stcPoaReload(); }
+        else { $('.stc-adhocpo-find').first().trigger('click'); }
+      } else {
+        alert(msg || 'Could not save.');
+      }
+    });
+  });
+})(jQuery);
+</script>
 <div class="modal fade bd-modal-merchant-sync-rename" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

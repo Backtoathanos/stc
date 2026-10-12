@@ -1,7 +1,38 @@
 <?php
-include "../../MCU/obdb.php";
-session_start();
+include __DIR__ . "/../../MCU/obdb.php";
+if (session_status() === PHP_SESSION_NONE) {
+	session_start();
+}
 require_once __DIR__ . '/includes/vikings_session_defaults.php';
+
+function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_per_day, $item_type, $rec_date, $date_from, $date_to){
+	$qty = (float)$qty;
+	$sale_rate = round((float)$sale_rate, 2);
+	$rent_per_day = round((float)$rent_per_day, 2);
+	$is_tools = stripos((string)$item_type, 'tool') !== false;
+	if((int)$returnable === 1 && $rent_per_day > 0 && $is_tools){
+		$start = strtotime(substr((string)$rec_date, 0, 10));
+		$from = strtotime(substr((string)$date_from, 0, 10));
+		$to = strtotime(substr((string)$date_to, 0, 10));
+		$today = strtotime(date('Y-m-d'));
+		$win_start = max($start ?: 0, $from ?: 0);
+		$win_end = min($to ?: $today, $today);
+		$days = ($win_start && $win_end >= $win_start) ? (int)floor(($win_end - $win_start) / 86400) + 1 : 0;
+		return array(
+			'rate' => $rent_per_day,
+			'total' => round($qty * $rent_per_day * $days, 2),
+			'days' => $days,
+			'rent' => true,
+		);
+	}
+	return array(
+		'rate' => $sale_rate,
+		'total' => round($qty * $sale_rate, 2),
+		'days' => 0,
+		'rent' => false,
+	);
+}
+
 class ragnarPurchaseAdd extends tesseract{
 	// call vendor on po page
 	public function stc_call_vendor(){
@@ -2526,8 +2557,112 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 	}
 
+	private function stc_poadhoc_rent_html($row, $qty){
+		$pid = (int)($row['stc_product_id'] ?? 0);
+		if($pid < 1){
+			return '';
+		}
+		$returnable = (int)($row['stc_product_returnable'] ?? 0);
+		$rent = (float)($row['stc_product_rent_per_day'] ?? 0);
+		$name = htmlspecialchars((string)($row['stc_product_name'] ?? ''), ENT_QUOTES);
+		if($returnable === 1){
+			$day_total = round($qty * $rent, 2);
+			return "
+				<div class='stc-poa-rent-note' style='margin-top:4px;font-size:12px;color:#0b6b4f;'>
+					Returnable<br>
+					₹".number_format($rent, 2)."/day<br>
+					₹".number_format($day_total, 2)."/day for ".number_format($qty, 2)."
+					<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='1' data-rent='".$rent."'>Edit</a>
+				</div>
+			";
+		}
+		return "
+			<div style='margin-top:4px;'>
+				<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='0' data-rent='0'>Set rent</a>
+			</div>
+		";
+	}
+
+	public function stc_ensure_product_rent_columns(){
+		$cols = array(
+			'stc_product_returnable' => "TINYINT(1) NOT NULL DEFAULT 0",
+			'stc_product_rent_per_day' => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+		);
+		foreach($cols as $name => $def){
+			$q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_product` LIKE '".$name."'");
+			if($q && mysqli_num_rows($q) === 0){
+				mysqli_query($this->stc_dbs, "ALTER TABLE `stc_product` ADD `".$name."` ".$def);
+			}
+		}
+	}
+
+	public function stc_product_rent_save($product_id, $returnable, $rent_per_day){
+		$this->stc_ensure_product_rent_columns();
+		$product_id = (int)$product_id;
+		$returnable = (int)$returnable === 1 ? 1 : 0;
+		$rent_per_day = is_numeric($rent_per_day) ? round((float)$rent_per_day, 2) : 0;
+		if($product_id < 1){
+			return 'Product is required.';
+		}
+		$ok = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_product`
+			SET `stc_product_returnable`='".$returnable."',
+				`stc_product_rent_per_day`='".$rent_per_day."'
+			WHERE `stc_product_id`='".$product_id."'
+		");
+		return $ok ? 'saved' : mysqli_error($this->stc_dbs);
+	}
+
+	public function stc_tools_rent_dispatch_rows(){
+		$this->stc_ensure_product_rent_columns();
+		$sql = "
+			SELECT
+				P.stc_product_id,
+				P.stc_product_name,
+				P.stc_product_rent_per_day,
+				A.stc_purchase_product_adhoc_itemdesc AS item_name,
+				A.stc_purchase_product_adhoc_unit AS unit,
+				R.stc_cust_super_requisition_list_items_rec_recqty AS qty,
+				R.stc_cust_super_requisition_list_items_rec_date AS rec_date,
+				D.stc_cust_project_title AS project_title,
+				I.stc_cust_super_requisition_items_type AS item_type
+			FROM stc_cust_super_requisition_list_items_rec R
+			INNER JOIN stc_purchase_product_adhoc A
+				ON A.stc_purchase_product_adhoc_id = R.stc_cust_super_requisition_list_items_rec_list_poaid
+			INNER JOIN stc_product P
+				ON P.stc_product_id = A.stc_purchase_product_adhoc_productid
+			INNER JOIN stc_cust_super_requisition_list_items I
+				ON I.stc_cust_super_requisition_list_id = R.stc_cust_super_requisition_list_items_rec_list_item_id
+			INNER JOIN stc_cust_super_requisition_list L
+				ON L.stc_cust_super_requisition_list_id = R.stc_cust_super_requisition_list_items_rec_list_id
+			INNER JOIN stc_cust_project D
+				ON D.stc_cust_project_id = L.stc_cust_super_requisition_list_project_id
+			WHERE P.stc_product_returnable = 1
+			AND I.stc_cust_super_requisition_items_type LIKE '%Tool%'
+			ORDER BY R.stc_cust_super_requisition_list_items_rec_date DESC
+			LIMIT 400
+		";
+		$q = mysqli_query($this->stc_dbs, $sql);
+		$rows = array();
+		$today = strtotime(date('Y-m-d'));
+		if($q){
+			while($row = mysqli_fetch_assoc($q)){
+				$start = strtotime(substr((string)$row['rec_date'], 0, 10));
+				$days = ($start && $today >= $start) ? (int)floor(($today - $start) / 86400) + 1 : 0;
+				$qty = (float)$row['qty'];
+				$rent = (float)$row['stc_product_rent_per_day'];
+				$row['days'] = $days;
+				$row['amount'] = round($qty * $rent * $days, 2);
+				$row['rec_date'] = $start ? date('d-m-Y', $start) : '';
+				$rows[] = $row;
+			}
+		}
+		return $rows;
+	}
+
 	// call po adhoc
 	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize, $adhoc_id = '', $product_id = '', $product_name = '', $adhoc_name = '', $received_by = '', $remarks = '', $sort_col = 'adhoc_id', $sort_dir = 'DESC'){
+		$this->stc_ensure_product_rent_columns();
 		$odin='';
 		$filter='';
 		if($itemname!=""){
@@ -2624,7 +2759,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_created_date`,
 				`stc_purchase_product_adhoc_updated_by`,
 				`stc_purchase_product_adhoc_updated_date`,
-				`stc_product_sale_percentage`
+				`stc_product_sale_percentage`,
+				IFNULL(`stc_product_returnable`, 0) AS `stc_product_returnable`,
+				IFNULL(`stc_product_rent_per_day`, 0) AS `stc_product_rent_per_day`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
 			LEFT JOIN `stc_category` ON `stc_product_cat_id`=`stc_cat_id`
@@ -2867,6 +3004,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 								<span>".number_format($product_sale_pct, 2)."</span>%</br>
 								".number_format($poadhoc_rate, 2)."
 							</a>
+							".$this->stc_poadhoc_rent_html($odinrow, $poadhoc_qty)."
 							".$pro_prate.$pro_percentage.$pro_rate."
 						</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
@@ -3356,11 +3494,19 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}	
 
 	public function stc_poadhoc_customerledger($dateFrom, $dateTo, $siteName) {
+		$this->stc_ensure_product_rent_columns();
 		$filter = '';
 		$dateFrom=date('Y-m-d', strtotime($dateFrom));
 		$dateTo=date('Y-m-d', strtotime($dateTo));
 		$query = "
-			SELECT D.stc_cust_project_id, D.stc_cust_project_title, A.stc_cust_super_requisition_list_items_rec_recqty as qty, E.stc_purchase_product_adhoc_rate as rate FROM `stc_cust_super_requisition_list_items_rec` A 
+			SELECT D.stc_cust_project_id, D.stc_cust_project_title,
+				A.stc_cust_super_requisition_list_items_rec_recqty as qty,
+				A.stc_cust_super_requisition_list_items_rec_date as rec_date,
+				E.stc_purchase_product_adhoc_rate as rate,
+				IFNULL(P.stc_product_returnable, 0) AS returnable,
+				IFNULL(P.stc_product_rent_per_day, 0) AS rent_per_day,
+				B.stc_cust_super_requisition_items_type AS item_type
+			FROM `stc_cust_super_requisition_list_items_rec` A 
 			INNER JOIN stc_cust_super_requisition_list_items B
 			ON A.stc_cust_super_requisition_list_items_rec_list_item_id=B.stc_cust_super_requisition_list_id
 			INNER JOIN stc_cust_super_requisition_list C
@@ -3369,6 +3515,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			ON C.stc_cust_super_requisition_list_project_id=D.stc_cust_project_id
 			INNER JOIN stc_purchase_product_adhoc E
 			ON A.stc_cust_super_requisition_list_items_rec_list_poaid=E.stc_purchase_product_adhoc_id
+			LEFT JOIN stc_product P ON P.stc_product_id = E.stc_purchase_product_adhoc_productid
 			WHERE stc_cust_project_cust_id=$siteName AND DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' 
 			ORDER BY D.stc_cust_project_title
 		";
@@ -3384,8 +3531,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 						'total' => 0,
 					);
 				}
-				$rate = round((float) $row['rate'], 2);
-				$projects[$projectId]['total'] += round((float) $row['qty'] * $rate, 2);
+				$bill = stc_rent_bill_line($row['qty'], $row['rate'], $row['returnable'], $row['rent_per_day'], $row['item_type'], $row['rec_date'], $dateFrom, $dateTo);
+				$projects[$projectId]['total'] += $bill['total'];
 			}
 		}
 		$odin = array();
@@ -5092,6 +5239,23 @@ if(isset($_POST['stc_po_adhoc_imgupdate'])){
 }
 
 // update image id
+if(isset($_POST['stc_product_rent_save'])){
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	echo $bjornestocking->stc_product_rent_save(
+		isset($_POST['product_id']) ? $_POST['product_id'] : 0,
+		isset($_POST['returnable']) ? $_POST['returnable'] : 0,
+		isset($_POST['rent_per_day']) ? $_POST['rent_per_day'] : 0
+	);
+	exit;
+}
+
+if(isset($_POST['stc_tools_rent_list'])){
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	header('Content-Type: application/json');
+	echo json_encode($bjornestocking->stc_tools_rent_dispatch_rows());
+	exit;
+}
+
 if(isset($_POST['stc_po_adhoc_rateupdate'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$rate=$_POST['rate'];
