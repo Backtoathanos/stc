@@ -460,6 +460,7 @@ class witcher_supervisor extends tesseract{
 		$rows_on_page=($requisitioni_qry ? mysqli_num_rows($requisitioni_qry) : 0);
 		if($rows_on_page>0){
 			foreach($requisitioni_qry as $requisitioni_row){
+				$this->stc_req_replace_after_return($requisitioni_row['list_item_id']);
 				$reqstaus='';
 				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==1){
 					$reqstaus='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
@@ -827,6 +828,7 @@ class witcher_supervisor extends tesseract{
 
 		if ($rows_on_page > 0) {
 			foreach ($requisitioni_qry as $requisitioni_row) {
+				$this->stc_req_replace_after_return($requisitioni_row['list_item_id']);
 				$reqstaus = $this->stc_req_status_badge($requisitioni_row['stc_cust_super_requisition_list_items_status']);
 				$priority = $requisitioni_row['stc_cust_super_requisition_items_priority'] == 2 ? 'Urgent' : 'Normal';
 
@@ -1003,6 +1005,7 @@ class witcher_supervisor extends tesseract{
 		");
 		if(mysqli_num_rows($transformersquery)>0){
 			foreach($transformersquery as $firstrow){
+				$this->stc_req_replace_after_return($firstrow['stc_cust_super_requisition_list_id']);
 				$sl++;
 				$reqstaus='';
 				if($firstrow['stc_cust_super_requisition_list_items_status']==1){
@@ -1226,6 +1229,7 @@ class witcher_supervisor extends tesseract{
 		$stcfinalvalue=0;
 		$stcsupunit='';
 		$date=date("Y-m-d H:i:s");
+		$this->stc_req_replace_after_return($stc_req_item_id);
 		$stcceckqntyqry=mysqli_query($this->stc_dbs, "
 			SELECT 
 				`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
@@ -1424,6 +1428,57 @@ class witcher_supervisor extends tesseract{
 		return $odin;
 	}
 
+	private function stc_req_replace_after_return($item_id){
+		$item_id = (int)$item_id;
+		if($item_id < 1){
+			return;
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT `id`, `created_date`
+			FROM `stc_cust_super_requisition_list_items_log`
+			WHERE `item_id`='".$item_id."' AND `title`='Returned'
+			ORDER BY `id` DESC
+			LIMIT 1
+		");
+		if(!$q || !($returned = mysqli_fetch_assoc($q))){
+			return;
+		}
+		$return_id = (int)$returned['id'];
+		$again = mysqli_query($this->stc_dbs, "
+			SELECT `created_date`
+			FROM `stc_cust_super_requisition_list_items_log`
+			WHERE `item_id`='".$item_id."' AND `title`='Dispatched' AND `id`>".$return_id."
+			ORDER BY `id` DESC
+			LIMIT 1
+		");
+		$since = '';
+		if($again && ($dispatched = mysqli_fetch_assoc($again)) && !empty($dispatched['created_date'])){
+			$since = $dispatched['created_date'];
+		}elseif(!empty($returned['created_date'])){
+			$since = $returned['created_date'];
+		}
+		if($since === ''){
+			return;
+		}
+		$since_esc = mysqli_real_escape_string($this->stc_dbs, $since);
+		mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_super_requisition_list_items_rec`
+			WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$item_id."'
+			AND (
+				`stc_cust_super_requisition_list_items_rec_date` IS NULL
+				OR `stc_cust_super_requisition_list_items_rec_date` < '".$since_esc."'
+			)
+		");
+		mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_super_requisition_rec_items_fr_supervisor`
+			WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$item_id."'
+			AND (
+				`stc_cust_super_requisition_rec_items_fr_supervisor_date` IS NULL
+				OR `stc_cust_super_requisition_rec_items_fr_supervisor_date` < '".$since_esc."'
+			)
+		");
+	}
+
 	public function stc_return_item($req_id){
 		$odin='';
 		$query=mysqli_query($this->stc_dbs, "
@@ -1435,6 +1490,7 @@ class witcher_supervisor extends tesseract{
 				
 			}
 			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='8' WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
+			mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_rec_items_fr_supervisor` WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
 			
 			$title="Returned";
 			$message="Returned by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A');
