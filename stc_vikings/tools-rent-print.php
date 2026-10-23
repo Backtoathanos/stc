@@ -77,7 +77,7 @@ td { background: #fff; }
         <th>Month</th>
         <th>Dispatch</th>
         <th>Days</th>
-        <th>Rent/day</th>
+        <th>Rent/month</th>
         <th>Amount</th>
       </tr>
     </thead>
@@ -95,10 +95,10 @@ td { background: #fff; }
           <td><?php echo htmlspecialchars($row['item_name'] ?: $row['stc_product_name']); ?></td>
           <td><?php echo htmlspecialchars($row['project_title'] ?? ''); ?></td>
           <td class="r"><?php echo number_format((float)$row['qty'], 2); ?></td>
-          <td class="r"><?php echo number_format($days / 30, 2); ?></td>
+          <td><?php echo htmlspecialchars(stc_rent_span_label($days)); ?></td>
           <td class="c"><?php echo htmlspecialchars($row['rec_date'] ?? ''); ?></td>
           <td class="r"><?php echo $days; ?></td>
-          <td class="r"><?php echo number_format((float)$row['stc_product_rent_per_day'], 2); ?></td>
+          <td class="r"><?php echo number_format((float)($row['rent_month'] ?? 0), 2); ?></td>
           <td class="r"><b><?php echo number_format($amount, 2); ?></b></td>
         </tr>
       <?php } ?>
@@ -109,7 +109,7 @@ td { background: #fff; }
       <?php } ?>
     </tbody>
   </table>
-  <p class="rent-note">Amount = qty × rent/day × days from dispatch through today</p>
+  <p class="rent-note">Amount = qty × (purchase rate × rent %) / month × (days / 30)</p>
 </div>
 <script>window.onload = function () { setTimeout(function () { window.print(); }, 400); };</script>
 </body>

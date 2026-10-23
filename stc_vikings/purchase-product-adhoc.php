@@ -1012,8 +1012,10 @@ include("kattegat/role_check.php");
       }
       .bd-modal-merchant-sync-rename label,
       .bd-modal-merchant-sync-add label,
+      .bd-modal-rent-edit label,
       .bd-modal-merchant-sync-rename .stc-mersync-label,
-      .bd-modal-merchant-sync-add .stc-mersync-label {
+      .bd-modal-merchant-sync-add .stc-mersync-label,
+      .bd-modal-rent-edit .stc-mersync-label {
           position: relative !important;
           left: auto !important;
           top: auto !important;
@@ -7245,7 +7247,7 @@ include("kattegat/role_check.php");
                                 <th>Month</th>
                                 <th>Dispatch</th>
                                 <th>Days</th>
-                                <th>Rent/day</th>
+                                <th>Rent/month</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
@@ -7262,16 +7264,22 @@ include("kattegat/role_check.php");
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Set daily rent</h5>
+                <h5 class="modal-title">Set monthly rent</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <p id="stc-rent-product-name" style="font-weight:600;margin-bottom:12px;"></p>
                 <input type="hidden" id="stc-rent-product-id">
+                <input type="hidden" id="stc-rent-prate" value="0">
                 <div class="form-group">
-                    <span class="stc-mersync-label">Rent / day</span>
-                    <input type="number" min="0" step="0.01" class="form-control" id="stc-rent-per-day" placeholder="10">
+                    <span class="stc-mersync-label">Purchase rate</span>
+                    <input type="text" class="form-control" id="stc-rent-prate-show" readonly>
                 </div>
+                <div class="form-group">
+                    <span class="stc-mersync-label">Rent %</span>
+                    <input type="number" min="0" step="0.01" class="form-control" id="stc-rent-percent" placeholder="15">
+                </div>
+                <p id="stc-rent-calc" style="margin-top:8px;font-weight:600;color:#0b6b4f;"></p>
                 <div><label style="position:static;transform:none;"><input type="checkbox" id="stc-rent-returnable"> Returnable</label></div>
             </div>
             <div class="modal-footer">
@@ -7287,9 +7295,14 @@ include("kattegat/role_check.php");
   function esc(v){ return $('<div>').text(v == null ? '' : v).html(); }
   function money(v){ return parseFloat(v || 0).toFixed(2); }
   function rentMonth(days){
-    var n = parseFloat(days || 0);
-    if(!n || n < 0) return '0.00';
-    return (n / 30).toFixed(2);
+    var n = parseInt(days || 0, 10);
+    if(!n || n < 1) return '0 days';
+    var months = Math.floor(n / 30);
+    var left = n % 30;
+    var parts = [];
+    if(months > 0) parts.push(months + (months === 1 ? ' month' : ' months'));
+    if(left > 0) parts.push(left + (left === 1 ? ' day' : ' days'));
+    return parts.join(' ');
   }
   function visibleRentRows(){
     var q = $.trim($('#stc-tools-rent-search').val()).toLowerCase();
@@ -7316,10 +7329,10 @@ include("kattegat/role_check.php");
       html += '<tr><td>'+esc(r.item_name || r.stc_product_name)+'</td>'
         + '<td>'+esc(r.project_title || '')+'</td>'
         + '<td class="text-right">'+money(r.qty)+'</td>'
-        + '<td class="text-right">'+esc(rentMonth(r.days))+'</td>'
+        + '<td>'+esc(rentMonth(r.days))+'</td>'
         + '<td>'+esc(r.rec_date || '')+'</td>'
         + '<td class="text-right">'+(r.days || 0)+'</td>'
-        + '<td class="text-right">'+money(r.stc_product_rent_per_day)+'</td>'
+        + '<td class="text-right">'+money(r.rent_month)+'</td>'
         + '<td class="text-right">'+money(r.amount)+'</td></tr>';
     });
     html += '<tr><td colspan="7" class="text-right"><strong>Total</strong></td><td class="text-right"><strong>'+money(total)+'</strong></td></tr>';
@@ -7354,10 +7367,20 @@ include("kattegat/role_check.php");
   $(document).on('click', '.stc-poa-rent-edit', function(){
     $('#stc-rent-product-id').val($(this).data('product-id'));
     $('#stc-rent-product-name').text($(this).data('product-name'));
-    $('#stc-rent-per-day').val($(this).data('rent'));
+    $('#stc-rent-prate').val($(this).data('prate') || 0);
+    $('#stc-rent-prate-show').val(parseFloat($(this).data('prate') || 0).toFixed(2));
+    $('#stc-rent-percent').val($(this).data('percent') || 0);
     $('#stc-rent-returnable').prop('checked', String($(this).data('returnable')) === '1');
+    paintRentCalc();
     $('.bd-modal-rent-edit').modal('show');
   });
+  function paintRentCalc(){
+    var prate = parseFloat($('#stc-rent-prate').val() || 0);
+    var pct = parseFloat($('#stc-rent-percent').val() || 0);
+    var monthly = prate * pct / 100;
+    $('#stc-rent-calc').text(prate.toFixed(2) + ' × ' + pct.toFixed(2) + '% = ₹' + monthly.toFixed(2) + ' / month');
+  }
+  $('#stc-rent-percent').on('input', paintRentCalc);
   $('#stc-rent-save').on('click', function(){
     var productId = $('#stc-rent-product-id').val();
     if(!productId){
@@ -7368,7 +7391,7 @@ include("kattegat/role_check.php");
       stc_product_rent_save: 1,
       product_id: productId,
       returnable: $('#stc-rent-returnable').is(':checked') ? 1 : 0,
-      rent_per_day: $('#stc-rent-per-day').val()
+      rent_percent: $('#stc-rent-percent').val()
     }, function(msg){
       if(String(msg).indexOf('saved') === 0){
         $('.bd-modal-rent-edit').modal('hide');

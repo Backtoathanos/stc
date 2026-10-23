@@ -5,12 +5,33 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/includes/vikings_session_defaults.php';
 
-function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_per_day, $item_type, $rec_date, $date_from, $date_to){
+function stc_rent_monthly($purchase_rate, $rent_percent){
+	return round((float)$purchase_rate * (float)$rent_percent / 100, 2);
+}
+
+function stc_rent_span_label($days){
+	$days = (int)$days;
+	if($days < 1){
+		return '0 days';
+	}
+	$months = (int)floor($days / 30);
+	$left = $days % 30;
+	$parts = array();
+	if($months > 0){
+		$parts[] = $months.' month'.($months === 1 ? '' : 's');
+	}
+	if($left > 0){
+		$parts[] = $left.' day'.($left === 1 ? '' : 's');
+	}
+	return implode(' ', $parts);
+}
+
+function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_percent, $item_type, $rec_date, $date_from, $date_to, $purchase_rate = 0){
 	$qty = (float)$qty;
 	$sale_rate = round((float)$sale_rate, 2);
-	$rent_per_day = round((float)$rent_per_day, 2);
+	$monthly = stc_rent_monthly($purchase_rate, $rent_percent);
 	$is_tools = stripos((string)$item_type, 'tool') !== false;
-	if((int)$returnable === 1 && $rent_per_day > 0 && $is_tools){
+	if((int)$returnable === 1 && $monthly > 0 && $is_tools){
 		$start = strtotime(substr((string)$rec_date, 0, 10));
 		$from = strtotime(substr((string)$date_from, 0, 10));
 		$to = strtotime(substr((string)$date_to, 0, 10));
@@ -18,10 +39,12 @@ function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_per_day, $item_
 		$win_start = max($start ?: 0, $from ?: 0);
 		$win_end = min($to ?: $today, $today);
 		$days = ($win_start && $win_end >= $win_start) ? (int)floor(($win_end - $win_start) / 86400) + 1 : 0;
+		$months = $days / 30;
 		return array(
-			'rate' => $rent_per_day,
-			'total' => round($qty * $rent_per_day * $days, 2),
+			'rate' => $monthly,
+			'total' => round($qty * $monthly * $months, 2),
 			'days' => $days,
+			'months' => round($months, 2),
 			'rent' => true,
 		);
 	}
@@ -29,6 +52,7 @@ function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_per_day, $item_
 		'rate' => $sale_rate,
 		'total' => round($qty * $sale_rate, 2),
 		'days' => 0,
+		'months' => 0,
 		'rent' => false,
 	);
 }
@@ -2563,22 +2587,24 @@ class ragnarPurchaseAdhoc extends tesseract{
 			return '';
 		}
 		$returnable = (int)($row['stc_product_returnable'] ?? 0);
-		$rent = (float)($row['stc_product_rent_per_day'] ?? 0);
+		$percent = (float)($row['stc_product_rent_percent'] ?? 0);
+		$prate = (float)($row['stc_purchase_product_adhoc_prate'] ?? 0);
+		$monthly = stc_rent_monthly($prate, $percent);
 		$name = htmlspecialchars((string)($row['stc_product_name'] ?? ''), ENT_QUOTES);
 		if($returnable === 1){
-			$day_total = round($qty * $rent, 2);
+			$month_total = round($qty * $monthly, 2);
 			return "
 				<div class='stc-poa-rent-note' style='margin-top:4px;font-size:12px;color:#0b6b4f;'>
 					Returnable<br>
-					₹".number_format($rent, 2)."/day<br>
-					₹".number_format($day_total, 2)."/day for ".number_format($qty, 2)."
-					<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='1' data-rent='".$rent."'>Edit</a>
+					".number_format($percent, 2)."% = ₹".number_format($monthly, 2)."/month<br>
+					₹".number_format($month_total, 2)."/month for ".number_format($qty, 2)."
+					<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='1' data-percent='".$percent."' data-prate='".$prate."'>Edit</a>
 				</div>
 			";
 		}
 		return "
 			<div style='margin-top:4px;'>
-				<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='0' data-rent='0'>Set rent</a>
+				<a href='javascript:void(0)' class='stc-poa-rent-edit' data-product-id='".$pid."' data-product-name='".$name."' data-returnable='0' data-percent='0' data-prate='".$prate."'>Set rent</a>
 			</div>
 		";
 	}
@@ -2587,6 +2613,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$cols = array(
 			'stc_product_returnable' => "TINYINT(1) NOT NULL DEFAULT 0",
 			'stc_product_rent_per_day' => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+			'stc_product_rent_percent' => "DECIMAL(8,2) NOT NULL DEFAULT 0",
 		);
 		foreach($cols as $name => $def){
 			$q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_product` LIKE '".$name."'");
@@ -2596,18 +2623,18 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 	}
 
-	public function stc_product_rent_save($product_id, $returnable, $rent_per_day){
+	public function stc_product_rent_save($product_id, $returnable, $rent_percent){
 		$this->stc_ensure_product_rent_columns();
 		$product_id = (int)$product_id;
 		$returnable = (int)$returnable === 1 ? 1 : 0;
-		$rent_per_day = is_numeric($rent_per_day) ? round((float)$rent_per_day, 2) : 0;
+		$rent_percent = is_numeric($rent_percent) ? round((float)$rent_percent, 2) : 0;
 		if($product_id < 1){
 			return 'Product is required.';
 		}
 		$ok = mysqli_query($this->stc_dbs, "
 			UPDATE `stc_product`
 			SET `stc_product_returnable`='".$returnable."',
-				`stc_product_rent_per_day`='".$rent_per_day."'
+				`stc_product_rent_percent`='".$rent_percent."'
 			WHERE `stc_product_id`='".$product_id."'
 		");
 		return $ok ? 'saved' : mysqli_error($this->stc_dbs);
@@ -2619,7 +2646,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 			SELECT
 				P.stc_product_id,
 				P.stc_product_name,
-				P.stc_product_rent_per_day,
+				IFNULL(P.stc_product_rent_percent, 0) AS stc_product_rent_percent,
+				IFNULL(A.stc_purchase_product_adhoc_prate, 0) AS purchase_rate,
 				A.stc_purchase_product_adhoc_itemdesc AS item_name,
 				A.stc_purchase_product_adhoc_unit AS unit,
 				R.stc_cust_super_requisition_list_items_rec_recqty AS qty,
@@ -2650,9 +2678,13 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$start = strtotime(substr((string)$row['rec_date'], 0, 10));
 				$days = ($start && $today >= $start) ? (int)floor(($today - $start) / 86400) + 1 : 0;
 				$qty = (float)$row['qty'];
-				$rent = (float)$row['stc_product_rent_per_day'];
+				$monthly = stc_rent_monthly($row['purchase_rate'] ?? 0, $row['stc_product_rent_percent'] ?? 0);
+				$months = $days / 30;
 				$row['days'] = $days;
-				$row['amount'] = round($qty * $rent * $days, 2);
+				$row['months'] = round($months, 2);
+				$row['month_label'] = stc_rent_span_label($days);
+				$row['rent_month'] = $monthly;
+				$row['amount'] = round($qty * $monthly * $months, 2);
 				$row['rec_date'] = $start ? date('d-m-Y', $start) : '';
 				$rows[] = $row;
 			}
@@ -2761,7 +2793,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_updated_date`,
 				`stc_product_sale_percentage`,
 				IFNULL(`stc_product_returnable`, 0) AS `stc_product_returnable`,
-				IFNULL(`stc_product_rent_per_day`, 0) AS `stc_product_rent_per_day`
+				IFNULL(`stc_product_rent_per_day`, 0) AS `stc_product_rent_per_day`,
+				IFNULL(`stc_product_rent_percent`, 0) AS `stc_product_rent_percent`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
 			LEFT JOIN `stc_category` ON `stc_product_cat_id`=`stc_cat_id`
@@ -3503,8 +3536,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 				A.stc_cust_super_requisition_list_items_rec_recqty as qty,
 				A.stc_cust_super_requisition_list_items_rec_date as rec_date,
 				E.stc_purchase_product_adhoc_rate as rate,
+				IFNULL(E.stc_purchase_product_adhoc_prate, 0) AS purchase_rate,
 				IFNULL(P.stc_product_returnable, 0) AS returnable,
-				IFNULL(P.stc_product_rent_per_day, 0) AS rent_per_day,
+				IFNULL(P.stc_product_rent_percent, 0) AS rent_percent,
 				B.stc_cust_super_requisition_items_type AS item_type
 			FROM `stc_cust_super_requisition_list_items_rec` A 
 			INNER JOIN stc_cust_super_requisition_list_items B
@@ -3531,7 +3565,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						'total' => 0,
 					);
 				}
-				$bill = stc_rent_bill_line($row['qty'], $row['rate'], $row['returnable'], $row['rent_per_day'], $row['item_type'], $row['rec_date'], $dateFrom, $dateTo);
+				$bill = stc_rent_bill_line($row['qty'], $row['rate'], $row['returnable'], $row['rent_percent'], $row['item_type'], $row['rec_date'], $dateFrom, $dateTo, $row['purchase_rate']);
 				$projects[$projectId]['total'] += $bill['total'];
 			}
 		}
@@ -5244,7 +5278,7 @@ if(isset($_POST['stc_product_rent_save'])){
 	echo $bjornestocking->stc_product_rent_save(
 		isset($_POST['product_id']) ? $_POST['product_id'] : 0,
 		isset($_POST['returnable']) ? $_POST['returnable'] : 0,
-		isset($_POST['rent_per_day']) ? $_POST['rent_per_day'] : 0
+		isset($_POST['rent_percent']) ? $_POST['rent_percent'] : (isset($_POST['rent_per_day']) ? $_POST['rent_per_day'] : 0)
 	);
 	exit;
 }
