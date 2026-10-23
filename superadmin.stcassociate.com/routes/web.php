@@ -32,6 +32,7 @@ use App\Http\Controllers\POAdhocController;
 use App\Http\Controllers\PPETrackerController;
 use App\Http\Controllers\ToolTrackerController;
 use App\Http\Controllers\GldChallanController;
+use App\Http\Controllers\TandTDataController;
 use App\Http\Controllers\DbSyncController;
 use App\Http\Controllers\DbTableController;
 use App\Http\Controllers\MediaImagesController;
@@ -318,6 +319,14 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/stc/tooltracker/edit-track', [ToolTrackerController::class, 'updateTrack']);
     Route::get('/branch/stc/tooltracker/delete-track', [ToolTrackerController::class, 'deleteTrack']);
     Route::post('/branch/stc/tooltracker/delete-track-bulk', [ToolTrackerController::class, 'deleteTrackBulk']);
+
+    // T&T Data (power calibration)
+    Route::get('/branch/stc/tandtdata', [TandTDataController::class, 'show']);
+    Route::post('/branch/stc/tandtdata/list', [TandTDataController::class, 'list']);
+    Route::get('/branch/stc/tandtdata/get', [TandTDataController::class, 'get']);
+    Route::post('/branch/stc/tandtdata/store', [TandTDataController::class, 'store']);
+    Route::post('/branch/stc/tandtdata/edit', [TandTDataController::class, 'update']);
+    Route::get('/branch/stc/tandtdata/delete', [TandTDataController::class, 'delete']);
 
     // GLD challan
     Route::get('/branch/stc/gld', [GldChallanController::class, 'show']);

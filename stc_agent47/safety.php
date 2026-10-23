@@ -3349,7 +3349,7 @@ else {
                                         <td class="text-center">${tool.calibration_due}</td>
                                         <td class="text-center">${tool.left_day !== undefined && tool.left_day !== '' ? tool.left_day : ''}</td>
                                         <td class="text-center">${statusHtml}</td>
-                                        <td class="text-center">${tool.docs ? `<a href="docs/${tool.docs}" target="_blank" class="btn btn-info btn-sm" title="View Certificate"><i class="fa fa-eye"></i></a>` : 'N/A'}</td>
+                                        <td class="text-center">${tool.docs ? `<a href="${String(tool.docs).indexOf('http') === 0 ? tool.docs : 'docs/' + tool.docs}" target="_blank" class="btn btn-info btn-sm" title="View Certificate"><i class="fa fa-eye"></i></a>` : 'N/A'}</td>
                                         <td class="text-center">
                                             <a href="#" class="btn btn-secondary btn-sm stc-tools-edit" data-id="${tool.id}" title="Edit"><i class="fa fa-edit"></i></a>
                                         </td>

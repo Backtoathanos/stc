@@ -146,6 +146,7 @@ if (!function_exists('stc_r2_content_type_for_ext')) {
             'webp' => 'image/webp',
             'heic' => 'image/heic',
             'heif' => 'image/heif',
+            'pdf' => 'application/pdf',
         ];
 
         return $map[$ext] ?? 'application/octet-stream';
@@ -590,6 +591,50 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
         $publicUrl = stc_r2_public_url_from_object_key($cfg['public_base'], $objectKey);
 
         return ['ok' => true, 'public_url' => $publicUrl, 'object_key' => $objectKey, 'ext' => $ext];
+    }
+}
+
+if (!function_exists('stc_r2_upload_safety_doc_from_path')) {
+    /**
+     * Upload a certificate / document (PDF or image) to R2.
+     *
+     * @return array{ok:bool, public_url?:string, object_key?:string, error?:string}
+     */
+    function stc_r2_upload_safety_doc_from_path(string $absoluteLocalPath, string $folder = 'tandtdata', int $entityId = 0, string $originalFilename = ''): array
+    {
+        $folder = preg_replace('/[^a-z0-9_-]/i', '', $folder);
+        if ($folder === '') {
+            $folder = 'tandtdata';
+        }
+
+        $cfg = stc_mcu_r2_config();
+        if ($cfg === null) {
+            return ['ok' => false, 'error' => 'R2 is not configured (missing R2_* in environment or superadmin .env).'];
+        }
+
+        $ext = strtolower(pathinfo($originalFilename !== '' ? $originalFilename : $absoluteLocalPath, PATHINFO_EXTENSION));
+        if ($ext === 'jpeg') {
+            $ext = 'jpg';
+        }
+        $allowed = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (!in_array($ext, $allowed, true)) {
+            return ['ok' => false, 'error' => 'Certificate must be PDF or an image.'];
+        }
+        if ($ext === 'jpeg') {
+            $ext = 'jpg';
+        }
+
+        $uniq = substr(str_replace('.', '', uniqid('', true)), 0, 24);
+        $baseId = $entityId > 0 ? (string) $entityId : 'agent';
+        $objectKey = $folder . '/' . $baseId . '_' . date('YmdHis') . '_' . $uniq . '.' . $ext;
+
+        $put = stc_r2_sigv4_put_object($cfg, $objectKey, $absoluteLocalPath, stc_r2_content_type_for_ext($ext));
+        if (!$put['ok']) {
+            return ['ok' => false, 'error' => $put['error'] ?? ('Upload failed HTTP ' . ($put['http'] ?? 0))];
+        }
+
+        $publicUrl = stc_r2_public_url_from_object_key($cfg['public_base'], $objectKey);
+        return ['ok' => true, 'public_url' => $publicUrl, 'object_key' => $objectKey];
     }
 }
 

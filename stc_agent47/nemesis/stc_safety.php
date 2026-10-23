@@ -342,28 +342,29 @@ if (isset($_POST['tandtdataaction'])) {
 
     // Handle file upload (optional for edit mode)
     if (isset($_FILES['certificate']) && $_FILES['certificate']['error'] === UPLOAD_ERR_OK) {
-		$uploadDir = '../docs/'; // Absolute path to the directory
-	
-		// Check if the directory exists, create if not
-		if (!is_dir($uploadDir)) {
-			mkdir($uploadDir, 0777, true); // Create directory if it doesn't exist
-		}
-	
 		$fileTmpPath = $_FILES['certificate']['tmp_name'];
-		$fileName = $_FILES['certificate']['name'];
-	
-		// Replace spaces in the filename with hyphens
-		$fileName = str_replace(' ', '-', $fileName);
-	
-		$newFileName = uniqid() . '-' . $fileName;
-		$destination = $uploadDir . $newFileName;
-	
-		// Move the uploaded file to the destination
-		if (move_uploaded_file($fileTmpPath, $destination)) {
-			$toolData['certificatePath'] = $newFileName; // Save the path for database storage
-		} else {
-			echo json_encode(['status' => false, 'message' => 'Failed to upload file']);
-			exit;
+		$fileName = str_replace(' ', '-', (string)$_FILES['certificate']['name']);
+		$cloudOk = false;
+		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+			&& function_exists('stc_r2_upload_safety_doc_from_path')
+			&& is_uploaded_file($fileTmpPath)) {
+			$r2 = stc_r2_upload_safety_doc_from_path($fileTmpPath, 'tandtdata', isset($toolData['id']) ? (int)$toolData['id'] : 0, $fileName);
+			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+				$toolData['certificatePath'] = $r2['public_url'];
+				$cloudOk = true;
+			}
+		}
+		if (!$cloudOk) {
+			$uploadDir = '../docs/';
+			if (!is_dir($uploadDir)) {
+				mkdir($uploadDir, 0777, true);
+			}
+			$newFileName = uniqid() . '-' . $fileName;
+			if (!move_uploaded_file($fileTmpPath, $uploadDir . $newFileName)) {
+				echo json_encode(['status' => false, 'message' => 'Failed to upload file']);
+				exit;
+			}
+			$toolData['certificatePath'] = $newFileName;
 		}
 	} else {
 		// For edit mode, if no file uploaded, keep existing file
