@@ -66,14 +66,53 @@ class prime extends tesseract{
 		return $optimusprime;
 	}
 
+	private function stc_ensure_tandtdata_columns(){
+		$cols = array(
+			'department_name' => "VARCHAR(150) NOT NULL DEFAULT ''",
+			'model_no' => "VARCHAR(150) NOT NULL DEFAULT ''",
+			'serial_thm_no' => "VARCHAR(150) NOT NULL DEFAULT ''",
+			'make_name' => "VARCHAR(150) NOT NULL DEFAULT ''",
+			'range_value' => "VARCHAR(150) NOT NULL DEFAULT ''",
+		);
+		foreach($cols as $name => $def){
+			$q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `toolstackelsdata` LIKE '".$name."'");
+			if($q && mysqli_num_rows($q) === 0){
+				mysqli_query($this->stc_dbs, "ALTER TABLE `toolstackelsdata` ADD `".$name."` ".$def);
+			}
+		}
+	}
+
+	private function stc_tandtdata_left_status($due){
+		$due_ts = $due ? strtotime((string)$due) : false;
+		if(!$due_ts){
+			return array('left_day' => '', 'cal_status' => '');
+		}
+		$days = (int)round((strtotime(date('Y-m-d', $due_ts)) - strtotime(date('Y-m-d'))) / 86400);
+		return array(
+			'left_day' => $days,
+			'cal_status' => $days < 0 ? 'Expired' : 'On Time',
+		);
+	}
+
 	public function stc_update_tandtdata($toolData) {
+		$this->stc_ensure_tandtdata_columns();
 		$result = '';
+		$dept = mysqli_real_escape_string($this->stc_dbs, $toolData['departmentName'] ?? '');
+		$model = mysqli_real_escape_string($this->stc_dbs, $toolData['modelNo'] ?? '');
+		$serial = mysqli_real_escape_string($this->stc_dbs, $toolData['serialThmNo'] ?? '');
+		$make = mysqli_real_escape_string($this->stc_dbs, $toolData['makeName'] ?? '');
+		$range = mysqli_real_escape_string($this->stc_dbs, $toolData['rangeValue'] ?? '');
 		
 		// Check if it's an update or insert
 		if(isset($toolData['id']) && !empty($toolData['id'])){
 			// Update existing record
 			$updateQuery = "UPDATE `toolstackelsdata` SET 
 				`title` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
+				`department_name` = '".$dept."',
+				`model_no` = '".$model."',
+				`serial_thm_no` = '".$serial."',
+				`make_name` = '".$make."',
+				`range_value` = '".$range."',
 				`calibration_date` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
 				`calibration_due` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "'";
 			
@@ -95,6 +134,11 @@ class prime extends tesseract{
 			$insertQuery = mysqli_query($this->stc_dbs, "
 				INSERT INTO `toolstackelsdata` (
 					`title`,
+					`department_name`,
+					`model_no`,
+					`serial_thm_no`,
+					`make_name`,
+					`range_value`,
 					`calibration_date`,
 					`calibration_due`,
 					`status`,
@@ -102,6 +146,11 @@ class prime extends tesseract{
 					`created_by`
 				) VALUES (
 					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
+					'".$dept."',
+					'".$model."',
+					'".$serial."',
+					'".$make."',
+					'".$range."',
 					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
 					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "',
 					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['status']) . "',
@@ -121,9 +170,17 @@ class prime extends tesseract{
 	}
 
 	public function stc_call_tandtdata($search, $page = 1, $pageSize = 10){
+		$this->stc_ensure_tandtdata_columns();
 		$whereClause = "`status`='1'";
 		if($search!=''){
-			$whereClause .= ' AND `title` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $search).'"';
+			$esc = mysqli_real_escape_string($this->stc_dbs, $search);
+			$whereClause .= ' AND (
+				`title` REGEXP "'.$esc.'"
+				OR `department_name` REGEXP "'.$esc.'"
+				OR `model_no` REGEXP "'.$esc.'"
+				OR `serial_thm_no` REGEXP "'.$esc.'"
+				OR `make_name` REGEXP "'.$esc.'"
+			)';
 		}
 		
 		// Get total count
@@ -143,8 +200,11 @@ class prime extends tesseract{
 		$data = [];
 		if (mysqli_num_rows($optimusprimequery) > 0) {
 			while ($row = mysqli_fetch_assoc($optimusprimequery)) {
-				$row['calibration_date'] = date('d-m-Y', strtotime($row['calibration_date']));
-				$row['calibration_due'] = date('d-m-Y', strtotime($row['calibration_due']));
+				$left = $this->stc_tandtdata_left_status($row['calibration_due'] ?? '');
+				$row['calibration_date'] = !empty($row['calibration_date']) ? date('d-m-Y', strtotime($row['calibration_date'])) : '';
+				$row['calibration_due'] = !empty($row['calibration_due']) ? date('d-m-Y', strtotime($row['calibration_due'])) : '';
+				$row['left_day'] = $left['left_day'];
+				$row['cal_status'] = $left['cal_status'];
 				$data[] = $row;
 			}
 		}
@@ -156,6 +216,7 @@ class prime extends tesseract{
 	}
 
 	public function stc_call_tandtdata_by_id($id){
+		$this->stc_ensure_tandtdata_columns();
 		$query = "SELECT * FROM `toolstackelsdata` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."' AND `status`='1'";
 		$result = mysqli_query($this->stc_dbs, $query);
 		if($result && $row = mysqli_fetch_assoc($result)){
@@ -261,7 +322,12 @@ if (isset($_POST['tandtdataaction'])) {
 	}
 
     $toolData = [
-        'toolName' => $_POST['toolName'],
+        'toolName' => $_POST['toolName'] ?? '',
+        'departmentName' => $_POST['departmentName'] ?? '',
+        'modelNo' => $_POST['modelNo'] ?? '',
+        'serialThmNo' => $_POST['serialThmNo'] ?? '',
+        'makeName' => $_POST['makeName'] ?? '',
+        'rangeValue' => $_POST['rangeValue'] ?? '',
         'calibrationDate' => $_POST['calibrationDate'],
         'calibrationDue' => $_POST['calibrationDue'],
         'status' => 1,

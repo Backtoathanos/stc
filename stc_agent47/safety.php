@@ -899,8 +899,8 @@ else {
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="position-relative form-group">
-                                                            <label for="exampleEmail" class="">By Tools Name</label>
-                                                            <input type="text" class="form-control" placeholder="Enter Tools Name" id="tandtdatainput">
+                                                            <label for="exampleEmail" class="">Search</label>
+                                                            <input type="text" class="form-control" placeholder="Equipment, department, model, serial or make" id="tandtdatainput">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">
@@ -918,15 +918,23 @@ else {
                                     <div class="col-md-12 col-xl-12"> 
                                         <div class="main-card mb-3 card">
                                             <div class="card-body">
+                                                <div class="table-responsive">
                                                 <table class="mb-0 table table-hover table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th class="text-center">Sl No</th>
-                                                            <th class="text-center">Tools Name</th>
-                                                            <th class="text-center">Calibration Date</th>
-                                                            <th class="text-center">Calibration Due</th>
-                                                            <th width="10%" class="text-center">Certificate Attended</th>
-                                                            <th width="10%" class="text-center">Action</th>
+                                                            <th class="text-center">Department Name</th>
+                                                            <th class="text-center">Equipment Name</th>
+                                                            <th class="text-center">Model No</th>
+                                                            <th class="text-center">Serial/THM No</th>
+                                                            <th class="text-center">Make Name</th>
+                                                            <th class="text-center">Range</th>
+                                                            <th class="text-center">Calibration Issued Date</th>
+                                                            <th class="text-center">Calibration Due Date</th>
+                                                            <th class="text-center">Left Day</th>
+                                                            <th class="text-center">Status</th>
+                                                            <th width="8%" class="text-center">Certificate</th>
+                                                            <th width="8%" class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody class="stc-safety-toolsTable-res-table">
@@ -935,6 +943,7 @@ else {
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                </div>
                                                 <div class="stc-safety-toolsTable-pagination" style="margin-top: 20px; text-align: center;"></div>
                                             </div>
                                         </div>
@@ -3323,12 +3332,23 @@ else {
                             let slno = (window.toolsCurrentPage - 1) * window.toolsRecordsPerPage;
                             response.data.forEach(function (tool) {
                                 slno++;
+                                var calStatus = tool.cal_status || '';
+                                var statusHtml = calStatus === 'Expired'
+                                    ? '<span style="background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:3px;">Expired</span>'
+                                    : (calStatus === 'On Time' ? '<span style="background:#d4edda;color:#155724;padding:2px 8px;border-radius:3px;">On Time</span>' : '');
                                 let row = `
                                     <tr>
-                                        <td>${slno}</td>
-                                        <td>${tool.title}</td>
+                                        <td class="text-center">${slno}</td>
+                                        <td>${tool.department_name || ''}</td>
+                                        <td>${tool.title || ''}</td>
+                                        <td>${tool.model_no || ''}</td>
+                                        <td>${tool.serial_thm_no || ''}</td>
+                                        <td>${tool.make_name || ''}</td>
+                                        <td>${tool.range_value || ''}</td>
                                         <td class="text-center">${tool.calibration_date}</td>
                                         <td class="text-center">${tool.calibration_due}</td>
+                                        <td class="text-center">${tool.left_day !== undefined && tool.left_day !== '' ? tool.left_day : ''}</td>
+                                        <td class="text-center">${statusHtml}</td>
                                         <td class="text-center">${tool.docs ? `<a href="docs/${tool.docs}" target="_blank" class="btn btn-info btn-sm" title="View Certificate"><i class="fa fa-eye"></i></a>` : 'N/A'}</td>
                                         <td class="text-center">
                                             <a href="#" class="btn btn-secondary btn-sm stc-tools-edit" data-id="${tool.id}" title="Edit"><i class="fa fa-edit"></i></a>
@@ -3339,7 +3359,7 @@ else {
                             });
                             updateToolsPagination(response.total_count);
                         } else {
-                            tableBody.append('<tr><td colspan="6">No records found</td></tr>');
+                            tableBody.append('<tr><td colspan="13">No records found</td></tr>');
                             $('.stc-safety-toolsTable-pagination').html('');
                         }
                     },
@@ -3420,7 +3440,12 @@ else {
                     success: function(response) {
                         if(response.status === true && response.data) {
                             var tool = response.data;
+                            $('#departmentName').val(tool.department_name || '');
                             $('#toolName').val(tool.title);
+                            $('#modelNo').val(tool.model_no || '');
+                            $('#serialThmNo').val(tool.serial_thm_no || '');
+                            $('#makeName').val(tool.make_name || '');
+                            $('#rangeValue').val(tool.range_value || '');
                             $('#calibrationDate').val(tool.calibration_date);
                             $('#calibrationDue').val(tool.calibration_due);
                             
@@ -4928,7 +4953,7 @@ else {
     </div>
 </div>
 <div class="modal fade" id="toolsModal" tabindex="-1" role="dialog" aria-labelledby="toolsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="position: relative;top: 30px;">
+    <div class="modal-dialog modal-lg" style="position: relative;top: 30px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">TOOLS & TACKLES DATA</h5>
@@ -4938,21 +4963,43 @@ else {
             </div>
             <div class="modal-body">
                 <form id="toolsForm"  enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="toolName" class="form-label">Tools Name</label>
-                        <input type="text" class="form-control" id="toolName" name="toolName" placeholder="Enter Tools Name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="calibrationDate" class="form-label">Calibration Date</label>
-                        <input type="date" class="form-control" id="calibrationDate" name="calibrationDate" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="calibrationDue" class="form-label">Calibration Due</label>
-                        <input type="date" class="form-control" id="calibrationDue" name="calibrationDue" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="certificate" class="form-label">Certificate Attended</label>
-                        <input type="file" class="form-control" id="certificate" name="certificate">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="departmentName" class="form-label">Department Name</label>
+                            <input type="text" class="form-control" id="departmentName" name="departmentName" placeholder="LDR1">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="toolName" class="form-label">Equipment Name</label>
+                            <input type="text" class="form-control" id="toolName" name="toolName" placeholder="Enter Equipment Name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="modelNo" class="form-label">Model No</label>
+                            <input type="text" class="form-control" id="modelNo" name="modelNo" placeholder="Enter Model No">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="serialThmNo" class="form-label">Serial/THM No</label>
+                            <input type="text" class="form-control" id="serialThmNo" name="serialThmNo" placeholder="Enter Serial / THM No">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="makeName" class="form-label">Make Name</label>
+                            <input type="text" class="form-control" id="makeName" name="makeName" placeholder="Enter Make Name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="rangeValue" class="form-label">Range</label>
+                            <input type="text" class="form-control" id="rangeValue" name="rangeValue" placeholder="Enter Range">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="calibrationDate" class="form-label">Calibration Issued Date</label>
+                            <input type="date" class="form-control" id="calibrationDate" name="calibrationDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="calibrationDue" class="form-label">Calibration Due Date</label>
+                            <input type="date" class="form-control" id="calibrationDue" name="calibrationDue" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="certificate" class="form-label">Certificate Attended</label>
+                            <input type="file" class="form-control" id="certificate" name="certificate">
+                        </div>
                     </div>
                     <input type="hidden" name="tandtdataaction">
                     <button type="submit" class="btn btn-success">Save</button>
