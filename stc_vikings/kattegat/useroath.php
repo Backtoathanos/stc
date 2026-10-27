@@ -48,19 +48,37 @@ class prime extends tesseract{
 
 	public function stc_update_user( $username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1){
 		$odin='';
+		$uid = (int)$_SESSION['stc_empl_id'];
+		$old = array();
+		$oldq = mysqli_query($this->stc_dbs, "SELECT * FROM `stc_user` WHERE `stc_user_id`='".$uid."' LIMIT 1");
+		if($oldq && mysqli_num_rows($oldq) > 0){
+			$old = mysqli_fetch_assoc($oldq);
+		}
+		$pass_sql = '';
+		if(trim((string)$userpass1) !== ''){
+			$pass_sql = ", `stc_user_password`='".mysqli_real_escape_string($this->stc_dbs, $userpass1)."'";
+		}
 		$updateloki=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_user` SET 
-				`stc_user_name`='".$username."',
-				`stc_user_address`='".$useraddress."',
-				`stc_user_phone`='".$userphone."',
-				`stc_user_phone_again`='".$userwhats."',
-				`stc_user_email`='".$useremail."',
-				`stc_user_userid`='".$userid."',
-				`stc_user_password`='".$userpass1."'
-			WHERE `stc_user_id`='".$_SESSION['stc_empl_id']."'
+				`stc_user_name`='".mysqli_real_escape_string($this->stc_dbs, $username)."',
+				`stc_user_address`='".mysqli_real_escape_string($this->stc_dbs, $useraddress)."',
+				`stc_user_phone`='".mysqli_real_escape_string($this->stc_dbs, $userphone)."',
+				`stc_user_phone_again`='".mysqli_real_escape_string($this->stc_dbs, $userwhats)."',
+				`stc_user_email`='".mysqli_real_escape_string($this->stc_dbs, $useremail)."',
+				`stc_user_userid`='".mysqli_real_escape_string($this->stc_dbs, $userid)."'
+				".$pass_sql."
+			WHERE `stc_user_id`='".$uid."'
 		");
 		if($updateloki){
-			$this->touch_user_log($username, $useraddress, $userpass1);
+			$this->touch_user_log($old, array(
+				'name' => $username,
+				'address' => $useraddress,
+				'phone' => $userphone,
+				'whatsapp' => $userwhats,
+				'email' => $useremail,
+				'userid' => $userid,
+				'password' => $userpass1,
+			));
 			$odin="Updated!!!";
 		}else{
 			$odin= "You can not do this!!!";
@@ -68,50 +86,45 @@ class prime extends tesseract{
 		return $odin;
 	}
 
-	private function touch_user_log($username, $useraddress, $userpass){
-		$uid = (int) $_SESSION['stc_empl_id'];
+	private function touch_user_log($old, $new){
+		$uid = (int)$_SESSION['stc_empl_id'];
 		if($uid < 1){
-			return;
-		}
-		$table = mysqli_query($this->stc_dbs, "SHOW TABLES LIKE 'user_log'");
-		if(!$table || mysqli_num_rows($table) === 0){
 			return;
 		}
 		$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 		$ipEsc = mysqli_real_escape_string($this->stc_dbs, $ip);
 		$today = date('Y-m-d');
-		mysqli_query($this->stc_dbs, "
-			UPDATE `user_log`
-			SET `updated_by`='".$uid."',
-				`updated_date`='".$today."',
-				`ip_address`='".$ipEsc."'
-			WHERE `user_type`='vikings' AND `user_id`='".$uid."'
-		");
-		$this->insert_user_log_if_missing($uid, 'user created as %', 'user created as '.$username, $today, $ipEsc);
-		if(trim((string) $useraddress) !== ''){
-			$this->insert_user_log_if_missing($uid, 'user address %', 'user address '.$useraddress, $today, $ipEsc);
+		$fields = array(
+			'name' => array('user created as ', 'stc_user_name'),
+			'address' => array('user address ', 'stc_user_address'),
+			'phone' => array('user phone ', 'stc_user_phone'),
+			'whatsapp' => array('user whatsapp ', 'stc_user_phone_again'),
+			'email' => array('user email ', 'stc_user_email'),
+			'userid' => array('user id ', 'stc_user_userid'),
+		);
+		foreach($fields as $key => $meta){
+			$after = trim((string)($new[$key] ?? ''));
+			$before = trim((string)($old[$meta[1]] ?? ''));
+			if($after === '' || $after === $before){
+				continue;
+			}
+			$this->insert_user_log($uid, $meta[0].$after, $today, $ipEsc);
 		}
-		if(trim((string) $userpass) !== '' && $userpass !== '123456'){
-			$this->insert_user_log_if_missing($uid, 'updated password from %', 'updated password from 123456 to '.$userpass, $today, $ipEsc);
+		$newpass = trim((string)($new['password'] ?? ''));
+		$oldpass = trim((string)($old['stc_user_password'] ?? ''));
+		if($newpass !== '' && $newpass !== $oldpass){
+			$from = $oldpass !== '' ? $oldpass : '123456';
+			$this->insert_user_log($uid, 'updated password from '.$from.' to '.$newpass, $today, $ipEsc);
 		}
 	}
 
-	private function insert_user_log_if_missing($uid, $like, $log, $today, $ipEsc){
-		$likeEsc = mysqli_real_escape_string($this->stc_dbs, $like);
-		$exists = mysqli_query($this->stc_dbs, "
-			SELECT `id` FROM `user_log`
-			WHERE `user_type`='vikings' AND `user_id`='".$uid."' AND `log` LIKE '".$likeEsc."'
-			LIMIT 1
-		");
-		if($exists && mysqli_num_rows($exists) > 0){
-			return;
-		}
-		$logEsc = mysqli_real_escape_string($this->stc_dbs, $log);
+	private function insert_user_log($uid, $log, $today, $ipEsc){
+		$logEsc = mysqli_real_escape_string($this->stc_dbs, substr((string)$log, 0, 255));
 		mysqli_query($this->stc_dbs, "
 			INSERT INTO `user_log`
 				(`user_type`, `user_id`, `log`, `date`, `status`, `created_by`, `updated_by`, `updated_date`, `ip_address`)
 			VALUES
-				('vikings', '".$uid."', '".$logEsc."', '".$today."', 1, 1, '".$uid."', '".$today."', '".$ipEsc."')
+				('vikings', '".$uid."', '".$logEsc."', '".$today."', 1, '".$uid."', '".$uid."', '".$today."', '".$ipEsc."')
 		");
 	}
 }
@@ -136,23 +149,22 @@ if(isset($_POST['load_u'])){
 }
 
 if(isset($_POST['user_update'])){
-	$username=$_POST['uname'];
-	$useraddress=$_POST['uaddress'];
-	$userphone=$_POST['uphone'];
-	$userwhats=$_POST['uwhats'];
-	$useremail=$_POST['uemail'];
-	$userid=$_POST['uid'];
-	$userpass1=$_POST['upassword'];
-	$userpass2=$_POST['upasswordagain'];
-	if(empty($username) || empty($useraddress) || empty($userphone) || empty($userwhats)|| empty($useremail) || empty($userid) || empty($userphone) || empty($userpass1) || empty($userpass2)){
-		echo "Dont let below fields empty!!!";
-	}elseif(!empty($userpass1) && !empty($userpass2) && $userpass1 != $userpass2){
-		echo "Password doesnot match!!!";
+	$username=trim((string)($_POST['uname'] ?? ''));
+	$useraddress=trim((string)($_POST['uaddress'] ?? ''));
+	$userphone=trim((string)($_POST['uphone'] ?? ''));
+	$userwhats=trim((string)($_POST['uwhats'] ?? ''));
+	$useremail=trim((string)($_POST['uemail'] ?? ''));
+	$userid=trim((string)($_POST['uid'] ?? ''));
+	$userpass1=trim((string)($_POST['upassword'] ?? ''));
+	$userpass2=trim((string)($_POST['upasswordagain'] ?? ''));
+	$opobobjcalluser='';
+	if($username==='' || $useraddress==='' || $userphone==='' || $userwhats==='' || $useremail==='' || $userid===''){
+		$opobobjcalluser='Dont let below fields empty!!!';
+	}elseif($userpass1!==$userpass2){
+		$opobobjcalluser='Password does not match.';
 	}else{
 		$objcalluser=new prime();
-		$opobobjcalluser=$objcalluser->stc_update_user( $username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1
-		);
-		
+		$opobobjcalluser=$objcalluser->stc_update_user($username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1);
 	}
 	echo $opobobjcalluser;
 }

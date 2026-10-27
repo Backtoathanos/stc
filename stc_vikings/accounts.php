@@ -202,8 +202,10 @@ STCAuthHelper::checkAuth();?>
               // dataType : 'JSON',
               success     : function (argument) {
                 // console.log(argument);
-                  alert(argument);
-                  window.location.reload;
+                  alert(String(argument || '').trim());
+                  if(String(argument || '').indexOf('Updated') === 0){
+                    window.location.reload();
+                  }
               }
             }); 
           });

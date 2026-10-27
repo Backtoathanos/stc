@@ -27,15 +27,19 @@ class login_check extends tesseract{
 
 	public function stc_update_user( $username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1){
 		$odin='';
+		$pass_sql = '';
+		if(trim((string)$userpass1) !== ''){
+			$pass_sql = ", `stc_user_password`='".mysqli_real_escape_string($this->stc_dbs, $userpass1)."'";
+		}
 		$updateloki=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_user` SET 
-				`stc_user_name`='".$username."',
-				`stc_user_address`='".$useraddress."',
-				`stc_user_phone`='".$userphone."',
-				`stc_user_phone_again`='".$userwhats."',
-				`stc_user_email`='".$useremail."',
-				`stc_user_userid`='".$userid."',
-				`stc_user_password`='".$userpass1."'
+				`stc_user_name`='".mysqli_real_escape_string($this->stc_dbs, $username)."',
+				`stc_user_address`='".mysqli_real_escape_string($this->stc_dbs, $useraddress)."',
+				`stc_user_phone`='".mysqli_real_escape_string($this->stc_dbs, $userphone)."',
+				`stc_user_phone_again`='".mysqli_real_escape_string($this->stc_dbs, $userwhats)."',
+				`stc_user_email`='".mysqli_real_escape_string($this->stc_dbs, $useremail)."',
+				`stc_user_userid`='".mysqli_real_escape_string($this->stc_dbs, $userid)."'
+				".$pass_sql."
 			WHERE `stc_user_id`='".$_SESSION['stc_admin_info_id']."'
 		");
 		if($updateloki){
@@ -596,23 +600,22 @@ if(isset($_POST['load_u'])){
 
 // user update
 if(isset($_POST['user_update'])){
-	$username=$_POST['uname'];
-	$useraddress=$_POST['uaddress'];
-	$userphone=$_POST['uphone'];
-	$userwhats=$_POST['uwhats'];
-	$useremail=$_POST['uemail'];
-	$userid=$_POST['uid'];
-	$userpass1=$_POST['upassword'];
-	$userpass2=$_POST['upasswordagain'];
-	if(empty($username) || empty($useraddress) || empty($userphone) || empty($userwhats)|| empty($useremail) || empty($userid) || empty($userphone) || empty($userpass1) || empty($userpass2)){
-		echo "Dont let below fields empty!!!";
-	}elseif(!empty($userpass1) && !empty($userpass2) && $userpass1 != $userpass2){
-		echo "Password doesnot match!!!";
+	$username=trim((string)($_POST['uname'] ?? ''));
+	$useraddress=trim((string)($_POST['uaddress'] ?? ''));
+	$userphone=trim((string)($_POST['uphone'] ?? ''));
+	$userwhats=trim((string)($_POST['uwhats'] ?? ''));
+	$useremail=trim((string)($_POST['uemail'] ?? ''));
+	$userid=trim((string)($_POST['uid'] ?? ''));
+	$userpass1=trim((string)($_POST['upassword'] ?? ''));
+	$userpass2=trim((string)($_POST['upasswordagain'] ?? ''));
+	$opobobjcalluser='';
+	if($username==='' || $useraddress==='' || $userphone==='' || $userwhats==='' || $useremail==='' || $userid===''){
+		$opobobjcalluser='Dont let below fields empty!!!';
+	}elseif($userpass1!==$userpass2){
+		$opobobjcalluser='Password does not match.';
 	}else{
 		$objcalluser=new login_check();
-		$opobobjcalluser=$objcalluser->stc_update_user( $username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1
-		);
-		
+		$opobobjcalluser=$objcalluser->stc_update_user($username, $useraddress, $userphone, $userwhats, $useremail, $userid, $userpass1);
 	}
 	echo $opobobjcalluser;
 }
