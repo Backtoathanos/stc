@@ -206,3 +206,38 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="modal-user-log" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User log</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped mb-0">
+            <thead>
+              <tr>
+                <th class="text-center">Id</th>
+                <th>Log</th>
+                <th>Date</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Created by</th>
+                <th class="text-center">Updated by</th>
+                <th>Updated date</th>
+                <th>IP address</th>
+              </tr>
+            </thead>
+            <tbody id="user-log-body">
+              <tr><td colspan="8" class="text-center">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -31,6 +31,12 @@ class AdminUsersController extends Controller
         $user->stc_user_status = $request->status;
         $user->save();
 
+        UsersHubController::logVikingsUserCreated(
+            (int) $user->stc_user_id,
+            (string) $request->name,
+            $request->ip()
+        );
+
         return $this->modalSuccess($request, url('/users'), 'Admin user created successfully!');
     }
 

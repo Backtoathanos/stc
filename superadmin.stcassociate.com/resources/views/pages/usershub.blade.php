@@ -83,8 +83,7 @@
                           @else Admin @endif
                         </td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="electronics" data-id="{{ $value->stc_electronics_user_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="electronics" data-id="{{ $value->stc_electronics_user_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="electronics" data-id="{{ $value->stc_electronics_user_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_electronics_user_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -123,8 +122,7 @@
                         <td>{{ $value->stc_groceries_user_password }}</td>
                         <td class="text-center">{{ ($value->stc_groceries_user_status == 1) ? 'Active' : 'In-active' }}</td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="groceries" data-id="{{ $value->stc_groceries_user_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="groceries" data-id="{{ $value->stc_groceries_user_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="groceries" data-id="{{ $value->stc_groceries_user_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_groceries_user_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -168,8 +166,7 @@
                           @else SDL @endif
                         </td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="manager" data-id="{{ $value->stc_agents_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="manager" data-id="{{ $value->stc_agents_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="manager" data-id="{{ $value->stc_agents_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_agents_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -214,8 +211,7 @@
                           @else TIC @endif
                         </td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="school" data-id="{{ $value->stc_school_user_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="school" data-id="{{ $value->stc_school_user_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="school" data-id="{{ $value->stc_school_user_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_school_user_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -258,8 +254,7 @@
                         <td>{{ $value->stc_cust_pro_supervisor_token }}</td>
                         <td>{{ $value->stc_agents_name }}</td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="site" data-id="{{ $value->stc_cust_pro_supervisor_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="site" data-id="{{ $value->stc_cust_pro_supervisor_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="site" data-id="{{ $value->stc_cust_pro_supervisor_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_cust_pro_supervisor_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -298,8 +293,7 @@
                         <td class="text-center">{{ ($value->stc_trading_user_status == 1) ? 'Active' : 'In-active' }}</td>
                         <td>{{ $value->stc_trading_user_location ?? '' }}</td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="trading" data-id="{{ $value->stc_trading_user_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="trading" data-id="{{ $value->stc_trading_user_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="trading" data-id="{{ $value->stc_trading_user_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_trading_user_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -347,8 +341,7 @@
                           @else Accountant @endif
                         </td>
                         <td class="text-center text-nowrap">
-                          <button type="button" class="btn btn-sm btn-info btn-edit-hub" data-type="uadmin" data-id="{{ $value->stc_user_id }}"><i class="fas fa-edit"></i></button>
-                          <button type="button" class="btn btn-sm btn-danger btn-delete-hub" data-type="uadmin" data-id="{{ $value->stc_user_id }}"><i class="fas fa-trash"></i></button>
+                          <button type="button" class="btn btn-sm btn-warning btn-log-hub" data-type="uadmin" data-id="{{ $value->stc_user_id }}" title="Log"><i class="fas fa-history"></i></button>
                           @php
                             $server = (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] == 'localhost') ? 'http://localhost/stc' : 'https://stcassociate.com';
                             $enc = openssl_encrypt((string)$value->stc_user_id, 'AES-128-CTR', 'stc_associate_go', 0, '1234567891011121');
@@ -691,6 +684,44 @@
           document.getElementById('form-uadmin').setAttribute('action', r.edit(id));
           $('#modal-uadmin').modal('show');
         }
+      });
+  });
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-log-hub');
+    if (!btn) return;
+    var type = btn.getAttribute('data-type');
+    var id = btn.getAttribute('data-id');
+    var body = document.getElementById('user-log-body');
+    body.innerHTML = '<tr><td colspan="8" class="text-center">Loading...</td></tr>';
+    $('#modal-user-log').modal('show');
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
+    fetch(@json(url('/users/hub/logs')) + '/' + encodeURIComponent(type) + '/' + encodeURIComponent(id), { headers: headers, credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (rows) {
+        if (!rows || !rows.length) {
+          body.innerHTML = '<tr><td colspan="8" class="text-center">No log records.</td></tr>';
+          return;
+        }
+        body.innerHTML = rows.map(function (row) {
+          return '<tr>'
+            + '<td class="text-center">' + esc(row.id) + '</td>'
+            + '<td>' + esc(row.log) + '</td>'
+            + '<td>' + esc(row.date) + '</td>'
+            + '<td class="text-center">' + esc(row.status) + '</td>'
+            + '<td class="text-center">' + esc(row.created_by) + '</td>'
+            + '<td class="text-center">' + esc(row.updated_by) + '</td>'
+            + '<td>' + esc(row.updated_date) + '</td>'
+            + '<td>' + esc(row.ip_address) + '</td>'
+            + '</tr>';
+        }).join('');
+      })
+      .catch(function () {
+        body.innerHTML = '<tr><td colspan="8" class="text-center">Could not load logs.</td></tr>';
       });
   });
 

@@ -91,6 +91,7 @@ Route::group(['middleware' => 'superadmin'], function(){
 
     Route::get('/users', [UsersHubController::class, 'index']);
     Route::get('/users/hub/record/{type}/{id}', [UsersHubController::class, 'recordJson']);
+    Route::get('/users/hub/logs/{type}/{id}', [UsersHubController::class, 'logs']);
 
     Route::post('/users/tradingusers/create', [TradingUsersController::class, 'insert']);
     Route::post('/users/tradingusers/edit/{id}', [TradingUsersController::class, 'update']);
