@@ -3922,7 +3922,7 @@ STCAuthHelper::checkAuth();?>
             <small class="text-muted">This amount becomes final after accept.</small>
           </div>
           <div class="col-md-6">
-            <span>Boss remarks</span>
+            <span>Director remarks</span>
             <textarea class="form-control stc-admit-modal-remarks" rows="2" placeholder="Optional remarks"></textarea>
           </div>
         </div>
@@ -3969,7 +3969,7 @@ STCAuthHelper::checkAuth();?>
             <small class="text-muted">This amount becomes final after accept.</small>
           </div>
           <div class="col-md-6">
-            <span>Boss remarks</span>
+            <span>Director remarks</span>
             <textarea class="form-control stc-readmit-modal-remarks" rows="2" placeholder="Optional remarks"></textarea>
           </div>
         </div>

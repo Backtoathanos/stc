@@ -228,7 +228,7 @@ class StcSchoolAdmission extends tesseract
 		if (!$ok) {
 			$this->json_out(array('status' => 'wrong', 'message' => 'Could not save admission. Please try again.'));
 		}
-		$this->json_out(array('status' => 'success', 'message' => 'New admission submitted. Waiting for boss approval.', 'id' => (int) mysqli_insert_id($this->stc_dbs)));
+		$this->json_out(array('status' => 'success', 'message' => 'New admission submitted. Waiting for director approval.', 'id' => (int) mysqli_insert_id($this->stc_dbs)));
 	}
 
 	public function list_rows($search = '')

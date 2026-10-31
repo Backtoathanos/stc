@@ -305,7 +305,7 @@
                         <div class="row">
                           <div class="col-12">
                             <h2 class="school-page-title mb-3">Admission</h2>
-                            <p class="text-muted mb-3">TIC fills student details and proposed amount. Boss will accept and lock the final amount from Reports.</p>
+                            <p class="text-muted mb-3">TIC fills student details and proposed amount. Director will accept and lock the final amount from Reports.</p>
                             <div class="mb-3">
                               <button type="button" class="btn <?php echo $stc_admit_inner_tab === 'new' ? 'btn-primary' : 'btn-default'; ?> stc-admit-inner-tab" data-pane="new">New Admission</button>
                               <button type="button" class="btn <?php echo $stc_admit_inner_tab === 're' ? 'btn-primary' : 'btn-default'; ?> stc-admit-inner-tab" data-pane="re">Readmission</button>
