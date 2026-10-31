@@ -4203,6 +4203,13 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
       return mysqli_real_escape_string($this->stc_dbs, (string)$value);
    }
 
+   private function ensure_marks_percent_column(){
+      $q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_school_readmission` LIKE 'stc_school_readmission_marks_percent'");
+      if($q && mysqli_num_rows($q) === 0){
+         mysqli_query($this->stc_dbs, "ALTER TABLE `stc_school_readmission` ADD `stc_school_readmission_marks_percent` DECIMAL(6,2) DEFAULT NULL");
+      }
+   }
+
    private function ensure_table(){
       mysqli_query($this->stc_dbs, "
          CREATE TABLE IF NOT EXISTS `stc_school_readmission` (
@@ -4236,6 +4243,7 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
             PRIMARY KEY (`stc_school_readmission_id`)
          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       ");
+      $this->ensure_marks_percent_column();
    }
 
    private function sql_date($value){
@@ -4281,6 +4289,9 @@ class ragnarReportsViewSchoolReadmission extends tesseract{
          'amount' => (float)$row['stc_school_readmission_amount'],
          'last_status' => (string)$row['stc_school_readmission_last_status'],
          'last_remarks' => (string)$row['stc_school_readmission_last_remarks'],
+         'marks_percent' => ($row['stc_school_readmission_marks_percent'] ?? '') === '' || ($row['stc_school_readmission_marks_percent'] ?? null) === null
+            ? null
+            : (float)$row['stc_school_readmission_marks_percent'],
          'status' => (string)$row['stc_school_readmission_status'],
          'final_amount' => $row['stc_school_readmission_final_amount'] === null || $row['stc_school_readmission_final_amount'] === '' ? null : (float)$row['stc_school_readmission_final_amount'],
          'boss_remarks' => (string)$row['stc_school_readmission_boss_remarks'],
@@ -4498,6 +4509,13 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
       return mysqli_real_escape_string($this->stc_dbs, (string)$value);
    }
 
+   private function ensure_marks_percent_column(){
+      $q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_school_admission` LIKE 'stc_school_admission_marks_percent'");
+      if($q && mysqli_num_rows($q) === 0){
+         mysqli_query($this->stc_dbs, "ALTER TABLE `stc_school_admission` ADD `stc_school_admission_marks_percent` DECIMAL(6,2) DEFAULT NULL");
+      }
+   }
+
    private function ensure_table(){
       mysqli_query($this->stc_dbs, "
          CREATE TABLE IF NOT EXISTS `stc_school_admission` (
@@ -4529,6 +4547,7 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
             PRIMARY KEY (`stc_school_admission_id`)
          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       ");
+      $this->ensure_marks_percent_column();
    }
 
    private function sql_date($value){
@@ -4570,6 +4589,9 @@ class ragnarReportsViewSchoolAdmission extends tesseract{
          'guardianname' => (string)$row['stc_school_admission_guardianname'],
          'student_remarks' => (string)$row['stc_school_admission_student_remarks'],
          'amount' => (float)$row['stc_school_admission_amount'],
+         'marks_percent' => ($row['stc_school_admission_marks_percent'] ?? '') === '' || ($row['stc_school_admission_marks_percent'] ?? null) === null
+            ? null
+            : (float)$row['stc_school_admission_marks_percent'],
          'status' => (string)$row['stc_school_admission_status'],
          'final_amount' => $row['stc_school_admission_final_amount'] === null || $row['stc_school_admission_final_amount'] === '' ? null : (float)$row['stc_school_admission_final_amount'],
          'boss_remarks' => (string)$row['stc_school_admission_boss_remarks'],

@@ -330,7 +330,8 @@ body.school-app .school-modal-save {
 }
 
 body.school-app .modal-body h3,
-body.school-app .modal-body h5 {
+body.school-app .modal-body h5,
+body.school-app .modal-body .stc-field-label {
   font-size: 0.85rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.06em !important;
@@ -811,6 +812,88 @@ body.school-app .school-rec-pagination-info {
 body.school-app .school-rec-pagination-info strong {
   color: #303f75;
   font-weight: 700;
+}
+
+/* Admission / readmission: kill Material floating labels so text stays readable */
+body.school-app #stc-admit-form .bmd-form-group,
+body.school-app #stc-readmit-form .bmd-form-group,
+body.school-app .stc-school-showteacher-res .bmd-form-group,
+body.school-app .stc-school-showstud-res .bmd-form-group,
+body.school-app .stc-school-showsub-res .bmd-form-group,
+body.school-app .stc-school-showclassroom-res .bmd-form-group,
+body.school-app .stc-school-showschedule-res .bmd-form-group {
+  position: static !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+}
+
+body.school-app #stc-admit-form .stc-field-label,
+body.school-app #stc-readmit-form .stc-field-label {
+  position: static !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  top: auto !important;
+  left: auto !important;
+  display: block !important;
+  float: none !important;
+  width: auto !important;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  word-spacing: normal !important;
+  text-transform: none !important;
+  color: #303f75 !important;
+  line-height: 1.4 !important;
+  white-space: normal !important;
+}
+
+body.school-app #stc-admit-form .mb-3,
+body.school-app #stc-readmit-form .mb-3 {
+  padding: 0.85rem;
+  margin-bottom: 1rem !important;
+  border-radius: 10px;
+  border: 1px solid rgba(25, 40, 80, 0.1);
+  background: #fff;
+}
+
+body.school-app #stc-admit-form .form-control,
+body.school-app #stc-readmit-form .form-control {
+  background-color: #fff !important;
+  background-image: none !important;
+  border: 1px solid #c5cdd8 !important;
+  border-radius: 8px !important;
+  height: 42px !important;
+  padding: 8px 12px !important;
+  box-shadow: none !important;
+  color: #222 !important;
+}
+
+body.school-app #stc-admit-form textarea.form-control,
+body.school-app #stc-readmit-form textarea.form-control {
+  height: auto !important;
+  min-height: 84px;
+}
+
+body.school-app #stc-admit-form .form-control:focus,
+body.school-app #stc-readmit-form .form-control:focus {
+  border-color: #5c6bc0 !important;
+  box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.18) !important;
+}
+
+body.school-app #stc-readmit-form .stc-studid-wrap {
+  position: relative;
+}
+
+body.school-app #stc-readmit-form .stc-studid-list {
+  z-index: 40;
+}
+
+body.school-app .stc-admit-acc .card {
+  overflow: visible;
 }
 
 @media (max-width: 575.98px) {

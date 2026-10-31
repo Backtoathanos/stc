@@ -30,6 +30,42 @@ class StcSchoolAdmission extends tesseract
 		return mysqli_real_escape_string($this->stc_dbs, (string) $value);
 	}
 
+	private function ensure_marks_percent_column()
+	{
+		$q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_school_admission` LIKE 'stc_school_admission_marks_percent'");
+		if ($q && mysqli_num_rows($q) === 0) {
+			mysqli_query($this->stc_dbs, "ALTER TABLE `stc_school_admission` ADD `stc_school_admission_marks_percent` DECIMAL(6,2) DEFAULT NULL");
+		}
+	}
+
+	private function parse_marks_percent($value)
+	{
+		$raw = trim((string) $value);
+		if ($raw === '' || !is_numeric($raw)) {
+			return null;
+		}
+		$n = round((float) $raw, 2);
+		if ($n < 0) {
+			$n = 0;
+		}
+		if ($n > 100) {
+			$n = 100;
+		}
+		return $n;
+	}
+
+	private function sql_marks($value)
+	{
+		$n = $this->parse_marks_percent($value);
+		return $n === null ? 'NULL' : "'".$this->esc(number_format($n, 2, '.', ''))."'";
+	}
+
+	private function map_marks($row)
+	{
+		$v = $row['stc_school_admission_marks_percent'] ?? null;
+		return ($v === null || $v === '') ? null : (float) $v;
+	}
+
 	private function ensure_table()
 	{
 		mysqli_query($this->stc_dbs, "
@@ -62,6 +98,7 @@ class StcSchoolAdmission extends tesseract
 			  PRIMARY KEY (`stc_school_admission_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		");
+		$this->ensure_marks_percent_column();
 	}
 
 	private function null_date($value)
@@ -101,37 +138,43 @@ class StcSchoolAdmission extends tesseract
 		$guardianname = trim((string) ($p['guardianname'] ?? ''));
 		$student_remarks = trim((string) ($p['student_remarks'] ?? ''));
 		$amount = (float) ($p['amount'] ?? 0);
+		$marks_percent = $this->parse_marks_percent($p['marks_percent'] ?? '');
 
-		if ($school === '' || $studid === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '') {
-			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, student ID, name, contact, guardian and admission amount.'));
+		if ($school === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '') {
+			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, name, contact, guardian and admission amount.'));
 		}
 		if ($amount <= 0) {
 			$this->json_out(array('status' => 'empty', 'message' => 'Enter a valid admission amount.'));
+		}
+		if ($marks_percent === null) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Enter last marks %.'));
 		}
 		$allowed_schools = array('SGMS', 'SHS', 'SIS', 'SMS');
 		if (!in_array($school, $allowed_schools, true)) {
 			$this->json_out(array('status' => 'empty', 'message' => 'Select a valid school.'));
 		}
 
-		$exists = mysqli_query($this->stc_dbs, "
-			SELECT `stc_school_student_id`
-			FROM `stc_school_student`
-			WHERE TRIM(`stc_school_student_studid`)='".$this->esc($studid)."'
-			LIMIT 1
-		");
-		if ($exists && mysqli_num_rows($exists) > 0) {
-			$this->json_out(array('status' => 'duplicate', 'message' => 'This student ID already exists. Use Readmission instead.'));
-		}
+		if ($studid !== '') {
+			$exists = mysqli_query($this->stc_dbs, "
+				SELECT `stc_school_student_id`
+				FROM `stc_school_student`
+				WHERE TRIM(`stc_school_student_studid`)='".$this->esc($studid)."'
+				LIMIT 1
+			");
+			if ($exists && mysqli_num_rows($exists) > 0) {
+				$this->json_out(array('status' => 'duplicate', 'message' => 'This student ID already exists. Use Readmission instead.'));
+			}
 
-		$pending = mysqli_query($this->stc_dbs, "
-			SELECT `stc_school_admission_id`
-			FROM `stc_school_admission`
-			WHERE `stc_school_admission_studid`='".$this->esc($studid)."'
-			  AND `stc_school_admission_status`='pending'
-			LIMIT 1
-		");
-		if ($pending && mysqli_num_rows($pending) > 0) {
-			$this->json_out(array('status' => 'duplicate', 'message' => 'A pending new admission already exists for this student ID.'));
+			$pending = mysqli_query($this->stc_dbs, "
+				SELECT `stc_school_admission_id`
+				FROM `stc_school_admission`
+				WHERE `stc_school_admission_studid`='".$this->esc($studid)."'
+				  AND `stc_school_admission_status`='pending'
+				LIMIT 1
+			");
+			if ($pending && mysqli_num_rows($pending) > 0) {
+				$this->json_out(array('status' => 'duplicate', 'message' => 'A pending new admission already exists for this student ID.'));
+			}
 		}
 
 		$created_by = (int) $_SESSION['stc_school_user_id'];
@@ -154,6 +197,7 @@ class StcSchoolAdmission extends tesseract
 				`stc_school_admission_guardianname`,
 				`stc_school_admission_student_remarks`,
 				`stc_school_admission_amount`,
+				`stc_school_admission_marks_percent`,
 				`stc_school_admission_status`,
 				`stc_school_admission_created_by`,
 				`stc_school_admission_created_date`
@@ -174,6 +218,7 @@ class StcSchoolAdmission extends tesseract
 				'".$this->esc($guardianname)."',
 				'".$this->esc($student_remarks)."',
 				'".$this->esc(number_format($amount, 2, '.', ''))."',
+				".$this->sql_marks($marks_percent).",
 				'pending',
 				'".$created_by."',
 				'".$this->esc($now)."'
@@ -248,6 +293,7 @@ class StcSchoolAdmission extends tesseract
 			'guardianname' => (string) $row['stc_school_admission_guardianname'],
 			'student_remarks' => (string) $row['stc_school_admission_student_remarks'],
 			'amount' => (float) $row['stc_school_admission_amount'],
+			'marks_percent' => $this->map_marks($row),
 			'final_amount' => $final === null || $final === '' ? null : (float) $final,
 			'status' => $status,
 			'student_pk' => (int) $row['stc_school_admission_student_pk'],
@@ -312,28 +358,34 @@ class StcSchoolAdmission extends tesseract
 		$guardianname = trim((string) ($p['guardianname'] ?? ''));
 		$student_remarks = trim((string) ($p['student_remarks'] ?? ''));
 		$amount = (float) ($p['amount'] ?? 0);
+		$marks_percent = $this->parse_marks_percent($p['marks_percent'] ?? '');
 
-		if ($school === '' || $studid === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '') {
-			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, student ID, name, contact, guardian and admission amount.'));
+		if ($school === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '') {
+			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, name, contact, guardian and admission amount.'));
 		}
 		if ($amount <= 0) {
 			$this->json_out(array('status' => 'empty', 'message' => 'Enter a valid admission amount.'));
+		}
+		if ($marks_percent === null) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Enter last marks %.'));
 		}
 		$allowed_schools = array('SGMS', 'SHS', 'SIS', 'SMS');
 		if (!in_array($school, $allowed_schools, true)) {
 			$this->json_out(array('status' => 'empty', 'message' => 'Select a valid school.'));
 		}
 
-		$dup = mysqli_query($this->stc_dbs, "
-			SELECT `stc_school_admission_id`
-			FROM `stc_school_admission`
-			WHERE `stc_school_admission_studid`='".$this->esc($studid)."'
-			  AND `stc_school_admission_id`<>'".$id."'
-			  AND `stc_school_admission_status`='pending'
-			LIMIT 1
-		");
-		if ($dup && mysqli_num_rows($dup) > 0) {
-			$this->json_out(array('status' => 'duplicate', 'message' => 'Another pending admission already uses this student ID.'));
+		if ($studid !== '') {
+			$dup = mysqli_query($this->stc_dbs, "
+				SELECT `stc_school_admission_id`
+				FROM `stc_school_admission`
+				WHERE `stc_school_admission_studid`='".$this->esc($studid)."'
+				  AND `stc_school_admission_id`<>'".$id."'
+				  AND `stc_school_admission_status`='pending'
+				LIMIT 1
+			");
+			if ($dup && mysqli_num_rows($dup) > 0) {
+				$this->json_out(array('status' => 'duplicate', 'message' => 'Another pending admission already uses this student ID.'));
+			}
 		}
 
 		$ok = mysqli_query($this->stc_dbs, "
@@ -353,7 +405,8 @@ class StcSchoolAdmission extends tesseract
 				`stc_school_admission_classroomid`='".$classroomid."',
 				`stc_school_admission_guardianname`='".$this->esc($guardianname)."',
 				`stc_school_admission_student_remarks`='".$this->esc($student_remarks)."',
-				`stc_school_admission_amount`='".$this->esc(number_format($amount, 2, '.', ''))."'
+				`stc_school_admission_amount`='".$this->esc(number_format($amount, 2, '.', ''))."',
+				`stc_school_admission_marks_percent`=".$this->sql_marks($marks_percent)."
 			WHERE `stc_school_admission_id`='".$id."'
 		");
 		if (!$ok) {

@@ -41,6 +41,36 @@ class StcSchoolReadmission extends tesseract
 		return mysqli_real_escape_string($this->stc_dbs, (string) $value);
 	}
 
+	private function ensure_marks_percent_column()
+	{
+		$q = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_school_readmission` LIKE 'stc_school_readmission_marks_percent'");
+		if ($q && mysqli_num_rows($q) === 0) {
+			mysqli_query($this->stc_dbs, "ALTER TABLE `stc_school_readmission` ADD `stc_school_readmission_marks_percent` DECIMAL(6,2) DEFAULT NULL");
+		}
+	}
+
+	private function parse_marks_percent($value)
+	{
+		$raw = trim((string) $value);
+		if ($raw === '' || !is_numeric($raw)) {
+			return null;
+		}
+		$n = round((float) $raw, 2);
+		if ($n < 0) {
+			$n = 0;
+		}
+		if ($n > 100) {
+			$n = 100;
+		}
+		return $n;
+	}
+
+	private function sql_marks($value)
+	{
+		$n = $this->parse_marks_percent($value);
+		return $n === null ? 'NULL' : "'".$this->esc(number_format($n, 2, '.', ''))."'";
+	}
+
 	private function ensure_table()
 	{
 		mysqli_query($this->stc_dbs, "
@@ -75,6 +105,7 @@ class StcSchoolReadmission extends tesseract
 			  PRIMARY KEY (`stc_school_readmission_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 		");
+		$this->ensure_marks_percent_column();
 	}
 
 	private function null_date($value)
@@ -93,14 +124,31 @@ class StcSchoolReadmission extends tesseract
 		return $d === null ? 'NULL' : "'".$this->esc($d)."'";
 	}
 
-	public function lookup_student($studid)
+	private function student_payload($row)
 	{
-		$this->require_school_user();
-		$studid = trim((string) $studid);
-		if ($studid === '') {
-			$this->json_out(array('status' => 'empty', 'message' => 'Enter student ID.'));
-		}
-		$res = mysqli_query($this->stc_dbs, "
+		return array(
+			'student_pk' => (int) $row['stc_school_student_id'],
+			'studid' => (string) $row['stc_school_student_studid'],
+			'firstname' => (string) $row['stc_school_student_firstname'],
+			'lastname' => (string) $row['stc_school_student_lastname'],
+			'dob' => $this->null_date($row['stc_school_student_dob']),
+			'gender' => (string) $row['stc_school_student_gender'],
+			'bloodgroup' => (string) $row['stc_school_student_bloodgroup'],
+			'email' => (string) $row['stc_school_student_email'],
+			'contact' => (string) $row['stc_school_student_contact'],
+			'address' => (string) $row['stc_school_student_address'],
+			'religion' => (string) $row['stc_school_student_religion'],
+			'admissiondate' => $this->null_date($row['stc_school_student_admissiondate']),
+			'classroomid' => (int) $row['stc_school_student_classroomid'],
+			'guardianname' => (string) $row['stc_school_student_guardianname'],
+			'remarks' => (string) $row['stc_school_student_remarks'],
+			'classroom' => (string) ($row['stc_school_class_title'] ?? ''),
+		);
+	}
+
+	private function student_select_sql()
+	{
+		return "
 			SELECT
 				s.`stc_school_student_id`,
 				s.`stc_school_student_studid`,
@@ -120,6 +168,17 @@ class StcSchoolReadmission extends tesseract
 				c.`stc_school_class_title`
 			FROM `stc_school_student` s
 			LEFT JOIN `stc_school_class` c ON c.`stc_school_class_id` = s.`stc_school_student_classroomid`
+		";
+	}
+
+	public function lookup_student($studid)
+	{
+		$this->require_school_user();
+		$studid = trim((string) $studid);
+		if ($studid === '') {
+			$this->json_out(array('status' => 'empty', 'message' => 'Enter student ID.'));
+		}
+		$res = mysqli_query($this->stc_dbs, $this->student_select_sql()."
 			WHERE TRIM(s.`stc_school_student_studid`) = '".$this->esc($studid)."'
 			LIMIT 1
 		");
@@ -129,25 +188,41 @@ class StcSchoolReadmission extends tesseract
 		}
 		$this->json_out(array(
 			'status' => 'success',
-			'data' => array(
-				'student_pk' => (int) $row['stc_school_student_id'],
-				'studid' => (string) $row['stc_school_student_studid'],
-				'firstname' => (string) $row['stc_school_student_firstname'],
-				'lastname' => (string) $row['stc_school_student_lastname'],
-				'dob' => $this->null_date($row['stc_school_student_dob']),
-				'gender' => (string) $row['stc_school_student_gender'],
-				'bloodgroup' => (string) $row['stc_school_student_bloodgroup'],
-				'email' => (string) $row['stc_school_student_email'],
-				'contact' => (string) $row['stc_school_student_contact'],
-				'address' => (string) $row['stc_school_student_address'],
-				'religion' => (string) $row['stc_school_student_religion'],
-				'admissiondate' => $this->null_date($row['stc_school_student_admissiondate']),
-				'classroomid' => (int) $row['stc_school_student_classroomid'],
-				'guardianname' => (string) $row['stc_school_student_guardianname'],
-				'remarks' => (string) $row['stc_school_student_remarks'],
-				'classroom' => (string) $row['stc_school_class_title'],
-			),
+			'data' => $this->student_payload($row),
 		));
+	}
+
+	public function search_students($q, $school = '')
+	{
+		$this->require_school_user();
+		$q = trim((string) $q);
+		$school = strtoupper(trim((string) $school));
+		$allowed_schools = array('SGMS', 'SHS', 'SIS', 'SMS');
+		$where = array('1=1');
+		if (in_array($school, $allowed_schools, true)) {
+			$where[] = "s.`stc_school_student_studid` LIKE '".$this->esc($school)."%'";
+		}
+		if ($q !== '') {
+			$like = '%'.$this->esc($q).'%';
+			$where[] = "(
+				s.`stc_school_student_studid` LIKE '".$like."'
+				OR s.`stc_school_student_firstname` LIKE '".$like."'
+				OR s.`stc_school_student_lastname` LIKE '".$like."'
+				OR CONCAT(s.`stc_school_student_firstname`, ' ', s.`stc_school_student_lastname`) LIKE '".$like."'
+			)";
+		}
+		$res = mysqli_query($this->stc_dbs, $this->student_select_sql()."
+			WHERE ".implode(' AND ', $where)."
+			ORDER BY s.`stc_school_student_studid` ASC
+			LIMIT 20
+		");
+		$rows = array();
+		if ($res) {
+			while ($row = mysqli_fetch_assoc($res)) {
+				$rows[] = $this->student_payload($row);
+			}
+		}
+		$this->json_out(array('status' => 'success', 'data' => $rows));
 	}
 
 	public function save($p)
@@ -173,7 +248,11 @@ class StcSchoolReadmission extends tesseract
 		$amount = (float) ($p['amount'] ?? 0);
 		$last_status = trim((string) ($p['last_status'] ?? ''));
 		$last_remarks = trim((string) ($p['last_remarks'] ?? ''));
+		$marks_percent = $this->parse_marks_percent($p['marks_percent'] ?? '');
 		$student_pk = (int) ($p['student_pk'] ?? 0);
+		if ($marks_percent === null) {
+			$this->json_out(array('status' => 'empty', 'message' => 'Enter last marks %.'));
+		}
 
 		if ($school === '' || $studid === '' || $firstname === '' || $lastname === '' || $contact === '' || $guardianname === '' || $last_status === '') {
 			$this->json_out(array('status' => 'empty', 'message' => 'Please fill school, student ID, name, contact, guardian, last status and admission amount.'));
@@ -235,6 +314,7 @@ class StcSchoolReadmission extends tesseract
 				`stc_school_readmission_amount`,
 				`stc_school_readmission_last_status`,
 				`stc_school_readmission_last_remarks`,
+				`stc_school_readmission_marks_percent`,
 				`stc_school_readmission_status`,
 				`stc_school_readmission_created_by`,
 				`stc_school_readmission_created_date`
@@ -258,6 +338,7 @@ class StcSchoolReadmission extends tesseract
 				'".$this->esc(number_format($amount, 2, '.', ''))."',
 				'".$this->esc($last_status)."',
 				'".$this->esc($last_remarks)."',
+				".$this->sql_marks($marks_percent).",
 				'pending',
 				'".$created_by."',
 				'".$this->esc($now)."'
@@ -326,6 +407,9 @@ class StcSchoolReadmission extends tesseract
 			'final_amount' => $final === null || $final === '' ? null : (float) $final,
 			'last_status' => (string) $row['stc_school_readmission_last_status'],
 			'last_remarks' => (string) $row['stc_school_readmission_last_remarks'],
+			'marks_percent' => ($row['stc_school_readmission_marks_percent'] ?? '') === '' || $row['stc_school_readmission_marks_percent'] === null
+				? null
+				: (float) $row['stc_school_readmission_marks_percent'],
 			'status' => $status,
 			'created_by' => (string) ($row['stc_school_user_fullName'] ?? ''),
 			'created_date' => (string) $row['stc_school_readmission_created_date'],
@@ -336,6 +420,9 @@ class StcSchoolReadmission extends tesseract
 	{
 		if (isset($_POST['stc_readmit_lookup'])) {
 			$this->lookup_student($_POST['studid'] ?? '');
+		}
+		if (isset($_POST['stc_readmit_search'])) {
+			$this->search_students($_POST['q'] ?? '', $_POST['school'] ?? '');
 		}
 		if (isset($_POST['stc_readmit_save'])) {
 			$this->save($_POST);

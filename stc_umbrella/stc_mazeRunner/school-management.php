@@ -44,7 +44,120 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
-    <link href="../assets/css/school-theme.css?v=8" rel="stylesheet" />
+    <link href="../assets/css/school-theme.css?v=11" rel="stylesheet" />
+    <style>
+      .stc-req { color: #d32f2f; font-weight: 700; margin-left: 3px; }
+      .stc-field-error { display: none; color: #d32f2f; font-size: 12px; margin-top: 4px; font-weight: 500; }
+      .stc-field-error.is-on { display: block; }
+      #stc-admit-form .is-invalid,
+      #stc-readmit-form .is-invalid {
+        border-color: #d32f2f !important;
+        box-shadow: 0 0 0 1px #d32f2f;
+      }
+      .stc-admit-acc { margin-bottom: 16px; }
+      .stc-admit-acc .card { margin-bottom: 10px; overflow: visible; }
+      .stc-admit-acc .stc-acc-btn {
+        width: 100%;
+        text-align: left;
+        background: #f5f7fb;
+        border: 0;
+        padding: 14px 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .stc-admit-acc .stc-acc-btn:after {
+        content: '\25BC';
+        font-size: 11px;
+        color: #777;
+      }
+      .stc-admit-acc .stc-acc-btn.collapsed:after { content: '\25B6'; }
+      .stc-admit-acc .stc-acc-mandatory .stc-acc-btn { background: #fdecea; color: #b71c1c; }
+      .stc-admit-acc .stc-acc-optional .stc-acc-btn { background: #eef5ff; color: #1565c0; }
+      .stc-field-label {
+        display: block;
+        cursor: pointer;
+        position: static !important;
+        float: none !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+        letter-spacing: 0.02em;
+        word-spacing: normal;
+        text-transform: none;
+        color: #303f75;
+        margin-bottom: 8px;
+      }
+      .stc-field-label .stc-req { cursor: pointer; }
+      #stc-admit-form .mb-3,
+      #stc-readmit-form .mb-3 {
+        padding: 0.85rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(25, 40, 80, 0.1);
+        background: #fff;
+      }
+      #stc-admit-form .form-control,
+      #stc-readmit-form .form-control {
+        background: #fff !important;
+        background-image: none !important;
+        border: 1px solid #c5cdd8 !important;
+        border-radius: 8px !important;
+        height: 42px !important;
+        padding: 8px 12px !important;
+      }
+      #stc-admit-form textarea.form-control,
+      #stc-readmit-form textarea.form-control { height: auto !important; min-height: 84px; }
+      #stc-admit-form .bmd-form-group,
+      #stc-readmit-form .bmd-form-group {
+        position: static !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100%;
+      }
+      .stc-studid-wrap { position: relative; }
+      #stc-readmit-form .mb-3,
+      #stc-readmit-mandatory,
+      #stc-readmit-mandatory .card-body { overflow: visible; }
+      .stc-studid-wrap .form-control,
+      .stc-studid-wrap .bmd-form-group { width: 100%; }
+      .stc-studid-list {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 4px);
+        z-index: 40;
+        max-height: 240px;
+        overflow-y: auto;
+        margin: 0;
+        padding: 6px 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #c5cdd8;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(22, 40, 80, 0.12);
+      }
+      .stc-studid-list.is-open { display: block; }
+      .stc-studid-list li {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 1.35;
+        color: #303f75;
+      }
+      .stc-studid-list li:hover,
+      .stc-studid-list li.is-on { background: #eef2ff; }
+      .stc-studid-list li small { display: block; color: #7a8699; font-size: 12px; }
+      .stc-studid-list .stc-studid-empty { cursor: default; color: #7a8699; }
+    </style>
   </head>
 
   <body class="school-app">
@@ -200,151 +313,170 @@
                           </div>
                         </div>
                         <div class="stc-admit-subpane" data-pane="new"<?php echo $stc_admit_inner_tab === 'new' ? '' : ' style="display:none;"'; ?>>
-                        <form id="stc-admit-form" autocomplete="off">
+                        <form id="stc-admit-form" autocomplete="off" novalidate>
                           <input type="hidden" id="stc-admit-id" value="0" />
-                          <div class="card mb-4">
-                            <div class="card-header"><h4 class="mb-0">Student details</h4></div>
-                            <div class="card-body">
-                              <div class="row">
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>School</h5>
-                                    <select id="stc-admit-school" class="form-control" required>
-                                      <option value="SGMS">Sara Girls Mission School</option>
-                                      <option value="SHS">Sara Hafiza Section</option>
-                                      <option value="SIS" selected>Sara International School</option>
-                                      <option value="SMS">Sara Model School</option>
-                                    </select>
+                          <div class="stc-admit-acc" id="stc-admit-accordion">
+                            <div class="card stc-acc-mandatory">
+                              <button type="button" class="stc-acc-btn" data-toggle="collapse" data-target="#stc-admit-mandatory" aria-expanded="true">Mandatory fields <span class="stc-req">*</span></button>
+                              <div id="stc-admit-mandatory" class="collapse show" data-parent="#stc-admit-accordion">
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-school">School <span class="stc-req">*</span></label>
+                                        <select id="stc-admit-school" class="form-control" required>
+                                          <option value="SGMS" selected>Sara Girls Mission School</option>
+                                          <option value="SHS">Sara Hafiza Section</option>
+                                          <option value="SIS">Sara International School</option>
+                                          <option value="SMS">Sara Model School</option>
+                                        </select>
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-firstname">First Name <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-firstname" type="text" class="form-control" placeholder="First name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-lastname">Last Name <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-lastname" type="text" class="form-control" placeholder="Last name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-contact">Contact <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-guardian">Parent / Guardian Name <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-amount">Admission amount <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-marks">Last marks % <span class="stc-req">*</span></label>
+                                        <input id="stc-admit-marks" type="number" min="0" max="100" step="0.01" class="form-control" placeholder="e.g. 72.50" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                                <div class="col-md-5">
-                                  <div class="mb-3">
-                                    <h5>Student ID</h5>
-                                    <input id="stc-admit-studid" type="text" class="form-control" placeholder="Enter student ID" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-3">
-                                  <div class="mb-3">
-                                    <h5>Class Room</h5>
-                                    <select id="stc-admit-classroom" class="form-control">
-                                      <option value="0">--Select--</option>
-                                      <?php
-                                        if (!isset($con)) {
-                                          include_once("../../MCU/db.php");
-                                        }
-                                        $class_sql_admit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
-                                        if ($class_sql_admit) {
-                                          foreach ($class_sql_admit as $classrow) {
-                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
-                                          }
-                                        }
-                                      ?>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>First Name</h5>
-                                    <input id="stc-admit-firstname" type="text" class="form-control" placeholder="First name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Last Name</h5>
-                                    <input id="stc-admit-lastname" type="text" class="form-control" placeholder="Last name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Date of Birth</h5>
-                                    <input id="stc-admit-dob" type="date" class="form-control" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Gender</h5>
-                                    <label><input type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Male" checked /> Male</label>
-                                    &nbsp;&nbsp;
-                                    <label><input type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Female" /> Female</label>
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Blood Group</h5>
-                                    <select id="stc-admit-bloodgroup" class="form-control">
-                                      <option value="0">--Select--</option>
-                                      <option value="a_positive">A+</option>
-                                      <option value="a_negative">A-</option>
-                                      <option value="b_positive">B+</option>
-                                      <option value="b_negative">B-</option>
-                                      <option value="o_positive">O+</option>
-                                      <option value="o_negative">O-</option>
-                                      <option value="ab_positive">AB+</option>
-                                      <option value="ab_negative">AB-</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Email</h5>
-                                    <input id="stc-admit-email" type="email" class="form-control" placeholder="Email" />
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Contact</h5>
-                                    <input id="stc-admit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <div class="mb-3">
-                                    <h5>Address</h5>
-                                    <textarea id="stc-admit-address" class="form-control" placeholder="Address"></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Religion</h5>
-                                    <input id="stc-admit-religion" type="text" class="form-control" placeholder="Religion" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Admission Date</h5>
-                                    <input id="stc-admit-admissiondate" type="date" class="form-control" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Parent / Guardian Name</h5>
-                                    <input id="stc-admit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <div class="mb-3">
-                                    <h5>Remarks</h5>
-                                    <textarea id="stc-admit-student-remarks" class="form-control" placeholder="Remarks"></textarea>
+                              </div>
+                            </div>
+                            <div class="card stc-acc-optional">
+                              <button type="button" class="stc-acc-btn collapsed" data-toggle="collapse" data-target="#stc-admit-optional" aria-expanded="false">Optional fields</button>
+                              <div id="stc-admit-optional" class="collapse" data-parent="#stc-admit-accordion">
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-studid">Student ID</label>
+                                        <input id="stc-admit-studid" type="text" class="form-control" placeholder="Enter student ID" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-classroom">Class Room</label>
+                                        <select id="stc-admit-classroom" class="form-control">
+                                          <option value="0">--Select--</option>
+                                          <?php
+                                            if (!isset($con)) {
+                                              include_once("../../MCU/db.php");
+                                            }
+                                            $class_sql_admit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
+                                            if ($class_sql_admit) {
+                                              foreach ($class_sql_admit as $classrow) {
+                                                echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
+                                              }
+                                            }
+                                          ?>
+                                        </select>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-dob">Date of Birth</label>
+                                        <input id="stc-admit-dob" type="date" class="form-control" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <span class="stc-field-label">Gender</span>
+                                        <label><input id="stc-admit-gender-male" type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Male" checked /> Male</label>
+                                        &nbsp;&nbsp;
+                                        <label><input id="stc-admit-gender-female" type="radio" name="stc-admit-gender" class="stc-admit-gender" value="Female" /> Female</label>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-bloodgroup">Blood Group</label>
+                                        <select id="stc-admit-bloodgroup" class="form-control">
+                                          <option value="0">--Select--</option>
+                                          <option value="a_positive">A+</option>
+                                          <option value="a_negative">A-</option>
+                                          <option value="b_positive">B+</option>
+                                          <option value="b_negative">B-</option>
+                                          <option value="o_positive">O+</option>
+                                          <option value="o_negative">O-</option>
+                                          <option value="ab_positive">AB+</option>
+                                          <option value="ab_negative">AB-</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-email">Email</label>
+                                        <input id="stc-admit-email" type="email" class="form-control" placeholder="Email" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-admissiondate">Admission Date</label>
+                                        <input id="stc-admit-admissiondate" type="date" class="form-control" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-address">Address</label>
+                                        <textarea id="stc-admit-address" class="form-control" placeholder="Address"></textarea>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-religion">Religion</label>
+                                        <input id="stc-admit-religion" type="text" class="form-control" placeholder="Religion" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-admit-student-remarks">Remarks</label>
+                                        <textarea id="stc-admit-student-remarks" class="form-control" placeholder="Remarks"></textarea>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div class="card mb-4">
-                            <div class="card-header"><h4 class="mb-0">Admission amount</h4></div>
-                            <div class="card-body">
-                              <div class="row">
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Admission amount</h5>
-                                    <input id="stc-admit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <button type="button" class="btn btn-success stc-admit-save-btn">Submit admission</button>
-                                  <button type="button" class="btn btn-default stc-admit-cancel-edit" style="display:none;">Cancel edit</button>
-                                </div>
-                              </div>
-                            </div>
+                          <div class="mb-4">
+                            <button type="button" class="btn btn-success stc-admit-save-btn">Submit admission</button>
+                            <button type="button" class="btn btn-default stc-admit-cancel-edit" style="display:none;">Cancel edit</button>
                           </div>
                         </form>
                         <div class="card">
@@ -367,6 +499,7 @@
                                       <th>Student ID</th>
                                       <th>Name</th>
                                       <th>Class</th>
+                                      <th class="text-right">Marks %</th>
                                       <th class="text-right">Proposed amount</th>
                                       <th class="text-right">Final amount</th>
                                       <th>Status</th>
@@ -375,7 +508,7 @@
                                     </tr>
                                   </thead>
                                   <tbody class="stc-admit-list-body">
-                                    <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
+                                    <tr><td colspan="11" class="text-center text-muted">Loading...</td></tr>
                                   </tbody>
                                 </table>
                               </div>
@@ -385,175 +518,196 @@
                         </div>
 
                         <div class="stc-admit-subpane" data-pane="re"<?php echo $stc_admit_inner_tab === 're' ? '' : ' style="display:none;"'; ?>>
-                        <form id="stc-readmit-form" autocomplete="off">
+                        <form id="stc-readmit-form" autocomplete="off" novalidate>
                           <input type="hidden" id="stc-readmit-student-pk" value="0" />
-                          <div class="card mb-4">
-                            <div class="card-header"><h4 class="mb-0">Student details</h4></div>
-                            <div class="card-body">
-                              <div class="row">
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>School</h5>
-                                    <select id="stc-readmit-school" class="form-control" required>
-                                      <option value="SGMS">Sara Girls Mission School</option>
-                                      <option value="SHS">Sara Hafiza Section</option>
-                                      <option value="SIS" selected>Sara International School</option>
-                                      <option value="SMS">Sara Model School</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-5">
-                                  <div class="mb-3">
-                                    <h5>Student ID</h5>
-                                    <div class="d-flex">
-                                      <input id="stc-readmit-studid" type="text" class="form-control" placeholder="Enter student ID" required />
-                                      <button type="button" class="btn btn-info ml-2 stc-readmit-lookup-btn" style="white-space:nowrap;">Load</button>
+                          <div class="stc-admit-acc" id="stc-readmit-accordion">
+                            <div class="card stc-acc-mandatory">
+                              <button type="button" class="stc-acc-btn" data-toggle="collapse" data-target="#stc-readmit-mandatory" aria-expanded="true">Mandatory fields <span class="stc-req">*</span></button>
+                              <div id="stc-readmit-mandatory" class="collapse show" data-parent="#stc-readmit-accordion">
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-school">School <span class="stc-req">*</span></label>
+                                        <select id="stc-readmit-school" class="form-control" required>
+                                          <option value="SGMS" selected>Sara Girls Mission School</option>
+                                          <option value="SHS">Sara Hafiza Section</option>
+                                          <option value="SIS">Sara International School</option>
+                                          <option value="SMS">Sara Model School</option>
+                                        </select>
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-studid">Student ID <span class="stc-req">*</span></label>
+                                        <div class="stc-studid-wrap">
+                                          <input id="stc-readmit-studid" type="text" class="form-control" placeholder="Type student ID or name" autocomplete="off" required />
+                                          <ul id="stc-readmit-studid-list" class="stc-studid-list"></ul>
+                                        </div>
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-firstname">First Name <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-firstname" type="text" class="form-control" placeholder="First name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-lastname">Last Name <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-lastname" type="text" class="form-control" placeholder="Last name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-contact">Contact <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-guardian">Parent / Guardian Name <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-amount">Admission amount <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-marks">Last marks % <span class="stc-req">*</span></label>
+                                        <input id="stc-readmit-marks" type="number" min="0" max="100" step="0.01" class="form-control" placeholder="e.g. 72.50" required />
+                                        <div class="stc-field-error"></div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-last-status">Last status <span class="stc-req">*</span></label>
+                                        <select id="stc-readmit-last-status" class="form-control" required>
+                                          <option value="">--Select--</option>
+                                          <option value="Promoted">Promoted</option>
+                                          <option value="Failed">Failed</option>
+                                          <option value="Repeater">Repeater</option>
+                                          <option value="Left">Left</option>
+                                          <option value="TC Issued">TC Issued</option>
+                                          <option value="Dropout">Dropout</option>
+                                          <option value="Inactive">Inactive</option>
+                                          <option value="Other">Other</option>
+                                        </select>
+                                        <div class="stc-field-error"></div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                                <div class="col-md-3">
-                                  <div class="mb-3">
-                                    <h5>Class Room</h5>
-                                    <select id="stc-readmit-classroom" class="form-control">
-                                      <option value="0">--Select--</option>
-                                      <?php
-                                        if (!isset($con)) {
-                                          include_once("../../MCU/db.php");
-                                        }
-                                        $class_sql_readmit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
-                                        if ($class_sql_readmit) {
-                                          foreach ($class_sql_readmit as $classrow) {
-                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
-                                          }
-                                        }
-                                      ?>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>First Name</h5>
-                                    <input id="stc-readmit-firstname" type="text" class="form-control" placeholder="First name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Last Name</h5>
-                                    <input id="stc-readmit-lastname" type="text" class="form-control" placeholder="Last name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Date of Birth</h5>
-                                    <input id="stc-readmit-dob" type="date" class="form-control" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Gender</h5>
-                                    <label><input type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Male" checked /> Male</label>
-                                    &nbsp;&nbsp;
-                                    <label><input type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Female" /> Female</label>
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Blood Group</h5>
-                                    <select id="stc-readmit-bloodgroup" class="form-control">
-                                      <option value="0">--Select--</option>
-                                      <option value="a_positive">A+</option>
-                                      <option value="a_negative">A-</option>
-                                      <option value="b_positive">B+</option>
-                                      <option value="b_negative">B-</option>
-                                      <option value="o_positive">O+</option>
-                                      <option value="o_negative">O-</option>
-                                      <option value="ab_positive">AB+</option>
-                                      <option value="ab_negative">AB-</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Email</h5>
-                                    <input id="stc-readmit-email" type="email" class="form-control" placeholder="Email" />
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="mb-3">
-                                    <h5>Contact</h5>
-                                    <input id="stc-readmit-contact" type="number" class="form-control" placeholder="Contact number" maxlength="10" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <div class="mb-3">
-                                    <h5>Address</h5>
-                                    <textarea id="stc-readmit-address" class="form-control" placeholder="Address"></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Religion</h5>
-                                    <input id="stc-readmit-religion" type="text" class="form-control" placeholder="Religion" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Admission Date</h5>
-                                    <input id="stc-readmit-admissiondate" type="date" class="form-control" />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Parent / Guardian Name</h5>
-                                    <input id="stc-readmit-guardian" type="text" class="form-control" placeholder="Guardian name" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <div class="mb-3">
-                                    <h5>Student remarks</h5>
-                                    <textarea id="stc-readmit-student-remarks" class="form-control" placeholder="Student remarks"></textarea>
+                              </div>
+                            </div>
+                            <div class="card stc-acc-optional">
+                              <button type="button" class="stc-acc-btn collapsed" data-toggle="collapse" data-target="#stc-readmit-optional" aria-expanded="false">Optional fields</button>
+                              <div id="stc-readmit-optional" class="collapse" data-parent="#stc-readmit-accordion">
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-classroom">Class Room</label>
+                                        <select id="stc-readmit-classroom" class="form-control">
+                                          <option value="0">--Select--</option>
+                                          <?php
+                                            if (!isset($con)) {
+                                              include_once("../../MCU/db.php");
+                                            }
+                                            $class_sql_readmit = mysqli_query($con, "SELECT * FROM stc_school_class WHERE stc_school_class_status=1");
+                                            if ($class_sql_readmit) {
+                                              foreach ($class_sql_readmit as $classrow) {
+                                                echo '<option value="'.$classrow['stc_school_class_id'].'">'.htmlspecialchars($classrow['stc_school_class_title'], ENT_QUOTES, 'UTF-8').'</option>';
+                                              }
+                                            }
+                                          ?>
+                                        </select>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-dob">Date of Birth</label>
+                                        <input id="stc-readmit-dob" type="date" class="form-control" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <span class="stc-field-label">Gender</span>
+                                        <label><input id="stc-readmit-gender-male" type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Male" checked /> Male</label>
+                                        &nbsp;&nbsp;
+                                        <label><input id="stc-readmit-gender-female" type="radio" name="stc-readmit-gender" class="stc-readmit-gender" value="Female" /> Female</label>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-bloodgroup">Blood Group</label>
+                                        <select id="stc-readmit-bloodgroup" class="form-control">
+                                          <option value="0">--Select--</option>
+                                          <option value="a_positive">A+</option>
+                                          <option value="a_negative">A-</option>
+                                          <option value="b_positive">B+</option>
+                                          <option value="b_negative">B-</option>
+                                          <option value="o_positive">O+</option>
+                                          <option value="o_negative">O-</option>
+                                          <option value="ab_positive">AB+</option>
+                                          <option value="ab_negative">AB-</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-email">Email</label>
+                                        <input id="stc-readmit-email" type="email" class="form-control" placeholder="Email" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-admissiondate">Admission Date</label>
+                                        <input id="stc-readmit-admissiondate" type="date" class="form-control" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-address">Address</label>
+                                        <textarea id="stc-readmit-address" class="form-control" placeholder="Address"></textarea>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-religion">Religion</label>
+                                        <input id="stc-readmit-religion" type="text" class="form-control" placeholder="Religion" />
+                                      </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-student-remarks">Student remarks</label>
+                                        <textarea id="stc-readmit-student-remarks" class="form-control" placeholder="Student remarks"></textarea>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <div class="mb-3">
+                                        <label class="stc-field-label" for="stc-readmit-last-remarks">Last status remarks</label>
+                                        <textarea id="stc-readmit-last-remarks" class="form-control" placeholder="Remarks on last status"></textarea>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div class="card mb-4">
-                            <div class="card-header"><h4 class="mb-0">Admission amount &amp; last status</h4></div>
-                            <div class="card-body">
-                              <div class="row">
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Admission amount</h5>
-                                    <input id="stc-readmit-amount" type="number" min="0.01" step="0.01" class="form-control" placeholder="Proposed amount" required />
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Last status</h5>
-                                    <select id="stc-readmit-last-status" class="form-control" required>
-                                      <option value="">--Select--</option>
-                                      <option value="Promoted">Promoted</option>
-                                      <option value="Failed">Failed</option>
-                                      <option value="Repeater">Repeater</option>
-                                      <option value="Left">Left</option>
-                                      <option value="TC Issued">TC Issued</option>
-                                      <option value="Dropout">Dropout</option>
-                                      <option value="Inactive">Inactive</option>
-                                      <option value="Other">Other</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-4">
-                                  <div class="mb-3">
-                                    <h5>Last status remarks</h5>
-                                    <textarea id="stc-readmit-last-remarks" class="form-control" placeholder="Remarks on last status"></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-md-12">
-                                  <button type="button" class="btn btn-success stc-readmit-save-btn">Submit readmission</button>
-                                </div>
-                              </div>
-                            </div>
+                          <div class="mb-4">
+                            <button type="button" class="btn btn-success stc-readmit-save-btn">Submit readmission</button>
                           </div>
                         </form>
                         <div class="card">
@@ -576,6 +730,7 @@
                                       <th>Student ID</th>
                                       <th>Name</th>
                                       <th>Class</th>
+                                      <th class="text-right">Marks %</th>
                                       <th class="text-right">Proposed amount</th>
                                       <th class="text-right">Final amount</th>
                                       <th>Last status</th>
@@ -584,7 +739,7 @@
                                     </tr>
                                   </thead>
                                   <tbody class="stc-readmit-list-body">
-                                    <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
+                                    <tr><td colspan="11" class="text-center text-muted">Loading...</td></tr>
                                   </tbody>
                                 </table>
                               </div>
@@ -864,11 +1019,9 @@
         <div class="row">
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Teacher ID
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherid">Teacher ID</label>
               <input
+                id="stcschoolmanagementteacherid"
                 name="stcschoolmanagementteacherid"
                 type="text"
                 class="form-control validate stcschoolmanagementteacherid"
@@ -879,11 +1032,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >First Name
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherfirstname">First Name</label>
               <input
+                id="stcschoolmanagementteacherfirstname"
                 name="stcschoolmanagementteacherfirstname"
                 type="text"
                 class="form-control validate stcschoolmanagementteacherfirstname"
@@ -894,11 +1045,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Last Name
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherlastname">Last Name</label>
               <input
+                id="stcschoolmanagementteacherlastname"
                 name="stcschoolmanagementteacherlastname"
                 type="text"
                 class="form-control validate stcschoolmanagementteacherlastname"
@@ -909,11 +1058,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Date of Birth
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherdateofbirth">Date of Birth</label>
               <input
+                id="stcschoolmanagementteacherdateofbirth"
                 name="stcschoolmanagementteacherdateofbirth"
                 type="date"
                 class="form-control validate stcschoolmanagementteacherdateofbirth"
@@ -924,42 +1071,22 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Gender
-              </h5>
-              <label
-                for="name"
-                >
-                <input
-                  name="stcschoolmanagementteachergender"
-                  type="radio"
-                  class="stcschoolmanagementteachergender"
-                  value="Male"
-                  checked
-                />
+              <span class="stc-field-label">Gender</span>
+              <label>
+                <input id="stcschoolmanagementteachergender-male" name="stcschoolmanagementteachergender" type="radio" class="stcschoolmanagementteachergender" value="Male" checked />
                 Male
-              </label> &nbsp &nbsp
-              <label
-                for="name"
-                >
-                <input
-                  name="stcschoolmanagementteachergender"
-                  type="radio"
-                  class="stcschoolmanagementteachergender"
-                  value="Female"
-                />
+              </label> &nbsp;&nbsp;
+              <label>
+                <input id="stcschoolmanagementteachergender-female" name="stcschoolmanagementteachergender" type="radio" class="stcschoolmanagementteachergender" value="Female" />
                 Female
               </label>
             </div>
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Blood Group
-              </h5>
-               <select 
+              <label class="stc-field-label" for="stcschoolmanagementteacherbloodgroup">Blood Group</label>
+              <select
+                id="stcschoolmanagementteacherbloodgroup" 
                   class="form-control stcschoolmanagementteacherbloodgroup" 
                   name="stcschoolmanagementteacherbloodgroup" 
                   >
@@ -977,11 +1104,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Email
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacheremail">Email</label>
               <input
+                id="stcschoolmanagementteacheremail"
                 name="stcschoolmanagementteacheremail"
                 type="email"
                 class="form-control validate stcschoolmanagementteacheremail"
@@ -992,11 +1117,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Contact
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteachernumber">Contact</label>
               <input
+                id="stcschoolmanagementteachernumber"
                 name="stcschoolmanagementteachernumber"
                 type="number"
                 class="form-control validate stcschoolmanagementteachernumber"
@@ -1008,11 +1131,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Address
-              </h5>
-              <textarea 
+              <label class="stc-field-label" for="stcschoolmanagementteacheraddress">Address</label>
+              <textarea
+                id="stcschoolmanagementteacheraddress" 
                 name="stcschoolmanagementteacheraddress"
                 class="form-control validate stcschoolmanagementteacheraddress"
                 value=""
@@ -1022,11 +1143,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Skills
-              </h5>
-              <textarea 
+              <label class="stc-field-label" for="stcschoolmanagementteacherskills">Skills</label>
+              <textarea
+                id="stcschoolmanagementteacherskills" 
                 name="stcschoolmanagementteacherskills"
                 class="form-control validate stcschoolmanagementteacherskills"
                 value=""
@@ -1036,11 +1155,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Religion
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherreligion">Religion</label>
               <input
+                id="stcschoolmanagementteacherreligion"
                 name="stcschoolmanagementteacherreligion"
                 type="text"
                 class="form-control validate stcschoolmanagementteacherreligion"
@@ -1051,11 +1168,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Joining Date
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementteacherjoiningdate">Joining Date</label>
               <input
+                id="stcschoolmanagementteacherjoiningdate"
                 name="stcschoolmanagementteacherjoiningdate"
                 type="date"
                 class="form-control validate stcschoolmanagementteacherjoiningdate"
@@ -1064,11 +1179,9 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Remarks
-              </h5>
-              <textarea 
+              <label class="stc-field-label" for="stcschoolmanagementteacherremarks">Remarks</label>
+              <textarea
+                id="stcschoolmanagementteacherremarks" 
                 name="stcschoolmanagementteacherremarks"
                 class="form-control validate stcschoolmanagementteacherremarks"
                 value=""
@@ -1103,11 +1216,9 @@
                 <div class="row">
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Student ID
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentid">Student ID</label>
+              <input
+                id="stcschoolmanagementstudentid"
                         name="stcschoolmanagementstudentid"
                         type="text"
                         class="form-control validate stcschoolmanagementstudentid"
@@ -1118,11 +1229,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >First Name
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentfirstname">First Name</label>
+              <input
+                id="stcschoolmanagementstudentfirstname"
                         name="stcschoolmanagementstudentfirstname"
                         type="text"
                         class="form-control validate stcschoolmanagementstudentfirstname"
@@ -1133,11 +1242,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Last Name
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentlastname">Last Name</label>
+              <input
+                id="stcschoolmanagementstudentlastname"
                         name="stcschoolmanagementstudentlastname"
                         type="text"
                         class="form-control validate stcschoolmanagementstudentlastname"
@@ -1148,11 +1255,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Date of Birth
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentdateofbirth">Date of Birth</label>
+              <input
+                id="stcschoolmanagementstudentdateofbirth"
                         name="stcschoolmanagementstudentdateofbirth"
                         type="date"
                         class="form-control validate stcschoolmanagementstudentdateofbirth"
@@ -1163,42 +1268,22 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Gender
-                      </h5>
-                      <label
-                        for="name"
-                        >
-                        <input
-                          name="stcschoolmanagementstudentgender"
-                          type="radio"
-                          class="stcschoolmanagementstudentgender"
-                          value="Male"
-                          checked
-                        />
+                      <span class="stc-field-label">Gender</span>
+                      <label>
+                        <input id="stcschoolmanagementstudentgender-male" name="stcschoolmanagementstudentgender" type="radio" class="stcschoolmanagementstudentgender" value="Male" checked />
                         Male
-                      </label> &nbsp &nbsp
-                      <label
-                        for="name"
-                        >
-                        <input
-                          name="stcschoolmanagementstudentgender"
-                          type="radio"
-                          class="stcschoolmanagementstudentgender"
-                          value="Female"
-                        />
+                      </label> &nbsp;&nbsp;
+                      <label>
+                        <input id="stcschoolmanagementstudentgender-female" name="stcschoolmanagementstudentgender" type="radio" class="stcschoolmanagementstudentgender" value="Female" />
                         Female
                       </label>
                     </div>
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Blood Group
-                      </h5>
-                       <select 
+                      <label class="stc-field-label" for="stcschoolmanagementstudentbloodgroup">Blood Group</label>
+              <select
+                id="stcschoolmanagementstudentbloodgroup" 
                           class="form-control stcschoolmanagementstudentbloodgroup" 
                           name="stcschoolmanagementstudentbloodgroup" 
                           >
@@ -1216,11 +1301,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Email
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentemail">Email</label>
+              <input
+                id="stcschoolmanagementstudentemail"
                         name="stcschoolmanagementstudentemail"
                         type="email"
                         class="form-control validate stcschoolmanagementstudentemail"
@@ -1231,11 +1314,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Contact
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentnumber">Contact</label>
+              <input
+                id="stcschoolmanagementstudentnumber"
                         name="stcschoolmanagementstudentnumber"
                         type="number"
                         class="form-control validate stcschoolmanagementstudentnumber"
@@ -1247,11 +1328,9 @@
                   </div>
                   <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Address
-                      </h5>
-                      <textarea 
+                      <label class="stc-field-label" for="stcschoolmanagementStudentaddress">Address</label>
+              <textarea
+                id="stcschoolmanagementStudentaddress" 
                         name="stcschoolmanagementStudentaddress"
                         class="form-control validate stcschoolmanagementStudentaddress"
                         value=""
@@ -1261,11 +1340,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Religion
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentreligion">Religion</label>
+              <input
+                id="stcschoolmanagementstudentreligion"
                         name="stcschoolmanagementstudentreligion"
                         type="text"
                         class="form-control validate stcschoolmanagementstudentreligion"
@@ -1276,11 +1353,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Admission Date
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentjoiningdate">Admission Date</label>
+              <input
+                id="stcschoolmanagementstudentjoiningdate"
                         name="stcschoolmanagementstudentjoiningdate"
                         type="date"
                         class="form-control validate stcschoolmanagementstudentjoiningdate"
@@ -1289,11 +1364,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Class Room
-                      </h5>
-                       <select 
+                      <label class="stc-field-label" for="stcschoolmanagementstudentclassroom">Class Room</label>
+              <select
+                id="stcschoolmanagementstudentclassroom" 
                           class="form-control stcschoolmanagementstudentclassroom" 
                           name="stcschoolmanagementstudentclassroom" 
                           >
@@ -1316,11 +1389,9 @@
                   </div>
                   <div class="col-sm-12 col-md-6 col-lg-6">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Parent / Guardian Name
-                      </h5>
-                      <input
+                      <label class="stc-field-label" for="stcschoolmanagementstudentparentguardianfullname">Parent / Guardian Name</label>
+              <input
+                id="stcschoolmanagementstudentparentguardianfullname"
                         name="stcschoolmanagementstudentparentguardianfullname"
                         type="text"
                         class="form-control validate stcschoolmanagementstudentparentguardianfullname"
@@ -1331,11 +1402,9 @@
                   </div>
                   <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
-                      <h5
-                        for="name"
-                        >Remarks
-                      </h5>
-                      <textarea 
+                      <label class="stc-field-label" for="stcschoolmanagementstudentremarks">Remarks</label>
+              <textarea
+                id="stcschoolmanagementstudentremarks" 
                         name="stcschoolmanagementstudentremarks"
                         class="form-control validate stcschoolmanagementstudentremarks"
                         value=""
@@ -1370,11 +1439,9 @@
         <div class="row">
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Subject ID
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementsubjectid">Subject ID</label>
               <input
+                id="stcschoolmanagementsubjectid"
                 name="stcschoolmanagementsubjectid"
                 type="text"
                 class="form-control validate stcschoolmanagementsubjectid"
@@ -1385,11 +1452,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Subject Title
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementsubjecttitle">Subject Title</label>
               <input
+                id="stcschoolmanagementsubjecttitle"
                 name="stcschoolmanagementsubjecttitle"
                 type="text"
                 class="form-control validate stcschoolmanagementsubjecttitle"
@@ -1400,11 +1465,9 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Syllubus Details
-              </h5>
-              <textarea 
+              <label class="stc-field-label" for="stcschoolmanagementsubjectdetails">Syllubus Details</label>
+              <textarea
+                id="stcschoolmanagementsubjectdetails" 
                 name="stcschoolmanagementsubjectdetails"
                 class="form-control validate stcschoolmanagementsubjectdetails"
                 value=""
@@ -1435,11 +1498,9 @@
         <div class="row">
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Class Room ID
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementclassroomid">Class Room ID</label>
               <input
+                id="stcschoolmanagementclassroomid"
                 name="stcschoolmanagementclassroomid"
                 type="text"
                 class="form-control validate stcschoolmanagementclassroomid"
@@ -1450,11 +1511,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Class Room Title
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementclassroomtitle">Class Room Title</label>
               <input
+                id="stcschoolmanagementclassroomtitle"
                 name="stcschoolmanagementclassroomtitle"
                 type="text"
                 class="form-control validate stcschoolmanagementclassroomtitle"
@@ -1465,11 +1524,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Location
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementclassroomlocation">Location</label>
               <input
+                id="stcschoolmanagementclassroomlocation"
                 name="stcschoolmanagementclassroomlocation"
                 type="text"
                 class="form-control validate stcschoolmanagementclassroomlocation"
@@ -1480,11 +1537,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Capacity
-              </h5>
+              <label class="stc-field-label" for="stcschoolmanagementclassroomcapacity">Capacity</label>
               <input
+                id="stcschoolmanagementclassroomcapacity"
                 name="stcschoolmanagementclassroomcapacity"
                 type="text"
                 class="form-control validate stcschoolmanagementclassroomcapacity"
@@ -1516,11 +1571,9 @@
         <div class="row">
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Class Type
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduletype">Class Type</label>
               <select
+                id="stcschoolscheduletype"
                 name="stcschoolscheduletype"
                 type="text"
                 class="form-control validate stcschoolscheduletype"
@@ -1533,11 +1586,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Teacher
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduleteacher">Teacher</label>
               <select
+                id="stcschoolscheduleteacher"
                 name="stcschoolscheduleteacher"
                 type="text"
                 class="form-control validate stcschoolscheduleteacher"
@@ -1559,11 +1610,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Subject
-              </h5>
+              <label class="stc-field-label" for="stcschoolschedulesubject">Subject</label>
               <select
+                id="stcschoolschedulesubject"
                 name="stcschoolschedulesubject"
                 type="text"
                 class="form-control validate stcschoolschedulesubject"
@@ -1585,11 +1634,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Class
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduleclass">Class</label>
               <select
+                id="stcschoolscheduleclass"
                 name="stcschoolscheduleclass"
                 type="text"
                 class="form-control validate stcschoolscheduleclass"
@@ -1614,11 +1661,9 @@
           </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Day
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduleday">Day</label>
               <select
+                id="stcschoolscheduleday"
                 name="stcschoolscheduleday"
                 type="text"
                 class="form-control validate stcschoolscheduleday"
@@ -1636,11 +1681,9 @@
           </div>
           <div class="col-sm-12 col-md-4 col-lg-4">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Period
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduleperiod">Period</label>
               <select
+                id="stcschoolscheduleperiod"
                 name="stcschoolscheduleperiod"
                 class="form-control validate stcschoolscheduleperiod" 
               ><option>Select</option>
@@ -1656,11 +1699,9 @@
           </div>
           <div class="col-sm-12 col-md-4 col-lg-4">
             <div class="mb-3">
-              <h5
-                for="name"
-                >Start Time
-              </h5>
+              <label class="stc-field-label" for="stcschoolschedulestarttime">Start Time</label>
               <input
+                id="stcschoolschedulestarttime"
                 name="stcschoolschedulestarttime"
                 type="time"
                 class="form-control validate stcschoolschedulestarttime"
@@ -1670,11 +1711,9 @@
           </div>
           <div class="col-sm-12 col-md-4 col-lg-4">
             <div class="mb-3">
-              <h5
-                for="name"
-                >End Time
-              </h5>
+              <label class="stc-field-label" for="stcschoolscheduleendtime">End Time</label>
               <input
+                id="stcschoolscheduleendtime"
                 name="stcschoolscheduleendtime"
                 type="time"
                 class="form-control validate stcschoolscheduleendtime"
@@ -2439,6 +2478,75 @@
           if (v === null || v === undefined || v === '') return '—';
           return Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
+        function stcClearFieldError($el) {
+          $el.removeClass('is-invalid');
+          $el.closest('.mb-3').find('.stc-field-error').removeClass('is-on').text('');
+        }
+        function stcShowFieldError($el, msg) {
+          $el.addClass('is-invalid');
+          var $err = $el.closest('.mb-3').find('.stc-field-error');
+          if (!$err.length) {
+            $err = $('<div class="stc-field-error"></div>').appendTo($el.closest('.mb-3'));
+          }
+          $err.addClass('is-on').text(msg);
+        }
+        function stcFieldIsValid($el, type) {
+          var val = ($el.val() == null ? '' : String($el.val())).trim();
+          if (type === 'amount') {
+            return Number(val) > 0;
+          }
+          if (type === 'marks') {
+            return val !== '' && isFinite(Number(val)) && Number(val) >= 0 && Number(val) <= 100;
+          }
+          return val !== '';
+        }
+        function stcFieldType($el) {
+          var id = $el.attr('id') || '';
+          if (id.indexOf('-amount') !== -1) return 'amount';
+          if (id.indexOf('-marks') !== -1) return 'marks';
+          return '';
+        }
+        function stcValidateRequired(fields) {
+          var ok = true;
+          var $first = null;
+          fields.forEach(function(f) {
+            var $el = $(f.id);
+            if (!$el.length) return;
+            $el.data('stc-req-msg', f.msg || 'This field is required.');
+            $el.data('stc-req-type', f.type || '');
+            if (stcFieldIsValid($el, f.type || '')) {
+              stcClearFieldError($el);
+              return;
+            }
+            stcShowFieldError($el, f.msg);
+            ok = false;
+            if (!$first) $first = $el;
+          });
+          if ($first && $first.offset()) {
+            var $pane = $first.closest('.collapse');
+            if ($pane.length && !$pane.hasClass('show') && typeof $pane.collapse === 'function') {
+              $pane.collapse('show');
+            }
+            $('html, body').animate({ scrollTop: $first.offset().top - 120 }, 250);
+          }
+          return ok;
+        }
+        $(document).on('input change', '#stc-admit-form .form-control, #stc-readmit-form .form-control', function() {
+          var $el = $(this);
+          if (!$el.hasClass('is-invalid')) {
+            return;
+          }
+          if (stcFieldIsValid($el, $el.data('stc-req-type') || stcFieldType($el))) {
+            stcClearFieldError($el);
+          }
+        });
+        $(document).on('submit', '#stc-admit-form, #stc-readmit-form', function(e) {
+          e.preventDefault();
+        });
+        function stcMarksPct(v) {
+          if (v === null || v === undefined || v === '') return '—';
+          return Number(v).toFixed(2) + '%';
+        }
 
         function load_readmissions() {
           if (!$('.stc-readmit-list-body').length) return;
@@ -2456,11 +2564,11 @@
                 return;
               }
               if (res.status !== 'success') {
-                $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
+                $('.stc-readmit-list-body').html('<tr><td colspan="11" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
                 return;
               }
               if (!res.data || !res.data.length) {
-                $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">No readmission requests yet.</td></tr>');
+                $('.stc-readmit-list-body').html('<tr><td colspan="11" class="text-center text-muted">No readmission requests yet.</td></tr>');
                 return;
               }
               var html = '';
@@ -2471,6 +2579,7 @@
                 html += '<td>' + (r.studid || '') + '</td>';
                 html += '<td>' + (r.name || '') + '</td>';
                 html += '<td>' + (r.classroom || '—') + '</td>';
+                html += '<td class="text-right">' + stcMarksPct(r.marks_percent) + '</td>';
                 html += '<td class="text-right">' + stcReadmitMoney(r.amount) + '</td>';
                 html += '<td class="text-right">' + stcReadmitMoney(r.final_amount) + '</td>';
                 html += '<td>' + (r.last_status || '') + '</td>';
@@ -2481,58 +2590,141 @@
               $('.stc-readmit-list-body').html(html);
             },
             error: function() {
-              $('.stc-readmit-list-body').html('<tr><td colspan="10" class="text-center text-muted">Could not reach server.</td></tr>');
+              $('.stc-readmit-list-body').html('<tr><td colspan="11" class="text-center text-muted">Could not reach server.</td></tr>');
             }
           });
         }
 
-        $(document).on('click', '.stc-readmit-lookup-btn', function(e) {
-          e.preventDefault();
-          var studid = ($('#stc-readmit-studid').val() || '').trim();
-          if (!studid) {
-            stcReadmitAlert('Student ID required', 'Enter student ID first.', 'warning');
+        var stcReadmitHits = [];
+        var stcReadmitHitIdx = -1;
+        var stcReadmitSearchTimer = null;
+
+        function stcReadmitHideList() {
+          $('#stc-readmit-studid-list').removeClass('is-open').empty();
+          stcReadmitHitIdx = -1;
+        }
+
+        function stcReadmitFillStudent(d) {
+          if (!d) { return; }
+          var studid = String(d.studid || '').trim();
+          $('#stc-readmit-student-pk').val(d.student_pk || 0);
+          $('#stc-readmit-studid').val(studid);
+          var schoolCode = (studid.toUpperCase().match(/^(SGMS|SHS|SIS|SMS)/) || [])[1];
+          if (schoolCode) {
+            $('#stc-readmit-school').val(schoolCode);
+          }
+          $('#stc-readmit-firstname').val(d.firstname || '');
+          $('#stc-readmit-lastname').val(d.lastname || '');
+          $('#stc-readmit-dob').val(d.dob || '');
+          $('.stc-readmit-gender').prop('checked', false);
+          $('.stc-readmit-gender[value="' + (d.gender || 'Male') + '"]').prop('checked', true);
+          $('#stc-readmit-bloodgroup').val(d.bloodgroup || '0');
+          $('#stc-readmit-email').val(d.email || '');
+          $('#stc-readmit-contact').val(d.contact || '');
+          $('#stc-readmit-address').val(d.address || '');
+          $('#stc-readmit-religion').val(d.religion || '');
+          $('#stc-readmit-admissiondate').val(d.admissiondate || '');
+          $('#stc-readmit-classroom').val(String(d.classroomid || 0));
+          $('#stc-readmit-guardian').val(d.guardianname || '');
+          $('#stc-readmit-student-remarks').val(d.remarks || '');
+          stcReadmitHideList();
+        }
+
+        function stcReadmitPaintList(rows) {
+          stcReadmitHits = rows || [];
+          stcReadmitHitIdx = -1;
+          var $list = $('#stc-readmit-studid-list');
+          if (!stcReadmitHits.length) {
+            $list.html('<li class="stc-studid-empty">No student found</li>').addClass('is-open');
             return;
           }
+          var html = '';
+          $.each(stcReadmitHits, function(i, d) {
+            var name = $.trim((d.firstname || '') + ' ' + (d.lastname || ''));
+            var extra = d.classroom ? ' • ' + d.classroom : '';
+            html += '<li data-idx="' + i + '"><strong>' + $('<div>').text(d.studid || '').html() + '</strong><small>' + $('<div>').text(name + extra).html() + '</small></li>';
+          });
+          $list.html(html).addClass('is-open');
+        }
+
+        function stcReadmitSearchStudents() {
           $.ajax({
             url: '../vanaheim/readmission.php',
             method: 'POST',
             dataType: 'JSON',
-            data: { stc_readmit_lookup: 1, studid: studid },
+            data: {
+              stc_readmit_search: 1,
+              q: ($('#stc-readmit-studid').val() || '').trim(),
+              school: $('#stc-readmit-school').val() || ''
+            },
             success: function(res) {
               if (!res || res.status === 'reload') {
                 window.location.reload();
                 return;
               }
               if (res.status !== 'success') {
-                stcReadmitAlert('Not found', res.message || 'Student not found.', 'info');
+                stcReadmitPaintList([]);
                 return;
               }
-              var d = res.data || {};
-              $('#stc-readmit-student-pk').val(d.student_pk || 0);
-              var schoolCode = (studid.toUpperCase().match(/^(SGMS|SHS|SIS|SMS)/) || [])[1];
-              if (schoolCode) {
-                $('#stc-readmit-school').val(schoolCode);
-              }
-              $('#stc-readmit-firstname').val(d.firstname || '');
-              $('#stc-readmit-lastname').val(d.lastname || '');
-              $('#stc-readmit-dob').val(d.dob || '');
-              $('.stc-readmit-gender').prop('checked', false);
-              $('.stc-readmit-gender[value="' + (d.gender || 'Male') + '"]').prop('checked', true);
-              $('#stc-readmit-bloodgroup').val(d.bloodgroup || '0');
-              $('#stc-readmit-email').val(d.email || '');
-              $('#stc-readmit-contact').val(d.contact || '');
-              $('#stc-readmit-address').val(d.address || '');
-              $('#stc-readmit-religion').val(d.religion || '');
-              $('#stc-readmit-admissiondate').val(d.admissiondate || '');
-              $('#stc-readmit-classroom').val(String(d.classroomid || 0));
-              $('#stc-readmit-guardian').val(d.guardianname || '');
-              $('#stc-readmit-student-remarks').val(d.remarks || '');
-              stcReadmitAlert('Loaded', 'Student details filled. Review and submit.', 'success');
+              stcReadmitPaintList(res.data || []);
             },
             error: function() {
-              stcReadmitAlert('Error', 'Could not load student.', 'error');
+              stcReadmitPaintList([]);
             }
           });
+        }
+
+        $(document).on('focus input', '#stc-readmit-studid', function() {
+          clearTimeout(stcReadmitSearchTimer);
+          stcReadmitSearchTimer = setTimeout(stcReadmitSearchStudents, 220);
+        });
+
+        $(document).on('keydown', '#stc-readmit-studid', function(e) {
+          var $items = $('#stc-readmit-studid-list li').not('.stc-studid-empty');
+          if (!$('#stc-readmit-studid-list').hasClass('is-open') || !$items.length) {
+            return;
+          }
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (e.key === 'ArrowDown') {
+              stcReadmitHitIdx = stcReadmitHitIdx + 1 >= $items.length ? 0 : stcReadmitHitIdx + 1;
+            } else {
+              stcReadmitHitIdx = stcReadmitHitIdx <= 0 ? $items.length - 1 : stcReadmitHitIdx - 1;
+            }
+            $items.removeClass('is-on').eq(stcReadmitHitIdx).addClass('is-on');
+            return;
+          }
+          if (e.key === 'Enter' && stcReadmitHitIdx >= 0 && stcReadmitHits[stcReadmitHitIdx]) {
+            e.preventDefault();
+            stcReadmitFillStudent(stcReadmitHits[stcReadmitHitIdx]);
+            return;
+          }
+          if (e.key === 'Escape') {
+            stcReadmitHideList();
+          }
+        });
+
+        $(document).on('mousedown', '#stc-readmit-studid-list li', function(e) {
+          e.preventDefault();
+          if ($(this).hasClass('stc-studid-empty')) {
+            return;
+          }
+          var idx = parseInt($(this).attr('data-idx'), 10);
+          if (!isNaN(idx) && stcReadmitHits[idx]) {
+            stcReadmitFillStudent(stcReadmitHits[idx]);
+          }
+        });
+
+        $(document).on('click', function(e) {
+          if (!$(e.target).closest('.stc-studid-wrap').length) {
+            stcReadmitHideList();
+          }
+        });
+
+        $(document).on('change', '#stc-readmit-school', function() {
+          if ($('#stc-readmit-studid-list').hasClass('is-open') || $('#stc-readmit-studid').is(':focus')) {
+            stcReadmitSearchStudents();
+          }
         });
 
         $(document).on('click', '.stc-readmit-save-btn', function(e) {
@@ -2545,12 +2737,17 @@
           var guardian = ($('#stc-readmit-guardian').val() || '').trim();
           var amount = Number($('#stc-readmit-amount').val());
           var lastStatus = ($('#stc-readmit-last-status').val() || '').trim();
-          if (!studid || !firstname || !lastname || !contact || !guardian || !lastStatus) {
-            stcReadmitAlert('Required', 'Fill student ID, name, contact, guardian and last status.', 'warning');
-            return;
-          }
-          if (!amount || amount <= 0) {
-            stcReadmitAlert('Required', 'Enter a valid admission amount.', 'warning');
+          if (!stcValidateRequired([
+            { id: '#stc-readmit-school', msg: 'Select school.' },
+            { id: '#stc-readmit-studid', msg: 'Enter student ID.' },
+            { id: '#stc-readmit-firstname', msg: 'Enter first name.' },
+            { id: '#stc-readmit-lastname', msg: 'Enter last name.' },
+            { id: '#stc-readmit-contact', msg: 'Enter contact number.' },
+            { id: '#stc-readmit-guardian', msg: 'Enter parent / guardian name.' },
+            { id: '#stc-readmit-amount', type: 'amount', msg: 'Enter admission amount.' },
+            { id: '#stc-readmit-marks', type: 'marks', msg: 'Enter last marks %.' },
+            { id: '#stc-readmit-last-status', msg: 'Select last status.' }
+          ])) {
             return;
           }
           if ($btn.prop('disabled')) return;
@@ -2579,7 +2776,8 @@
               student_remarks: $('#stc-readmit-student-remarks').val(),
               amount: amount,
               last_status: lastStatus,
-              last_remarks: $('#stc-readmit-last-remarks').val()
+              last_remarks: $('#stc-readmit-last-remarks').val(),
+              marks_percent: $('#stc-readmit-marks').val()
             },
             success: function(res) {
               $btn.prop('disabled', false);
@@ -2648,11 +2846,11 @@
                 return;
               }
               if (res.status !== 'success') {
-                $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
+                $('.stc-admit-list-body').html('<tr><td colspan="11" class="text-center text-muted">' + (res.message || 'Could not load.') + '</td></tr>');
                 return;
               }
               if (!res.data || !res.data.length) {
-                $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">No admission requests yet.</td></tr>');
+                $('.stc-admit-list-body').html('<tr><td colspan="11" class="text-center text-muted">No admission requests yet.</td></tr>');
                 return;
               }
               var html = '';
@@ -2663,6 +2861,7 @@
                 html += '<td>' + (r.studid || '') + '</td>';
                 html += '<td>' + (r.name || '') + '</td>';
                 html += '<td>' + (r.classroom || '—') + '</td>';
+                html += '<td class="text-right">' + stcMarksPct(r.marks_percent) + '</td>';
                 html += '<td class="text-right">' + stcReadmitMoney(r.amount) + '</td>';
                 html += '<td class="text-right">' + stcReadmitMoney(r.final_amount) + '</td>';
                 html += '<td class="text-center">' + stcReadmitStatusBadge(r.status) + '</td>';
@@ -2673,7 +2872,7 @@
               $('.stc-admit-list-body').html(html);
             },
             error: function() {
-              $('.stc-admit-list-body').html('<tr><td colspan="10" class="text-center text-muted">Could not reach server.</td></tr>');
+              $('.stc-admit-list-body').html('<tr><td colspan="11" class="text-center text-muted">Could not reach server.</td></tr>');
             }
           });
         }
@@ -2707,6 +2906,7 @@
           $('#stc-admit-guardian').val(d.guardianname || '');
           $('#stc-admit-student-remarks').val(d.student_remarks || '');
           $('#stc-admit-amount').val(d.amount || '');
+          $('#stc-admit-marks').val(d.marks_percent != null ? d.marks_percent : '');
           $('.stc-admit-save-btn').text('Update admission');
           $('.stc-admit-cancel-edit').show();
           $('html, body').animate({ scrollTop: $('#stc-admit-form').offset().top - 80 }, 300);
@@ -2749,12 +2949,15 @@
           var contact = ($('#stc-admit-contact').val() || '').trim();
           var guardian = ($('#stc-admit-guardian').val() || '').trim();
           var amount = Number($('#stc-admit-amount').val());
-          if (!studid || !firstname || !lastname || !contact || !guardian) {
-            stcReadmitAlert('Required', 'Fill student ID, name, contact and guardian.', 'warning');
-            return;
-          }
-          if (!amount || amount <= 0) {
-            stcReadmitAlert('Required', 'Enter a valid admission amount.', 'warning');
+          if (!stcValidateRequired([
+            { id: '#stc-admit-school', msg: 'Select school.' },
+            { id: '#stc-admit-firstname', msg: 'Enter first name.' },
+            { id: '#stc-admit-lastname', msg: 'Enter last name.' },
+            { id: '#stc-admit-contact', msg: 'Enter contact number.' },
+            { id: '#stc-admit-guardian', msg: 'Enter parent / guardian name.' },
+            { id: '#stc-admit-amount', type: 'amount', msg: 'Enter admission amount.' },
+            { id: '#stc-admit-marks', type: 'marks', msg: 'Enter last marks %.' }
+          ])) {
             return;
           }
           if ($btn.prop('disabled')) return;
@@ -2775,7 +2978,8 @@
             classroomid: $('#stc-admit-classroom').val(),
             guardianname: guardian,
             student_remarks: $('#stc-admit-student-remarks').val(),
-            amount: amount
+            amount: amount,
+            marks_percent: $('#stc-admit-marks').val()
           };
           if (editId > 0) {
             payload.stc_admit_update = 1;

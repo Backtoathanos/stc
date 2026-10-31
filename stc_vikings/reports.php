@@ -1663,6 +1663,7 @@ STCAuthHelper::checkAuth();?>
                                                             <th>Name</th>
                                                             <th>Class</th>
                                                             <th>Last status</th>
+                                                            <th class="text-right">Marks %</th>
                                                             <th class="text-right">New Admission Fee</th>
                                                             <th class="text-right">Re-Admission Fee</th>
                                                             <th class="text-right">Tuition Fee</th>
@@ -1675,7 +1676,7 @@ STCAuthHelper::checkAuth();?>
                                                         </tr>
                                                     </thead>
                                                     <tbody class="stc-admit-report-body">
-                                                        <tr><td colspan="16" class="text-center text-muted">Click Find to load admissions.</td></tr>
+                                                        <tr><td colspan="17" class="text-center text-muted">Click Find to load admissions.</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -2590,6 +2591,10 @@ STCAuthHelper::checkAuth();?>
                 if(v === null || v === undefined || v === '') return '—';
                 return Number(v).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             }
+            function stcMarksPct(v){
+                if(v === null || v === undefined || v === '') return '—';
+                return Number(v).toFixed(2) + '%';
+            }
             function stcReadmitBadge(status){
                 var s = (status || 'pending').toLowerCase();
                 if(s === 'accepted') return '<span class="label label-success">Accepted</span>';
@@ -2608,7 +2613,7 @@ STCAuthHelper::checkAuth();?>
             }
             function renderSchoolAdmitRows(rows){
                 if(!rows.length){
-                    $('.stc-admit-report-body').html('<tr><td colspan="16" class="text-center text-muted">No admission requests found.</td></tr>');
+                    $('.stc-admit-report-body').html('<tr><td colspan="17" class="text-center text-muted">No admission requests found.</td></tr>');
                     return;
                 }
                 var html = '';
@@ -2627,6 +2632,7 @@ STCAuthHelper::checkAuth();?>
                     html += '<td>'+(r.name||'')+'</td>';
                     html += '<td>'+(r.classroom||'—')+'</td>';
                     html += '<td>'+(r.last_status||'—')+'</td>';
+                    html += '<td class="text-right">'+stcMarksPct(r.marks_percent)+'</td>';
                     html += '<td class="text-right">'+stcReadmitMoney(r.std_admission_fee)+'</td>';
                     html += '<td class="text-right">'+stcReadmitMoney(r.std_readmission_fee)+'</td>';
                     html += '<td class="text-right">'+stcReadmitMoney(r.std_tuition_fee)+'</td>';
@@ -2644,7 +2650,7 @@ STCAuthHelper::checkAuth();?>
                 var status = $('.stc-admit-filter-status').val();
                 var search = $('.stc-admit-filter-search').val();
                 var kind = $('.stc-admit-filter-kind').val() || 'all';
-                $('.stc-admit-report-body').html('<tr><td colspan="16" class="text-center text-muted">Loading...</td></tr>');
+                $('.stc-admit-report-body').html('<tr><td colspan="17" class="text-center text-muted">Loading...</td></tr>');
                 var pending = 2;
                 var newRows = [];
                 var reRows = [];
@@ -2712,6 +2718,7 @@ STCAuthHelper::checkAuth();?>
                 $('.stc-rm-guardian').text(d.guardianname || '');
                 $('.stc-rm-religion').text(d.religion || '');
                 $('.stc-rm-last-status').text(d.last_status || '');
+                $('.stc-rm-marks').text(stcMarksPct(d.marks_percent));
                 $('.stc-rm-last-remarks').text(d.last_remarks || '');
                 $('.stc-rm-student-remarks').text(d.student_remarks || '');
                 $('.stc-rm-amount').text(stcReadmitMoney(d.amount));
@@ -2796,6 +2803,7 @@ STCAuthHelper::checkAuth();?>
                 $('.stc-am-contact').text(d.contact || '');
                 $('.stc-am-email').text(d.email || '');
                 $('.stc-am-class').text(d.classroom || '');
+                $('.stc-am-marks').text(stcMarksPct(d.marks_percent));
                 $('.stc-am-address').text(d.address || '');
                 $('.stc-am-guardian').text(d.guardianname || '');
                 $('.stc-am-religion').text(d.religion || '');
@@ -3901,6 +3909,7 @@ STCAuthHelper::checkAuth();?>
           <div class="col-md-4"><p><b>Contact:</b> <span class="stc-am-contact"></span></p></div>
           <div class="col-md-4"><p><b>Email:</b> <span class="stc-am-email"></span></p></div>
           <div class="col-md-4"><p><b>Class:</b> <span class="stc-am-class"></span></p></div>
+          <div class="col-md-4"><p><b>Marks %:</b> <span class="stc-am-marks"></span></p></div>
           <div class="col-md-12"><p><b>Address:</b> <span class="stc-am-address"></span></p></div>
           <div class="col-md-6"><p><b>Guardian:</b> <span class="stc-am-guardian"></span></p></div>
           <div class="col-md-6"><p><b>Religion:</b> <span class="stc-am-religion"></span></p></div>
@@ -3948,8 +3957,9 @@ STCAuthHelper::checkAuth();?>
           <div class="col-md-12"><p><b>Address:</b> <span class="stc-rm-address"></span></p></div>
           <div class="col-md-6"><p><b>Guardian:</b> <span class="stc-rm-guardian"></span></p></div>
           <div class="col-md-6"><p><b>Religion:</b> <span class="stc-rm-religion"></span></p></div>
-          <div class="col-md-6"><p><b>Last status:</b> <span class="stc-rm-last-status"></span></p></div>
-          <div class="col-md-6"><p><b>Last remarks:</b> <span class="stc-rm-last-remarks"></span></p></div>
+          <div class="col-md-4"><p><b>Last status:</b> <span class="stc-rm-last-status"></span></p></div>
+          <div class="col-md-4"><p><b>Marks %:</b> <span class="stc-rm-marks"></span></p></div>
+          <div class="col-md-4"><p><b>Last remarks:</b> <span class="stc-rm-last-remarks"></span></p></div>
           <div class="col-md-12"><p><b>Student remarks:</b> <span class="stc-rm-student-remarks"></span></p></div>
           <div class="col-md-6"><p><b>Proposed amount:</b> <span class="stc-rm-amount"></span></p></div>
           <div class="col-md-6"><p><b>TIC:</b> <span class="stc-rm-tic"></span></p></div>
