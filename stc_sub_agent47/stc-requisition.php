@@ -964,3 +964,7 @@ $(document).ready(function() {
         </div>
     </div>
 </div>
+<?php
+require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
+stc_req_comm_render_ui('nemesis/stc_req_comm.php');
+?>

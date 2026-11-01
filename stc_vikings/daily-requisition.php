@@ -702,7 +702,7 @@ include("kattegat/role_check.php");
         $tr.find('.dr-main-action').html(buildDrActionHtml(itemId, reqQty, dispQty));
 
         if (patch.status_code !== undefined) {
-          $tr.find('.dr-main-status').html(statusBadge(patch.status_code, patch.status_text || ''));
+          $tr.find('.dr-main-status').html(statusBadge(patch.status_code, patch.status_text || '') + ' <a href="#" class="btn btn-warning btn-sm stc-req-comm-open" data-req-item-id="' + escapeHtml(itemId) + '" data-req-id="' + escapeHtml($tr.attr('data-req-id') || '') + '" data-item-title="' + escapeHtml($tr.find('td').eq(4).text() || '') + '" title="Wrong / Fault material"><i class="fa fa-comments"></i></a>');
         }
       }
 
@@ -786,7 +786,7 @@ include("kattegat/role_check.php");
                 var racks = (item.racks && String(item.racks).trim() !== '') ? String(item.racks) : '-';
                 var codeBalRackHtml = buildDrCodeBalRackHtml(item.item_id, item.product_id, pendingQty, item.unit, racks);
 
-                rows += '<tr data-item-id="' + escapeHtml(item.item_id) + '" data-req-qty="' + escapeHtml(reqQty) + '" data-disp-qty="' + escapeHtml(dispQty) + '" data-unit="' + escapeHtml(item.unit) + '" data-product-id="' + escapeHtml(item.product_id) + '" data-racks="' + escapeHtml(racks) + '">' +
+                rows += '<tr data-item-id="' + escapeHtml(item.item_id) + '" data-req-id="' + escapeHtml(item.requisition_number || '') + '" data-req-qty="' + escapeHtml(reqQty) + '" data-disp-qty="' + escapeHtml(dispQty) + '" data-unit="' + escapeHtml(item.unit) + '" data-product-id="' + escapeHtml(item.product_id) + '" data-racks="' + escapeHtml(racks) + '">' +
                   '<td class="text-center">' + escapeHtml(slno) + '</td>' +
                   '<td class="text-center dr-col-project">' + prCell + '</td>' +
                   '<td class="dr-col-project">' + projectAndManager + '</td>' +
@@ -796,7 +796,7 @@ include("kattegat/role_check.php");
                   '<td class="text-right">' + escapeHtml(item.req_qty) + '</td>' +
                   '<td class="text-right dr-main-dispatched">' + escapeHtml(item.dispatched_qty) + '</td>' +
                   '<td class="text-center dr-col-project dr-main-code-bal">' + codeBalRackHtml + '</td>' +
-                  '<td class="text-center dr-main-status">' + statusBadge(item.status_code, item.status_text) + '</td>' +
+                  '<td class="text-center dr-main-status">' + statusBadge(item.status_code, item.status_text) + ' <a href="#" class="btn btn-warning btn-sm stc-req-comm-open" data-req-item-id="' + escapeHtml(item.item_id) + '" data-req-id="' + escapeHtml(item.requisition_number || '') + '" data-item-title="' + escapeHtml(item.item_desc || '') + '" title="Wrong / Fault material"><i class="fa fa-comments"></i></a></td>' +
                   '<td class="text-center">' + escapeHtml(item.item_type) + '</td>' +
                   '<td class="text-center dr-main-action">' + actionHtml + '</td>' +
                   '<td class="text-center">' + logsBtn + '</td>' +
@@ -1758,6 +1758,10 @@ include("kattegat/role_check.php");
       loadDailyRequisitions('', currentPage, true);
     });
   </script>
+<?php
+require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
+stc_req_comm_render_ui('kattegat/stc_req_comm.php');
+?>
 </body>
 
 </html>

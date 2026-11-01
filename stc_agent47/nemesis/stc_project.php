@@ -2,6 +2,7 @@
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
+require_once "../../MCU/stc_req_item_communicate.php";
 /*------------------------------------------------------------------------------------------------*/
 /*------------------------------------------For Agents--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
@@ -3564,7 +3565,9 @@ class pirates_supervisor extends tesseract{
 				}else{
 					$log_html='<div class="noExl text-center text-muted" style="display:none;">No logs found.</div>';
 				}
-				$rqitemstts='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" title="View Log" class="stc-sup-requisition-viewlog-modal-btn" style="text-decoration:none;cursor:pointer;">'.$rqitemstts.'</a>'.$log_html;
+				$rqitemstts='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" title="View Log" class="stc-sup-requisition-viewlog-modal-btn" style="text-decoration:none;cursor:pointer;">'.$rqitemstts.'</a>'
+					.stc_req_comm_button($requisitionrow['reqlistid'], $requisitionrow['stc_cust_super_requisition_list_items_req_id'], $requisitionrow['stc_cust_super_requisition_list_items_title'])
+					.$log_html;
 				$optimusprime.='
 						<tr>
 							<td>'.$slno.'</td>

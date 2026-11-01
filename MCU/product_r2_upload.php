@@ -560,9 +560,9 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
      */
     function stc_r2_upload_safety_image_from_path(string $absoluteLocalPath, string $folderOneOf, int $entityId = 0, string $tag = '', string $originalFilename = ''): array
     {
-        $allowed = ['tbm', 'nearmiss', 'capa', 'dso'];
+        $allowed = ['tbm', 'nearmiss', 'capa', 'dso', 'reqcomm'];
         if (!in_array($folderOneOf, $allowed, true)) {
-            return ['ok' => false, 'error' => 'Invalid safety folder (use tbm, nearmiss, capa, or dso).'];
+            return ['ok' => false, 'error' => 'Invalid safety folder (use tbm, nearmiss, capa, dso, or reqcomm).'];
         }
 
         $cfg = stc_mcu_r2_config();

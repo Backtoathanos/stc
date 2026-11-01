@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
+require_once "../../MCU/stc_req_item_communicate.php";
 /*------------------------------------------------------------------------------------------------*/
 /*------------------------------------------For Agents--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
@@ -566,6 +567,7 @@ class witcher_supervisor extends tesseract{
 							<a href="javascript:void(0)" data-toggle="modal" class="btn btn-danger return-req-item" id="'.$requisitioni_row['list_item_id'].'" title="Return" style="background-color:#ffd34e; font-size: 15px;color: black;"><i class="fas fa-undo"></i></a>
 					';
 				}
+				$action.=stc_req_comm_button($requisitioni_row['list_item_id'], $requisitioni_row['list_id'], $requisitioni_row['stc_cust_super_requisition_list_items_title']);
 				$log='
 					<a 
 							href="#" 
@@ -1089,6 +1091,7 @@ class witcher_supervisor extends tesseract{
 									class="btn btn-info btn-sm stc-sup-requisition-rece-modal-btn">	 
 									Recieving
 								</a>
+								'.stc_req_comm_button($firstrow['stc_cust_super_requisition_list_id'], $odid, $firstrow['stc_cust_super_requisition_list_items_title']).'
 							</td>
 						</tr>
 					';
@@ -1106,7 +1109,7 @@ class witcher_supervisor extends tesseract{
 							<td>'.number_format($recievingqty, 2).'</td>
 							<td>'.$reqstaus.'</td>
 							<td>'.$priority.'</td>
-							<td>#</td>
+							<td>'.stc_req_comm_button($firstrow['stc_cust_super_requisition_list_id'], $odid, $firstrow['stc_cust_super_requisition_list_items_title']).'</td>
 						</tr>
 					';
 				}

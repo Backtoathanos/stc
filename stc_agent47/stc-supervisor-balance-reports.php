@@ -458,6 +458,10 @@ else {
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <?php
+    require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
+    stc_req_comm_render_ui('nemesis/stc_req_comm.php');
+    ?>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
     <script>
