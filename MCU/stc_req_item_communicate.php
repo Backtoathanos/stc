@@ -23,6 +23,18 @@ if (!function_exists('stc_req_comm_ensure_table')) {
               KEY `idx_req_comm_user` (`user_type`, `created_by`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         ");
+        @mysqli_query($db, "
+            CREATE TABLE IF NOT EXISTS `stc_req_item_communicate_seen` (
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `req_item_id` INT NOT NULL,
+              `user_type` VARCHAR(32) NOT NULL DEFAULT '',
+              `created_by` INT NOT NULL DEFAULT 0,
+              `last_seen_id` INT NOT NULL DEFAULT 0,
+              `last_seen_date` DATETIME NOT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `uniq_req_comm_seen` (`req_item_id`, `user_type`, `created_by`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
         $done = true;
     }
 }
@@ -103,6 +115,102 @@ if (!function_exists('stc_req_comm_list')) {
     }
 }
 
+if (!function_exists('stc_req_comm_mark_seen')) {
+    function stc_req_comm_mark_seen($db, $reqItemId, $actor){
+        stc_req_comm_ensure_table($db);
+        $reqItemId = (int)$reqItemId;
+        if($reqItemId <= 0 || empty($actor['created_by'])) return;
+        $maxQ = mysqli_query($db, "SELECT MAX(`id`) AS max_id FROM `stc_req_item_communicate` WHERE `req_item_id`='".$reqItemId."' AND `status`=1");
+        $maxRow = $maxQ ? mysqli_fetch_assoc($maxQ) : array();
+        $maxId = (int)($maxRow['max_id'] ?? 0);
+        $now = date('Y-m-d H:i:s');
+        $userType = mysqli_real_escape_string($db, (string)$actor['user_type']);
+        $createdBy = (int)$actor['created_by'];
+        $exists = mysqli_query($db, "
+            SELECT `id` FROM `stc_req_item_communicate_seen`
+            WHERE `req_item_id`='".$reqItemId."' AND `user_type`='".$userType."' AND `created_by`='".$createdBy."'
+            LIMIT 1
+        ");
+        if($exists && mysqli_num_rows($exists) > 0){
+            mysqli_query($db, "
+                UPDATE `stc_req_item_communicate_seen`
+                SET `last_seen_id`='".$maxId."', `last_seen_date`='".$now."'
+                WHERE `req_item_id`='".$reqItemId."' AND `user_type`='".$userType."' AND `created_by`='".$createdBy."'
+            ");
+        }else{
+            mysqli_query($db, "
+                INSERT INTO `stc_req_item_communicate_seen`(
+                    `req_item_id`, `user_type`, `created_by`, `last_seen_id`, `last_seen_date`
+                ) VALUES (
+                    '".$reqItemId."', '".$userType."', '".$createdBy."', '".$maxId."', '".$now."'
+                )
+            ");
+        }
+    }
+}
+
+if (!function_exists('stc_req_comm_inbox')) {
+    function stc_req_comm_inbox($db, $actor){
+        stc_req_comm_ensure_table($db);
+        $userType = mysqli_real_escape_string($db, (string)$actor['user_type']);
+        $createdBy = (int)$actor['created_by'];
+        $out = array();
+        $q = mysqli_query($db, "
+            SELECT
+                C.`id`,
+                C.`req_item_id`,
+                C.`req_id`,
+                C.`message`,
+                C.`image_url`,
+                C.`issue_type`,
+                C.`username`,
+                C.`created_date`,
+                I.`stc_cust_super_requisition_list_items_title` AS item_title,
+                P.`stc_cust_project_title` AS project_title
+            FROM `stc_req_item_communicate` C
+            INNER JOIN (
+                SELECT `req_item_id`, MAX(`id`) AS max_id
+                FROM `stc_req_item_communicate`
+                WHERE `status`=1
+                GROUP BY `req_item_id`
+            ) L ON L.`req_item_id`=C.`req_item_id` AND L.`max_id`=C.`id`
+            LEFT JOIN `stc_req_item_communicate_seen` S
+                ON S.`req_item_id`=C.`req_item_id`
+                AND S.`user_type`='".$userType."'
+                AND S.`created_by`='".$createdBy."'
+            LEFT JOIN `stc_cust_super_requisition_list_items` I
+                ON I.`stc_cust_super_requisition_list_id`=C.`req_item_id`
+            LEFT JOIN `stc_cust_super_requisition_list` RL
+                ON RL.`stc_cust_super_requisition_list_id`=C.`req_id`
+            LEFT JOIN `stc_cust_project` P
+                ON P.`stc_cust_project_id`=RL.`stc_cust_super_requisition_list_project_id`
+            WHERE C.`status`=1
+              AND (S.`id` IS NULL OR S.`last_seen_id` < C.`id`)
+              AND NOT (C.`user_type`='".$userType."' AND C.`created_by`='".$createdBy."')
+            ORDER BY C.`id` DESC
+            LIMIT 40
+        ");
+        if($q){
+            while($row = mysqli_fetch_assoc($q)){
+                $out[] = array(
+                    'id' => (int)$row['id'],
+                    'req_item_id' => (int)$row['req_item_id'],
+                    'req_id' => (int)$row['req_id'],
+                    'message' => (string)$row['message'],
+                    'image_url' => (string)$row['image_url'],
+                    'issue_type' => (string)$row['issue_type'],
+                    'issue_label' => stc_req_comm_issue_label($row['issue_type']),
+                    'username' => (string)$row['username'],
+                    'item_title' => (string)($row['item_title'] ?? ''),
+                    'project_title' => (string)($row['project_title'] ?? ''),
+                    'created_date' => date('d-m-Y h:i A', strtotime($row['created_date'])),
+                );
+            }
+        }
+        return $out;
+    }
+}
+
 if (!function_exists('stc_req_comm_upload_image')) {
     function stc_req_comm_upload_image($reqItemId, $file){
         if(empty($file) || !isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])){
@@ -147,6 +255,160 @@ if (!function_exists('stc_req_comm_write_item_log')) {
     }
 }
 
+if (!function_exists('stc_req_comm_user_email')) {
+    function stc_req_comm_user_email($db, $userType, $userId){
+        $userId = (int)$userId;
+        if($userId <= 0) return '';
+        $sql = '';
+        if($userType === 'subagent'){
+            $sql = "SELECT `stc_cust_pro_supervisor_email` AS email FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id`='".$userId."' LIMIT 1";
+        }elseif($userType === 'agent'){
+            $sql = "SELECT `stc_agents_email` AS email FROM `stc_agents` WHERE `stc_agents_id`='".$userId."' LIMIT 1";
+        }elseif($userType === 'vikings'){
+            $sql = "SELECT `stc_user_email` AS email FROM `stc_user` WHERE `stc_user_id`='".$userId."' LIMIT 1";
+        }
+        if($sql === '') return '';
+        $q = mysqli_query($db, $sql);
+        if(!$q || mysqli_num_rows($q) === 0) return '';
+        $row = mysqli_fetch_assoc($q);
+        $email = trim((string)($row['email'] ?? ''));
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '';
+    }
+}
+
+if (!function_exists('stc_req_comm_notify_recipients')) {
+    function stc_req_comm_notify_recipients($db, $reqItemId, $item, $actor){
+        $emails = array();
+        $add = function($email) use (&$emails){
+            $email = strtolower(trim((string)$email));
+            if($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $emails[$email] = true;
+            }
+        };
+
+        $add($item['supervisor_email'] ?? '');
+
+        $agentIds = array();
+        if((int)($item['supervisor_created_by'] ?? 0) > 0){
+            $agentIds[] = (int)$item['supervisor_created_by'];
+        }
+        if((int)($item['project_created_by'] ?? 0) > 0){
+            $agentIds[] = (int)$item['project_created_by'];
+        }
+        if($agentIds){
+            $aq = mysqli_query($db, "
+                SELECT `stc_agents_email`
+                FROM `stc_agents`
+                WHERE `stc_agents_id` IN (".implode(',', array_unique($agentIds)).")
+            ");
+            if($aq){
+                while($ar = mysqli_fetch_assoc($aq)){
+                    $add($ar['stc_agents_email'] ?? '');
+                }
+            }
+        }
+
+        $pq = mysqli_query($db, "
+            SELECT DISTINCT `user_type`, `created_by`
+            FROM `stc_req_item_communicate`
+            WHERE `req_item_id`='".(int)$reqItemId."' AND `status`=1
+        ");
+        if($pq){
+            while($pr = mysqli_fetch_assoc($pq)){
+                $add(stc_req_comm_user_email($db, strtolower((string)$pr['user_type']), (int)$pr['created_by']));
+            }
+        }
+
+        $senderEmail = strtolower(stc_req_comm_user_email($db, (string)$actor['user_type'], (int)$actor['created_by']));
+        if($senderEmail !== ''){
+            unset($emails[$senderEmail]);
+        }
+        return array_keys($emails);
+    }
+}
+
+if (!function_exists('stc_req_comm_notify_email')) {
+    function stc_req_comm_notify_email($db, $reqItemId, $reqId, $item, $message, $issueType, $imageUrl, $actor){
+        $recipients = stc_req_comm_notify_recipients($db, $reqItemId, $item, $actor);
+        if(!$recipients) return;
+
+        $reqNo = (int)$reqId;
+        $itemTitle = trim((string)($item['item_title'] ?? ''));
+        $project = trim((string)($item['project_title'] ?? ''));
+        $label = stc_req_comm_issue_label($issueType);
+        if($label === '') $label = 'Message';
+        $sender = trim((string)$actor['username']);
+        $when = date('d-m-Y h:i A');
+        $safeTitle = htmlspecialchars($itemTitle !== '' ? $itemTitle : 'Requisition item', ENT_QUOTES, 'UTF-8');
+        $safeProject = htmlspecialchars($project !== '' ? $project : '-', ENT_QUOTES, 'UTF-8');
+        $safeSender = htmlspecialchars($sender !== '' ? $sender : 'A user', ENT_QUOTES, 'UTF-8');
+        $safeMsg = $message !== '' ? nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')) : '<em>No text. A picture was shared.</em>';
+        $photoHtml = $imageUrl !== ''
+            ? '<p style="margin:16px 0 0;"><a href="'.htmlspecialchars($imageUrl, ENT_QUOTES, 'UTF-8').'" style="color:#075e54;">View attached picture</a></p>'
+            : '';
+
+        $portal = 'https://stcassociate.com/stc_sub_agent47/stc-requisition.php?page=requisition';
+        $from = 'info@stcassociate.com';
+        $host = isset($_SERVER['SERVER_NAME']) ? (string)$_SERVER['SERVER_NAME'] : '';
+        if(strpos($host, 'agent') !== false){
+            $from = 'info@agent.stcassociate.com';
+            $portal = 'https://stcassociate.com/stc_agent47/stc-supervisor-balance-reports.php?page=reports';
+        }elseif(strpos($host, 'viking') !== false){
+            $portal = 'https://stcassociate.com/stc_vikings/daily-requisition.php';
+        }
+
+        $subject = 'You have gained a message for your requisition #'.$reqNo;
+        $body = '
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Requisition message</title></head>
+<body style="margin:0;padding:0;background:#f2f2f2;">
+  <table role="presentation" style="width:100%;border:none;border-spacing:0;background:#f2f2f2;">
+    <tr>
+      <td align="center" style="padding:24px 10px;">
+        <table role="presentation" style="width:94%;max-width:600px;border:none;border-spacing:0;background:#ffffff;font-family:Arial,sans-serif;color:#333;">
+          <tr>
+            <td style="padding:24px 28px;text-align:center;background:#075e54;">
+              <img src="https://stcassociate.com/stc_symbiote/img/stc_logo.png" width="90" alt="STC" style="border-radius:50%;">
+              <h1 style="margin:12px 0 0;font-size:20px;color:#fff;">STC Associates</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px;">
+              <p style="margin:0 0 12px;font-size:16px;">You have gained a message for your requisition.</p>
+              <p style="margin:0 0 8px;"><b>Requisition No:</b> '.$reqNo.'</p>
+              <p style="margin:0 0 8px;"><b>Project:</b> '.$safeProject.'</p>
+              <p style="margin:0 0 8px;"><b>Item:</b> '.$safeTitle.'</p>
+              <p style="margin:0 0 8px;"><b>Type:</b> '.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'</p>
+              <p style="margin:0 0 16px;"><b>From:</b> '.$safeSender.' &nbsp; <span style="color:#777;">'.$when.'</span></p>
+              <div style="padding:12px 14px;background:#ece5dd;border-radius:8px;font-size:15px;line-height:22px;">'.$safeMsg.'</div>
+              '.$photoHtml.'
+              <p style="margin:22px 0 0;text-align:center;">
+                <a href="'.$portal.'" style="display:inline-block;background:#075e54;color:#fff;text-decoration:none;padding:10px 18px;border-radius:4px;">Open communication</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 28px;background:#404040;color:#ccc;font-size:12px;text-align:center;">
+              This is a system generated mail. Please do not reply.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>';
+
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8\r\n";
+        $headers .= 'From: STC Associates <'.$from.">\r\n";
+        foreach($recipients as $to){
+            @mail($to, $subject, $body, $headers);
+        }
+    }
+}
+
 if (!function_exists('stc_req_comm_send')) {
     function stc_req_comm_send($db, $reqItemId, $reqId, $message, $issueType, $file, $actor){
         stc_req_comm_ensure_table($db);
@@ -161,9 +423,23 @@ if (!function_exists('stc_req_comm_send')) {
             return array('ok' => false, 'error' => 'Invalid item.');
         }
         $chk = mysqli_query($db, "
-            SELECT `stc_cust_super_requisition_list_id`, `stc_cust_super_requisition_list_items_req_id`
-            FROM `stc_cust_super_requisition_list_items`
-            WHERE `stc_cust_super_requisition_list_id`='".$reqItemId."'
+            SELECT
+                I.`stc_cust_super_requisition_list_id`,
+                I.`stc_cust_super_requisition_list_items_req_id`,
+                I.`stc_cust_super_requisition_list_items_title` AS item_title,
+                L.`stc_cust_super_requisition_list_super_id`,
+                P.`stc_cust_project_title` AS project_title,
+                P.`stc_cust_project_createdby` AS project_created_by,
+                S.`stc_cust_pro_supervisor_email` AS supervisor_email,
+                S.`stc_cust_pro_supervisor_created_by` AS supervisor_created_by
+            FROM `stc_cust_super_requisition_list_items` I
+            LEFT JOIN `stc_cust_super_requisition_list` L
+                ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+            LEFT JOIN `stc_cust_project` P
+                ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+            LEFT JOIN `stc_cust_pro_supervisor` S
+                ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+            WHERE I.`stc_cust_super_requisition_list_id`='".$reqItemId."'
             LIMIT 1
         ");
         if(!$chk || mysqli_num_rows($chk) === 0){
@@ -209,6 +485,7 @@ if (!function_exists('stc_req_comm_send')) {
             if($imageUrl !== '') $logMsg .= '<br/>Photo: '.$imageUrl;
             stc_req_comm_write_item_log($db, $reqItemId, $label, $logMsg, $actor['created_by']);
         }
+        stc_req_comm_notify_email($db, $reqItemId, $reqId, $item, $message, $issueType, $imageUrl, $actor);
         return array('ok' => true);
     }
 }
@@ -226,6 +503,19 @@ if (!function_exists('stc_req_comm_button')) {
     }
 }
 
+if (!function_exists('stc_req_comm_inbox_button')) {
+    function stc_req_comm_inbox_button($label = 'Messages'){
+        $label = htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8');
+        return '<div class="stc-req-comm-inbox-wrap" id="stcReqCommInbox">'
+            .'<button type="button" class="btn btn-danger form-control" id="stcReqCommInboxBtn">'
+            .'<i class="fa fa-bell"></i> '.$label
+            .' <span class="stc-req-comm-inbox-badge" id="stcReqCommInboxBadge" style="display:none;">0</span>'
+            .'</button>'
+            .'<div class="stc-req-comm-inbox-panel" id="stcReqCommInboxPanel" style="display:none;"></div>'
+            .'</div>';
+    }
+}
+
 if (!function_exists('stc_req_comm_handle_request')) {
     function stc_req_comm_handle_request($db, $forceType = ''){
         header('Content-Type: application/json; charset=utf-8');
@@ -236,8 +526,15 @@ if (!function_exists('stc_req_comm_handle_request')) {
         }
         $action = isset($_POST['stc_req_comm_action']) ? strtolower(trim((string)$_POST['stc_req_comm_action'])) : '';
         $reqItemId = isset($_POST['req_item_id']) ? (int)$_POST['req_item_id'] : 0;
+        if($action === 'inbox'){
+            $items = stc_req_comm_inbox($db, $actor);
+            echo json_encode(array('ok' => true, 'count' => count($items), 'items' => $items));
+            exit;
+        }
         if($action === 'list'){
-            echo json_encode(array('ok' => true, 'messages' => stc_req_comm_list($db, $reqItemId, $actor)));
+            $messages = stc_req_comm_list($db, $reqItemId, $actor);
+            stc_req_comm_mark_seen($db, $reqItemId, $actor);
+            echo json_encode(array('ok' => true, 'messages' => $messages));
             exit;
         }
         if($action === 'send'){
@@ -247,6 +544,7 @@ if (!function_exists('stc_req_comm_handle_request')) {
             $file = isset($_FILES['image']) ? $_FILES['image'] : array();
             $res = stc_req_comm_send($db, $reqItemId, $reqId, $message, $issueType, $file, $actor);
             if(!empty($res['ok'])){
+                stc_req_comm_mark_seen($db, $reqItemId, $actor);
                 echo json_encode(array('ok' => true, 'messages' => stc_req_comm_list($db, $reqItemId, $actor)));
             }else{
                 echo json_encode(array('ok' => false, 'error' => $res['error'] ?? 'Failed.'));
@@ -323,12 +621,25 @@ if (!function_exists('stc_req_comm_render_ui')) {
   .stc-req-comm-filename{padding:0 12px 8px;font-size:12px;color:#555;background:#f0f0f0;}
   .stc-req-comm-empty{text-align:center;color:#667781;padding:40px 10px;}
   a.stc-req-comm-open{margin-left:4px;}
+  a.stc-req-comm-open.has-unread{box-shadow:0 0 0 2px #e74c3c;}
+  .stc-req-comm-inbox-wrap{position:relative;}
+  .stc-req-comm-inbox-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:10px;background:#fff;color:#c0392b;font-weight:700;font-size:12px;}
+  .stc-req-comm-inbox-panel{position:absolute;top:calc(100% + 6px);right:0;left:auto;width:360px;max-height:380px;overflow-y:auto;z-index:20070;background:#fff;border:1px solid #ddd;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);white-space:normal;text-align:left;}
+  .stc-req-comm-inbox-item{display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#333;text-decoration:none;}
+  .stc-req-comm-inbox-item:hover{background:#fff6e5;color:#333;text-decoration:none;}
+  .stc-req-comm-inbox-item b{display:block;font-size:13px;}
+  .stc-req-comm-inbox-item span{display:block;font-size:12px;color:#666;}
+  .stc-req-comm-inbox-empty{padding:18px 12px;text-align:center;color:#777;font-size:13px;}
+  #stcReqCommInboxBtn.stc-req-comm-has-new{animation:stcReqCommPulse 1.4s infinite;}
+  @keyframes stcReqCommPulse{0%{box-shadow:0 0 0 0 rgba(231,76,60,.55);}70%{box-shadow:0 0 0 8px rgba(231,76,60,0);}100%{box-shadow:0 0 0 0 rgba(231,76,60,0);}}
 </style>
 <script>
-(function($){
+(function(){
   var apiUrl = <?php echo json_encode((string)$apiUrl); ?>;
-  function esc(s){ return $('<div>').text(s == null ? '' : String(s)).html(); }
+  function jq(){ return window.jQuery; }
+  function esc(s){ return jq()('<div>').text(s == null ? '' : String(s)).html(); }
   function renderMessages(list){
+    var $ = jq();
     var html = '';
     if(!list || !list.length){
       html = '<div class="stc-req-comm-empty">No messages yet. Report wrong or fault material here.</div>';
@@ -346,73 +657,164 @@ if (!function_exists('stc_req_comm_render_ui')) {
     $('#stcReqCommThread').html(html);
   }
   function loadMessages(){
+    var $ = jq();
     var itemId = $('#stcReqCommItemId').val();
     $('#stcReqCommThread').html('<div class="stc-req-comm-empty">Loading...</div>');
     $.post(apiUrl, { stc_req_comm_action:'list', req_item_id:itemId }, function(res){
-      if(res && res.ok){ renderMessages(res.messages); }
+      if(res && res.ok){ renderMessages(res.messages); refreshInbox(); }
       else { $('#stcReqCommThread').html('<div class="stc-req-comm-empty">'+(res && res.error ? esc(res.error) : 'Could not load messages.')+'</div>'); }
     }, 'json').fail(function(){
       $('#stcReqCommThread').html('<div class="stc-req-comm-empty">Could not load messages.</div>');
     });
   }
-  $(document).on('click', '.stc-req-comm-open', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    var $btn = $(this);
+  function renderInbox(items){
+    var $ = jq();
+    var $badge = $('#stcReqCommInboxBadge');
+    var $btn = $('#stcReqCommInboxBtn');
+    var $panel = $('#stcReqCommInboxPanel');
+    if(!$badge.length) return;
+    var count = items && items.length ? items.length : 0;
+    if(count > 0){
+      $badge.text(count > 99 ? '99+' : count).show();
+      $btn.addClass('stc-req-comm-has-new');
+    }else{
+      $badge.hide();
+      $btn.removeClass('stc-req-comm-has-new');
+    }
+    var html = '';
+    if(!count){
+      html = '<div class="stc-req-comm-inbox-empty">No new requisition messages.</div>';
+    }else{
+      items.forEach(function(it){
+        var preview = it.message ? it.message : (it.image_url ? 'Photo attached' : 'New message');
+        var tag = it.issue_label ? ' · '+it.issue_label : '';
+        html += '<a href="#" class="stc-req-comm-inbox-item stc-req-comm-open"'
+          + ' data-req-item-id="'+esc(it.req_item_id)+'"'
+          + ' data-req-id="'+esc(it.req_id)+'"'
+          + ' data-item-title="'+esc(it.item_title || '')+'">'
+          + '<b>'+esc(it.item_title || ('Item #'+it.req_item_id))+tag+'</b>'
+          + '<span>Req# '+esc(it.req_id)+' · '+esc(it.project_title || '-')+'</span>'
+          + '<span>'+esc(it.username)+' · '+esc(it.created_date)+'</span>'
+          + '<span>'+esc(preview)+'</span>'
+          + '</a>';
+      });
+    }
+    $panel.html(html);
+    $('.stc-req-comm-open').removeClass('has-unread');
+    if(count){
+      items.forEach(function(it){
+        $('.stc-req-comm-open[data-req-item-id="'+it.req_item_id+'"]').addClass('has-unread');
+      });
+    }
+  }
+  function refreshInbox(){
+    var $ = jq();
+    if(!$('#stcReqCommInbox').length) return;
+    $.post(apiUrl, { stc_req_comm_action:'inbox' }, function(res){
+      if(res && res.ok){ renderInbox(res.items || []); }
+    }, 'json');
+  }
+  function openCommModal(){
+    var $ = jq();
     var $modal = $('#stcReqCommModal');
-    $('#stcReqCommItemId').val($btn.data('req-item-id') || '');
-    $('#stcReqCommReqId').val($btn.data('req-id') || 0);
-    var title = $btn.data('item-title') || '';
-    $('#stcReqCommTitle').text(title ? ' — '+title : '');
-    $('#stcReqCommMessage').val('');
-    $('#stcReqCommImage').val('');
-    $('#stcReqCommFileName').text('');
-    $('#stcReqCommIssue').val('wrong_material');
     if($modal.parent()[0] !== document.body){
       $modal.appendTo('body');
     }
-    $modal.modal('show').addClass('show in');
-    loadMessages();
-  });
-  $(document).on('hidden.bs.modal', '#stcReqCommModal', function(){
-    $(this).removeClass('show in');
-    if($('.modal.in, .modal.show').length === 0){
+    $modal.addClass('show in').css('display','block').attr('aria-hidden','false');
+    if(!$('.stc-req-comm-backdrop').length){
+      $('<div class="modal-backdrop fade in show stc-req-comm-backdrop"></div>').css('z-index', 20040).appendTo('body');
+    }
+    $('body').addClass('modal-open');
+  }
+  function closeCommModal(){
+    var $ = jq();
+    $('#stcReqCommModal').removeClass('show in').css('display','none').attr('aria-hidden','true');
+    $('.stc-req-comm-backdrop').remove();
+    if(!$('.modal.in:visible, .modal.show:visible').length){
       $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
     }
-  });
-  $(document).on('change', '#stcReqCommImage', function(){
-    var f = this.files && this.files[0] ? this.files[0].name : '';
-    $('#stcReqCommFileName').text(f);
-  });
-  $(document).on('submit', '#stcReqCommForm', function(e){
-    e.preventDefault();
-    var $btn = $('#stcReqCommSend').prop('disabled', true);
-    var fd = new FormData(this);
-    $.ajax({
-      url: apiUrl,
-      method: 'POST',
-      data: fd,
-      processData: false,
-      contentType: false,
-      dataType: 'json',
-      success: function(res){
-        $btn.prop('disabled', false);
-        if(res && res.ok){
-          $('#stcReqCommMessage').val('');
-          $('#stcReqCommImage').val('');
-          $('#stcReqCommFileName').text('');
-          renderMessages(res.messages);
-        }else{
-          alert((res && res.error) ? res.error : 'Could not send.');
-        }
-      },
-      error: function(){
-        $btn.prop('disabled', false);
-        alert('Could not send.');
+  }
+  function bindCommUi(){
+    var $ = jq();
+    if(!$ || $.stcReqCommBound){ return; }
+    $.stcReqCommBound = true;
+    $(document).on('click', '.stc-req-comm-open', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var $btn = $(this);
+      $('#stcReqCommItemId').val($btn.attr('data-req-item-id') || $btn.data('req-item-id') || '');
+      $('#stcReqCommReqId').val($btn.attr('data-req-id') || $btn.data('req-id') || 0);
+      var title = $btn.attr('data-item-title') || $btn.data('item-title') || '';
+      $('#stcReqCommTitle').text(title ? ' — '+title : '');
+      $('#stcReqCommMessage').val('');
+      $('#stcReqCommImage').val('');
+      $('#stcReqCommFileName').text('');
+      $('#stcReqCommIssue').val('wrong_material');
+      openCommModal();
+      loadMessages();
+    });
+    $(document).on('click', '#stcReqCommInboxBtn', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      $('#stcReqCommInboxPanel').toggle();
+    });
+    $(document).on('click', function(e){
+      if(!$(e.target).closest('#stcReqCommInbox').length){
+        $('#stcReqCommInboxPanel').hide();
       }
     });
-  });
-})(jQuery);
+    $(document).on('click', '#stcReqCommInboxPanel .stc-req-comm-open', function(){
+      $('#stcReqCommInboxPanel').hide();
+    });
+    $(document).on('click', '#stcReqCommModal [data-dismiss="modal"], .stc-req-comm-backdrop', function(e){
+      e.preventDefault();
+      closeCommModal();
+      refreshInbox();
+    });
+    $(document).on('change', '#stcReqCommImage', function(){
+      var f = this.files && this.files[0] ? this.files[0].name : '';
+      $('#stcReqCommFileName').text(f);
+    });
+    $(document).on('submit', '#stcReqCommForm', function(e){
+      e.preventDefault();
+      var $btn = $('#stcReqCommSend').prop('disabled', true);
+      var fd = new FormData(this);
+      $.ajax({
+        url: apiUrl,
+        method: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(res){
+          $btn.prop('disabled', false);
+          if(res && res.ok){
+            $('#stcReqCommMessage').val('');
+            $('#stcReqCommImage').val('');
+            $('#stcReqCommFileName').text('');
+            renderMessages(res.messages);
+            refreshInbox();
+          }else{
+            alert((res && res.error) ? res.error : 'Could not send.');
+          }
+        },
+        error: function(){
+          $btn.prop('disabled', false);
+          alert('Could not send.');
+        }
+      });
+    });
+    window.stcReqCommRefreshInbox = refreshInbox;
+    refreshInbox();
+    setInterval(refreshInbox, 45000);
+  }
+  if(window.jQuery){ bindCommUi(); }
+  else {
+    document.addEventListener('DOMContentLoaded', function(){
+      if(window.jQuery){ bindCommUi(); }
+    });
+  }
+})();
 </script>
         <?php
     }

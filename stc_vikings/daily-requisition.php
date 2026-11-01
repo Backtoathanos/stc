@@ -292,8 +292,14 @@ include("kattegat/role_check.php");
         <div class="app-main__inner">
           <div class="row">
             <div class="col-xl-12 col-lg-12 col-md-12">
-              <div class="card-border mb-3 card card-body border-success">
-                <h5 align="center">Daily Requisition</h5>
+              <div class="card-border mb-3 card card-body border-success" style="position:relative;">
+                <h5 align="center" style="margin:0;">Daily Requisition</h5>
+                <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:170px;">
+                    <?php
+                    require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
+                    echo stc_req_comm_inbox_button('Messages');
+                    ?>
+                </div>
               </div>
             </div>
           </div>
@@ -807,6 +813,9 @@ include("kattegat/role_check.php");
               rows = '<tr><td colspan="13" class="text-center">No record found.</td></tr>';
             }
             $('.stc-daily-requisition-body').html(rows);
+            if (typeof window.stcReqCommRefreshInbox === 'function') {
+              window.stcReqCommRefreshInbox();
+            }
             var totalPages = parseInt(response.total_pages || 0, 10) || cachedTotalPages;
             if (response.total_pages) cachedTotalPages = response.total_pages;
             renderPagination(totalPages, parseInt(response.page || 1, 10));
