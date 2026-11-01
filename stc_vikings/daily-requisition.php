@@ -247,7 +247,8 @@ include("kattegat/role_check.php");
     #dailyReqBalanceModal.modal,
     #dailyReqLogsModal.modal,
     #statusRemarkModal.modal,
-    #drDispatchLinesModal.modal {
+    #drDispatchLinesModal.modal,
+    #stcReqCommModal.modal {
       z-index: 20050 !important;
     }
     body.modal-open .modal-backdrop {
@@ -578,7 +579,7 @@ include("kattegat/role_check.php");
       $('#drDispatchLinesModal').appendTo('body');
 
       // Fix: Bootstrap modal leaves padding-right on body/fixed elements, causing app-main__outer to shrink on each close
-      $('#dailyReqBalanceModal, #dailyReqLogsModal, #statusRemarkModal, #drDispatchLinesModal').on('hidden.bs.modal', function () {
+      $('#dailyReqBalanceModal, #dailyReqLogsModal, #statusRemarkModal, #drDispatchLinesModal, #stcReqCommModal').on('hidden.bs.modal', function () {
         setTimeout(function () {
           if ($('.modal.in').length === 0) {
             $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });

@@ -295,6 +295,16 @@ if (!function_exists('stc_req_comm_render_ui')) {
   </div>
 </div>
 <style>
+  #stcReqCommModal.modal{z-index:20060 !important;}
+  #stcReqCommModal.modal.fade.in,
+  #stcReqCommModal.modal.fade.show,
+  #stcReqCommModal.modal.in,
+  #stcReqCommModal.modal.show{
+    display:block !important;
+    opacity:1 !important;
+  }
+  #stcReqCommModal .modal-dialog{z-index:20061;margin:40px auto;transform:none !important;}
+  body.modal-open .modal-backdrop{z-index:20040 !important;}
   .stc-req-comm-thread{height:420px;overflow-y:auto;padding:14px 12px;background:#ece5dd;}
   .stc-req-comm-row{display:flex;margin-bottom:10px;}
   .stc-req-comm-row.in{justify-content:flex-start;}
@@ -349,6 +359,7 @@ if (!function_exists('stc_req_comm_render_ui')) {
     e.preventDefault();
     e.stopPropagation();
     var $btn = $(this);
+    var $modal = $('#stcReqCommModal');
     $('#stcReqCommItemId').val($btn.data('req-item-id') || '');
     $('#stcReqCommReqId').val($btn.data('req-id') || 0);
     var title = $btn.data('item-title') || '';
@@ -357,8 +368,17 @@ if (!function_exists('stc_req_comm_render_ui')) {
     $('#stcReqCommImage').val('');
     $('#stcReqCommFileName').text('');
     $('#stcReqCommIssue').val('wrong_material');
-    $('#stcReqCommModal').modal('show');
+    if($modal.parent()[0] !== document.body){
+      $modal.appendTo('body');
+    }
+    $modal.modal('show').addClass('show in');
     loadMessages();
+  });
+  $(document).on('hidden.bs.modal', '#stcReqCommModal', function(){
+    $(this).removeClass('show in');
+    if($('.modal.in, .modal.show').length === 0){
+      $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
+    }
   });
   $(document).on('change', '#stcReqCommImage', function(){
     var f = this.files && this.files[0] ? this.files[0].name : '';
