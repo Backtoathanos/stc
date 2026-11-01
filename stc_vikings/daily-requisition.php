@@ -292,14 +292,12 @@ include("kattegat/role_check.php");
         <div class="app-main__inner">
           <div class="row">
             <div class="col-xl-12 col-lg-12 col-md-12">
-              <div class="card-border mb-3 card card-body border-success" style="position:relative;">
-                <h5 align="center" style="margin:0;">Daily Requisition</h5>
-                <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:170px;">
-                    <?php
-                    require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
-                    echo stc_req_comm_inbox_button('Messages');
-                    ?>
-                </div>
+              <div class="card-border mb-3 card card-body border-success stc-req-comm-headbar">
+                <h5>Daily Requisition</h5>
+                <?php
+                require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
+                echo stc_req_comm_inbox_button('Messages');
+                ?>
               </div>
             </div>
           </div>

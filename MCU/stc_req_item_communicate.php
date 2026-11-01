@@ -507,12 +507,12 @@ if (!function_exists('stc_req_comm_inbox_button')) {
     function stc_req_comm_inbox_button($label = 'Messages'){
         $label = htmlspecialchars((string)$label, ENT_QUOTES, 'UTF-8');
         return '<div class="stc-req-comm-inbox-wrap" id="stcReqCommInbox">'
-            .'<button type="button" class="btn btn-danger form-control" id="stcReqCommInboxBtn">'
-            .'<i class="fa fa-bell"></i> '.$label
-            .' <span class="stc-req-comm-inbox-badge" id="stcReqCommInboxBadge" style="display:none;">0</span>'
+            .'<button type="button" class="stc-req-comm-inbox-btn" id="stcReqCommInboxBtn" title="Requisition messages">'
+            .'<i class="fa fa-bell"></i><span>'.$label.'</span>'
+            .'<em class="stc-req-comm-inbox-badge" id="stcReqCommInboxBadge" style="display:none;">0</em>'
             .'</button>'
-            .'<div class="stc-req-comm-inbox-panel" id="stcReqCommInboxPanel" style="display:none;"></div>'
-            .'</div>';
+            .'</div>'
+            .'<div class="stc-req-comm-inbox-panel" id="stcReqCommInboxPanel" style="display:none;"></div>';
     }
 }
 
@@ -622,16 +622,55 @@ if (!function_exists('stc_req_comm_render_ui')) {
   .stc-req-comm-empty{text-align:center;color:#667781;padding:40px 10px;}
   a.stc-req-comm-open{margin-left:4px;}
   a.stc-req-comm-open.has-unread{box-shadow:0 0 0 2px #e74c3c;}
-  .stc-req-comm-inbox-wrap{position:relative;}
-  .stc-req-comm-inbox-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:10px;background:#fff;color:#c0392b;font-weight:700;font-size:12px;}
-  .stc-req-comm-inbox-panel{position:absolute;top:calc(100% + 6px);right:0;left:auto;width:360px;max-height:380px;overflow-y:auto;z-index:20070;background:#fff;border:1px solid #ddd;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);white-space:normal;text-align:left;}
-  .stc-req-comm-inbox-item{display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#333;text-decoration:none;}
-  .stc-req-comm-inbox-item:hover{background:#fff6e5;color:#333;text-decoration:none;}
-  .stc-req-comm-inbox-item b{display:block;font-size:13px;}
-  .stc-req-comm-inbox-item span{display:block;font-size:12px;color:#666;}
-  .stc-req-comm-inbox-empty{padding:18px 12px;text-align:center;color:#777;font-size:13px;}
-  #stcReqCommInboxBtn.stc-req-comm-has-new{animation:stcReqCommPulse 1.4s infinite;}
-  @keyframes stcReqCommPulse{0%{box-shadow:0 0 0 0 rgba(231,76,60,.55);}70%{box-shadow:0 0 0 8px rgba(231,76,60,0);}100%{box-shadow:0 0 0 0 rgba(231,76,60,0);}}
+  .stc-req-comm-headbar{position:relative;display:flex;align-items:center;justify-content:flex-end;min-height:38px;}
+  .stc-req-comm-headbar h5{position:absolute;left:0;right:0;margin:0;text-align:center;pointer-events:none;}
+  .stc-req-comm-inbox-wrap{position:relative;z-index:2;flex:0 0 auto;}
+  .stc-req-comm-inbox-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    height:38px;padding:0 14px;border:1px solid #d9dee3;border-radius:8px;
+    background:#fff;color:#2d3748;font-weight:600;font-size:13px;line-height:1;
+    box-shadow:0 1px 2px rgba(16,24,40,.06);cursor:pointer;
+  }
+  .stc-req-comm-inbox-btn:hover{border-color:#c5ccd3;background:#f8fafc;}
+  .stc-req-comm-inbox-btn i{color:#e67e22;}
+  .stc-req-comm-inbox-badge{
+    display:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+    background:#e74c3c;color:#fff;font-style:normal;font-weight:700;font-size:11px;
+    line-height:18px;text-align:center;
+  }
+  .stc-req-comm-inbox-panel{
+    position:fixed;width:400px;max-width:calc(100vw - 24px);max-height:420px;
+    overflow:hidden;z-index:20070;background:#fff;border:1px solid #e5e7eb;
+    border-radius:12px;box-shadow:0 16px 40px rgba(15,23,42,.18);
+    white-space:normal;text-align:left;font-family:inherit;
+  }
+  .stc-req-comm-inbox-head{
+    padding:12px 14px;background:#075e54;color:#fff;font-weight:700;font-size:14px;
+  }
+  .stc-req-comm-inbox-list{max-height:370px;overflow-y:auto;}
+  .stc-req-comm-inbox-item{
+    display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+    border-bottom:1px solid #f1f5f9;color:#1f2937;text-decoration:none;background:#fff;
+  }
+  .stc-req-comm-inbox-item:last-child{border-bottom:0;}
+  .stc-req-comm-inbox-item:hover{background:#f0fdf8;color:#1f2937;text-decoration:none;}
+  .stc-req-comm-inbox-ico{
+    width:34px;height:34px;border-radius:50%;background:#fff4e5;color:#e67e22;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+  }
+  .stc-req-comm-inbox-body{min-width:0;flex:1;}
+  .stc-req-comm-inbox-title{font-size:13px;font-weight:700;line-height:1.35;word-break:break-word;}
+  .stc-req-comm-inbox-meta,.stc-req-comm-inbox-msg,.stc-req-comm-inbox-foot{
+    display:block;font-size:12px;color:#667781;margin-top:3px;word-break:break-word;
+  }
+  .stc-req-comm-inbox-msg{color:#334155;}
+  .stc-req-comm-inbox-tag{
+    display:inline-block;background:#f39c12;color:#fff;border-radius:3px;
+    padding:1px 6px;font-size:10px;font-weight:700;margin-right:6px;
+  }
+  .stc-req-comm-inbox-empty{padding:28px 16px;text-align:center;color:#7b8794;font-size:13px;}
+  .stc-req-comm-inbox-btn.stc-req-comm-has-new{border-color:#f5c6cb;background:#fff5f5;}
+  .stc-req-comm-inbox-btn.stc-req-comm-has-new i{color:#e74c3c;}
 </style>
 <script>
 (function(){
@@ -681,24 +720,27 @@ if (!function_exists('stc_req_comm_render_ui')) {
       $badge.hide();
       $btn.removeClass('stc-req-comm-has-new');
     }
-    var html = '';
+    var html = '<div class="stc-req-comm-inbox-head">New requisition messages</div><div class="stc-req-comm-inbox-list">';
     if(!count){
-      html = '<div class="stc-req-comm-inbox-empty">No new requisition messages.</div>';
+      html += '<div class="stc-req-comm-inbox-empty">No new requisition messages.</div>';
     }else{
       items.forEach(function(it){
         var preview = it.message ? it.message : (it.image_url ? 'Photo attached' : 'New message');
-        var tag = it.issue_label ? ' · '+it.issue_label : '';
+        var tag = it.issue_label ? '<span class="stc-req-comm-inbox-tag">'+esc(it.issue_label)+'</span>' : '';
         html += '<a href="#" class="stc-req-comm-inbox-item stc-req-comm-open"'
           + ' data-req-item-id="'+esc(it.req_item_id)+'"'
           + ' data-req-id="'+esc(it.req_id)+'"'
           + ' data-item-title="'+esc(it.item_title || '')+'">'
-          + '<b>'+esc(it.item_title || ('Item #'+it.req_item_id))+tag+'</b>'
-          + '<span>Req# '+esc(it.req_id)+' · '+esc(it.project_title || '-')+'</span>'
-          + '<span>'+esc(it.username)+' · '+esc(it.created_date)+'</span>'
-          + '<span>'+esc(preview)+'</span>'
-          + '</a>';
+          + '<div class="stc-req-comm-inbox-ico"><i class="fa fa-comments"></i></div>'
+          + '<div class="stc-req-comm-inbox-body">'
+          + '<div class="stc-req-comm-inbox-title">'+esc(it.item_title || ('Item #'+it.req_item_id))+'</div>'
+          + '<div class="stc-req-comm-inbox-meta">Req# '+esc(it.req_id)+' · '+esc(it.project_title || '-')+'</div>'
+          + '<div class="stc-req-comm-inbox-msg">'+esc(preview)+'</div>'
+          + '<div class="stc-req-comm-inbox-foot">'+tag+esc(it.username)+' · '+esc(it.created_date)+'</div>'
+          + '</div></a>';
       });
     }
+    html += '</div>';
     $panel.html(html);
     $('.stc-req-comm-open').removeClass('has-unread');
     if(count){
@@ -753,18 +795,45 @@ if (!function_exists('stc_req_comm_render_ui')) {
       openCommModal();
       loadMessages();
     });
+    function placeInboxPanel(){
+      var $btn = $('#stcReqCommInboxBtn');
+      var $panel = $('#stcReqCommInboxPanel');
+      if(!$btn.length || !$panel.length) return;
+      $panel.appendTo('body');
+      var r = $btn[0].getBoundingClientRect();
+      var width = Math.min(400, window.innerWidth - 24);
+      var left = Math.min(window.innerWidth - width - 12, Math.max(12, r.right - width));
+      $panel.css({
+        position: 'fixed',
+        top: (r.bottom + 8) + 'px',
+        left: left + 'px',
+        right: 'auto',
+        width: width + 'px',
+        display: 'block'
+      });
+    }
     $(document).on('click', '#stcReqCommInboxBtn', function(e){
       e.preventDefault();
       e.stopPropagation();
-      $('#stcReqCommInboxPanel').toggle();
+      var $panel = $('#stcReqCommInboxPanel');
+      if($panel.is(':visible')){
+        $panel.hide();
+      }else{
+        placeInboxPanel();
+      }
     });
     $(document).on('click', function(e){
-      if(!$(e.target).closest('#stcReqCommInbox').length){
+      if(!$(e.target).closest('#stcReqCommInbox, #stcReqCommInboxPanel').length){
         $('#stcReqCommInboxPanel').hide();
       }
     });
     $(document).on('click', '#stcReqCommInboxPanel .stc-req-comm-open', function(){
       $('#stcReqCommInboxPanel').hide();
+    });
+    $(window).on('resize scroll', function(){
+      if($('#stcReqCommInboxPanel').is(':visible')){
+        placeInboxPanel();
+      }
     });
     $(document).on('click', '#stcReqCommModal [data-dismiss="modal"], .stc-req-comm-backdrop', function(e){
       e.preventDefault();
