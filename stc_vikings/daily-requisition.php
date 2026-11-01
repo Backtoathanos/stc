@@ -293,6 +293,7 @@ include("kattegat/role_check.php");
           <div class="row">
             <div class="col-xl-12 col-lg-12 col-md-12">
               <div class="card-border mb-3 card card-body border-success stc-req-comm-headbar">
+                <span></span>
                 <h5>Daily Requisition</h5>
                 <?php
                 require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';

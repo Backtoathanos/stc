@@ -511,8 +511,8 @@ if (!function_exists('stc_req_comm_inbox_button')) {
             .'<i class="fa fa-bell"></i><span>'.$label.'</span>'
             .'<em class="stc-req-comm-inbox-badge" id="stcReqCommInboxBadge" style="display:none;">0</em>'
             .'</button>'
-            .'</div>'
-            .'<div class="stc-req-comm-inbox-panel" id="stcReqCommInboxPanel" style="display:none;"></div>';
+            .'<div class="stc-req-comm-inbox-panel" id="stcReqCommInboxPanel" style="display:none;"></div>'
+            .'</div>';
     }
 }
 
@@ -622,9 +622,9 @@ if (!function_exists('stc_req_comm_render_ui')) {
   .stc-req-comm-empty{text-align:center;color:#667781;padding:40px 10px;}
   a.stc-req-comm-open{margin-left:4px;}
   a.stc-req-comm-open.has-unread{box-shadow:0 0 0 2px #e74c3c;}
-  .stc-req-comm-headbar{position:relative;display:flex;align-items:center;justify-content:flex-end;min-height:38px;}
-  .stc-req-comm-headbar h5{position:absolute;left:0;right:0;margin:0;text-align:center;pointer-events:none;}
-  .stc-req-comm-inbox-wrap{position:relative;z-index:2;flex:0 0 auto;}
+  .stc-req-comm-headbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;min-height:38px;}
+  .stc-req-comm-headbar h5{grid-column:2;margin:0;text-align:center;white-space:nowrap;}
+  .stc-req-comm-inbox-wrap{grid-column:3;justify-self:end;position:relative;z-index:2;}
   .stc-req-comm-inbox-btn{
     display:inline-flex;align-items:center;gap:8px;
     height:38px;padding:0 14px;border:1px solid #d9dee3;border-radius:8px;
