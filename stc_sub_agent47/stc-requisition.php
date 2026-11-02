@@ -17,8 +17,112 @@
     <link href="./main.css" rel="stylesheet">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <style>
-      .fade:not(.show) {
-        opacity: 10;
+      /* Keep other fades visible, but do not make modal backdrops solid black. */
+      .fade:not(.show):not(.modal):not(.modal-backdrop) {
+        opacity: 1;
+      }
+      .modal-backdrop {
+        z-index: 1040;
+      }
+      .modal {
+        z-index: 1055;
+      }
+      .modal-backdrop.fade.in,
+      .modal-backdrop.fade.show,
+      .stc-req-backdrop {
+        opacity: 0.45 !important;
+        z-index: 1050 !important;
+      }
+      #stc-create-req-modal,
+      .bd-requisition-modal-lg {
+        z-index: 1060 !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      #stc-create-req-modal.fade,
+      #stc-create-req-modal.fade.in,
+      #stc-create-req-modal.fade.show {
+        opacity: 1 !important;
+      }
+      #stc-create-req-modal .modal-dialog {
+        transform: none !important;
+        width: 92% !important;
+        max-width: 1080px !important;
+        margin: 30px auto !important;
+        pointer-events: auto !important;
+      }
+      #stc-create-req-modal .modal-content {
+        background: #fff !important;
+        opacity: 1 !important;
+        border: 0;
+        border-radius: 10px;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+      }
+      #stc-create-req-modal .modal-header,
+      #stc-create-req-modal .modal-body,
+      #stc-create-req-modal .modal-footer {
+        background: #fff !important;
+      }
+      #stc-create-req-modal h5,
+      #stc-create-req-modal .modal-title {
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        color: #222 !important;
+      }
+      #stc-create-req-modal .stc-reqm-lbl {
+        display: block !important;
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        margin: 0 0 6px !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        color: #222 !important;
+        line-height: 1.3 !important;
+      }
+      #stc-create-req-modal .stc-reqm-field {
+        display: block !important;
+        margin-bottom: 14px;
+      }
+      #stc-create-req-modal .stc-reqm-field .form-control,
+      #stc-create-req-modal .form-control {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #fff !important;
+        border: 1px solid #c5cdd8 !important;
+        border-radius: 6px !important;
+        height: 40px !important;
+        padding: 8px 12px !important;
+        box-shadow: none !important;
+        font-size: 14px !important;
+        color: #222 !important;
+      }
+      #stc-create-req-modal .stc-reqm-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        gap: 12px;
+      }
+      #stc-create-req-modal .item-card {
+        border: 1px solid #e5e8eb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        background: #fff;
+      }
+      #stc-create-req-modal .stc-reqm-actions {
+        margin-top: 8px;
+        text-align: right;
+      }
+      @media (max-width: 767px) {
+        #stc-create-req-modal .stc-reqm-grid {
+          grid-template-columns: 1fr 1fr;
+        }
       }
       .stc-req-filter-toolbar {
         padding: 0 0 14px;
@@ -126,7 +230,7 @@
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-12 col-xl-12"> 
-                                            <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-requisition-modal-lg">Add Requisition</a>
+                                            <a href="javascript:void(0)" class="btn btn-primary form-control stc-open-create-req">Add Requisition</a>
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5 class="card-title">View Requisition</h5>
@@ -670,49 +774,42 @@
             });
         });
     </script>
-</body>
-</html>
-<div class="modal fade bd-requisition-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade bd-requisition-modal-lg" id="stc-create-req-modal" tabindex="-1" role="dialog" aria-labelledby="stcCreateReqTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Create Requisition</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="stcCreateReqTitle">Create Requisition</h5>
+                <button type="button" class="close stc-close-create-req" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
                                 <form class="stc-sup-form-create" novalidate>
-                                    <div class="form-group">
-                                        <h5 class="card-title">Select Site</h5>
+                                    <div class="stc-reqm-field">
+                                        <label class="stc-reqm-lbl" for="load_cust_sup_site">Select Site</label>
                                         <select class="form-control load_cust_agents" id="load_cust_sup_site" name="load_cust_sup_site">
                                             <option>No Customers Found!!!</option>
                                         </select> 
                                     </div>
-                                    <div class="form-group">
-                                        <h5 class="card-title">Order Number</h5>
+                                    <div class="stc-reqm-field">
+                                        <label class="stc-reqm-lbl" for="stc-sup-order-number">Order Number</label>
                                         <input type="text" class="form-control" id="stc-sup-order-number" name="stc-sup-order-number" placeholder="Enter Order Number" maxlength="100" required>
                                     </div>
                                     
                                     <div class="items-container mt-4">
-                                        <div class="card item-card mb-3">
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-md-5 col-sm-12 mb-3">
-                                                        <label>Item Description</label>
+                                        <div class="item-card">
+                                                <div class="stc-reqm-grid">
+                                                    <div class="stc-reqm-field" style="position:relative;">
+                                                        <label class="stc-reqm-lbl">Item Description</label>
                                                         <input type="text" class="form-control stc-sup-desc" name="stc-sup-desc[]" placeholder="Enter Item Name" required>
                                                         <ul class="list-group mt-1 desc-suggestion-box" style="position: absolute; z-index: 9999; display: none; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
                                                     </div>
-                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
-                                                        <label>Quantity</label>
+                                                    <div class="stc-reqm-field">
+                                                        <label class="stc-reqm-lbl">Quantity</label>
                                                         <input type="number" class="form-control stc-sup-qty" name="stc-sup-qty[]" placeholder="Qty" required>
                                                     </div>
-                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
-                                                        <label>Unit</label>
+                                                    <div class="stc-reqm-field">
+                                                        <label class="stc-reqm-lbl">Unit</label>
                                                         <select class="form-control stc-sup-unit" name="stc-sup-unit[]">
                                                             <option value="NA">SELECT</option>
                                                             <option value="BAG">BAG</option>
@@ -739,8 +836,8 @@
                                                             <option value="SQMT">SQMT</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
-                                                        <label>Type</label>
+                                                    <div class="stc-reqm-field">
+                                                        <label class="stc-reqm-lbl">Type</label>
                                                         <select class="form-control stc-sup-type" name="stc-sup-type[]">
                                                             <option value="NA">SELECT</option>
                                                             <option value="Consumable">CONSUMABLE</option>
@@ -749,35 +846,30 @@
                                                             <option value="Tools & Tackles">TOOLS & TACKLES</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-1 col-sm-6 col-6 mb-3">
-                                                        <label>Priority</label>
+                                                    <div class="stc-reqm-field">
+                                                        <label class="stc-reqm-lbl">Priority</label>
                                                         <select class="form-control stc-sup-priority" name="stc-sup-priority[]">
                                                             <option value="1">Normal</option>
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="text-right">
+                                                <div class="stc-reqm-actions">
                                                     <button type="button" class="btn btn-danger btn-sm remove-item"><i class="fa fa-minus"></i> Remove</button>
                                                 </div>
-                                            </div>
                                         </div>
                                     </div>
                                     
                                     <div class="text-center mb-3">
-                                        <button type="button" class="btn btn-success btn-lg add-item"><i class="fa fa-plus"></i> Add Another Item</button>
+                                        <button type="button" class="btn btn-success add-item"><i class="fa fa-plus"></i> Add Another Item</button>
                                     </div>
                                     
                                     <input type="hidden" name="stc-sup-hit">
                                     <input type="hidden" class="stc-sup-sdlnumber" name="stc-sup-sdlnumber">
                                     <button class="btn btn-primary btn-block" type="submit">Submit Requisition</button>
                                 </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary stc-close-create-req">Close</button>
             </div>
         </div>
     </div>
@@ -785,14 +877,47 @@
 
 <script>
 $(document).ready(function() {
+    function stcCloseCreateReq() {
+        $('#stc-create-req-modal').removeClass('in show').hide().attr('aria-hidden', 'true');
+        $('.stc-req-backdrop').remove();
+        if (!$('.modal.in:visible, .modal.show:visible').length) {
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').not('.stc-req-backdrop').each(function(){
+                if (!$('.modal.in:visible, .modal.show:visible').length) {
+                    $(this).remove();
+                }
+            });
+        }
+    }
+    function stcOpenCreateReq() {
+        $('.stc-req-backdrop').remove();
+        $('body').append('<div class="modal-backdrop fade in show stc-req-backdrop"></div>');
+        $('body').addClass('modal-open');
+        $('#stc-create-req-modal').addClass('in show').css({ display: 'block', opacity: 1 }).attr('aria-hidden', 'false');
+    }
+    $(document).on('click', '.stc-open-create-req', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        stcOpenCreateReq();
+    });
+    $(document).on('click', '.stc-close-create-req, .stc-req-backdrop', function(e) {
+        e.preventDefault();
+        stcCloseCreateReq();
+    });
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $('#stc-create-req-modal').is(':visible')) {
+            stcCloseCreateReq();
+        }
+    });
+
     // Add new item card
-    $(document).on('click', '.add-item', function() {
-        var newCard = $('.item-card:first').clone();
+    $(document).on('click', '.bd-requisition-modal-lg .add-item', function() {
+        var newCard = $('.bd-requisition-modal-lg .item-card:first').clone();
         newCard.find('input').val('');
         newCard.find('select').val('NA');
         newCard.find('.stc-sup-priority').val('1');
         newCard.find('.desc-suggestion-box').hide().empty();
-        $('.items-container').append(newCard);
+        $('.bd-requisition-modal-lg .items-container').append(newCard);
         
         // Scroll to the new card
         $('html, body').animate({
@@ -801,8 +926,8 @@ $(document).ready(function() {
     });
     
     // Remove item card
-    $(document).on('click', '.remove-item', function() {
-        if ($('.item-card').length > 1) {
+    $(document).on('click', '.bd-requisition-modal-lg .remove-item', function() {
+        if ($('.bd-requisition-modal-lg .item-card').length > 1) {
             $(this).closest('.item-card').remove();
         } else {
             alert("You need at least one item!");
@@ -968,3 +1093,5 @@ $(document).ready(function() {
 require_once __DIR__ . '/../MCU/stc_req_item_communicate.php';
 stc_req_comm_render_ui('nemesis/stc_req_comm.php');
 ?>
+</body>
+</html>

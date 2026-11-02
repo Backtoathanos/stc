@@ -7,6 +7,17 @@ include "../../MCU/obdb.php";
 /*------------------------------------------For Agents--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
 class transformers extends tesseract{
+	private function stc_fmt_date($value, $empty = 'NA'){
+		if($value === null || $value === '' || $value === '0000-00-00' || $value === '0000-00-00 00:00:00'){
+			return $empty;
+		}
+		$ts = strtotime((string)$value);
+		if($ts === false || (int)date('Y', $ts) <= 1970){
+			return $empty;
+		}
+		return date('d-m-Y', $ts);
+	}
+
 	// call location	
 	public function stc_call_locdept(){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -526,9 +537,9 @@ class transformers extends tesseract{
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
 
-				$list_date=(date('Y', strtotime($row['stc_status_down_list_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_date'])) : 'NA';
-				$rec_date=(date('Y', strtotime($row['stc_status_down_list_rect_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_rect_date'])) : 'NA';
-				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : '';
+				$list_date=$this->stc_fmt_date($row['stc_status_down_list_date'], 'NA');
+				$rec_date=$this->stc_fmt_date($row['stc_status_down_list_rect_date'], 'NA');
+				$tar_date=$this->stc_fmt_date($row['stc_status_down_list_target_date'], '');
 
 				$status='';
 				$statusbgcolor = '';
@@ -754,11 +765,8 @@ class transformers extends tesseract{
 				';
 			}
 			if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
-				$updatedon='';
-				if(date('Y', strtotime($row['stc_status_down_list_updated_date']))!=1970){
-					$updatedon = date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
-				}
-				$ftargetdate=$row['stc_status_down_list_ftarget_date']=='' ? "" : date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date']));
+				$updatedon=$this->stc_fmt_date($row['stc_status_down_list_updated_date'], '');
+				$ftargetdate=$this->stc_fmt_date($row['stc_status_down_list_ftarget_date'], '');
 				$hidden2='	
 					<td data-col="stc-col-anycomment">'.$row['stc_status_down_list_remarks'].'</td>
 					<td data-col="stc-col-failurerootcause">'.$row['stc_status_down_list_failurerootcost'].'</td>
@@ -770,7 +778,7 @@ class transformers extends tesseract{
 
 			$optimusprime.='
 				<tr>
-					<td data-col="stc-col-date">'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+					<td data-col="stc-col-date">'.$list_date.'</td>
 					<td data-col="stc-col-location">'.$row['stc_status_down_list_plocation'].'</td>
 					<td data-col="stc-col-department">'.$row['stc_status_down_list_sub_location'].'</td>
 					<td data-col="stc-col-area">'.$row['stc_status_down_list_area'].'</td>
