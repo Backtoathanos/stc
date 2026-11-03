@@ -1,0 +1,54 @@
+/**
+ * Bootstrap 3 JS (.in) + theme CSS that expects Bootstrap 4 (.show)
+ * Keep every modal visible above its backdrop.
+ */
+.fade:not(.show):not(.in):not(.modal):not(.modal-backdrop) {
+  opacity: 1;
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+.modal.fade.in,
+.modal.fade.show,
+.modal.in,
+.modal.show {
+  opacity: 1 !important;
+}
+
+.modal.fade.in .modal-dialog,
+.modal.fade.show .modal-dialog,
+.modal.in .modal-dialog,
+.modal.show .modal-dialog {
+  transform: none !important;
+  -webkit-transform: none !important;
+  pointer-events: auto !important;
+}
+
+.modal-backdrop.fade.in,
+.modal-backdrop.fade.show,
+.modal-backdrop.in,
+.modal-backdrop.show {
+  opacity: 0.45 !important;
+  z-index: 1050 !important;
+}
+
+.modal-content {
+  background: #fff;
+  opacity: 1;
+}
+
+/* Chat / custom high-z modals own their backdrop — do not raise all backdrops */
+.stc-req-comm-backdrop {
+  z-index: 20040 !important;
+  opacity: 0.45 !important;
+}
+
+body.stc-req-comm-open .stc-req-comm-backdrop {
+  z-index: 20040 !important;
+}

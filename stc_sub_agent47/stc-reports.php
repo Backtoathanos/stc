@@ -17,6 +17,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
+    <link href="./assets/css/stc-modal-fix.css" rel="stylesheet">
     <style>
       .stc-req-filter-toolbar {
         padding: 0 0 14px;
@@ -183,6 +184,7 @@ if (($_SESSION['stc_agent_sub_category'] ?? '') !== 'Site Incharge') {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="./assets/scripts/stc-modal-fix.js"></script>
     <script type="text/javascript" src="./assets/scripts/jquery.table2excel.js"></script>
     <script>
     $(document).ready(function(){

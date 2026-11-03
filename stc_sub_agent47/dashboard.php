@@ -17,6 +17,7 @@
       rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
+    <link href="./assets/css/stc-modal-fix.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet"><!-- Bootstrap CSS -->
     <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <style>
@@ -167,6 +168,7 @@
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <!-- <script type="text/javascript" src="./assets/scripts/loginopr.js"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="./assets/scripts/stc-modal-fix.js"></script>
     <script>
         $(document).ready(function(){
             $('body').delegate('.search-icon', 'click', function(e){

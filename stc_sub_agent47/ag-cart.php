@@ -16,6 +16,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
+    <link href="./assets/css/stc-modal-fix.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
@@ -107,6 +108,7 @@
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="./assets/scripts/stc-modal-fix.js"></script>
     <script>
         $(document).ready(function(){
             $('body').delegate('.search-icon', 'click', function(e){

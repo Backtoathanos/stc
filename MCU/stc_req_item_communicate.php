@@ -653,7 +653,7 @@ if (!function_exists('stc_req_comm_render_ui')) {
     <div class="modal-content stc-req-comm-box">
       <div class="modal-header" style="background:#075e54;color:#fff;">
         <h5 class="modal-title"><i class="fa fa-comments"></i> Item Communication <span id="stcReqCommTitle" style="font-weight:400;font-size:13px;"></span></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;opacity:1;"><span>&times;</span></button>
+        <button type="button" class="close stc-req-comm-close" aria-label="Close" style="color:#fff;opacity:1;"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body" style="padding:0;background:#ece5dd;">
         <div id="stcReqCommThread" class="stc-req-comm-thread"></div>
@@ -686,11 +686,18 @@ if (!function_exists('stc_req_comm_render_ui')) {
   #stcReqCommModal.modal.fade.show,
   #stcReqCommModal.modal.in,
   #stcReqCommModal.modal.show{
-    display:block !important;
     opacity:1 !important;
   }
+  #stcReqCommModal.modal:not(.in):not(.show){
+    display:none !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
   #stcReqCommModal .modal-dialog{z-index:20061;margin:40px auto;transform:none !important;}
-  body.modal-open .modal-backdrop{z-index:20040 !important;}
+  /* Raise backdrop only while chat is open */
+  body.stc-req-comm-open > .modal-backdrop,
+  .stc-req-comm-backdrop{z-index:20040 !important;opacity:0.45 !important;}
+  .stc-req-comm-close{cursor:pointer;}
   .stc-req-comm-thread{height:420px;overflow-y:auto;padding:14px 12px;background:#ece5dd;}
   .stc-req-comm-row{display:flex;margin-bottom:10px;}
   .stc-req-comm-row.in{justify-content:flex-start;}
@@ -907,7 +914,8 @@ if (!function_exists('stc_req_comm_render_ui')) {
     if($modal.parent()[0] !== document.body){
       $modal.appendTo('body');
     }
-    $modal.addClass('show in').css('display','block').attr('aria-hidden','false');
+    $('body').addClass('stc-req-comm-open');
+    $modal.addClass('show in').css({ display: 'block', opacity: 1 }).attr('aria-hidden', 'false');
     if(!$('.stc-req-comm-backdrop').length){
       $('<div class="modal-backdrop fade in show stc-req-comm-backdrop"></div>').css('z-index', 20040).appendTo('body');
     }
@@ -915,10 +923,17 @@ if (!function_exists('stc_req_comm_render_ui')) {
   }
   function closeCommModal(){
     var $ = jq();
-    $('#stcReqCommModal').removeClass('show in').css('display','none').attr('aria-hidden','true');
+    var $modal = $('#stcReqCommModal');
+    $modal.removeClass('show in').attr('aria-hidden', 'true');
+    $modal[0].style.setProperty('display', 'none', 'important');
+    $modal[0].style.setProperty('opacity', '0', 'important');
     $('.stc-req-comm-backdrop').remove();
-    if(!$('.modal.in:visible, .modal.show:visible').length){
+    $('body').removeClass('stc-req-comm-open');
+    if(!$('.modal.in:visible, .modal.show:visible').not('#stcReqCommModal').length){
       $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
+      $('.modal-backdrop').not('.stc-req-comm-backdrop').each(function(){
+        if(!$('.modal.in:visible, .modal.show:visible').length){ $(this).remove(); }
+      });
     }
   }
   function bindCommUi(){
@@ -986,10 +1001,23 @@ if (!function_exists('stc_req_comm_render_ui')) {
         placeInboxPanel();
       }
     });
-    $(document).on('click', '#stcReqCommModal [data-dismiss="modal"], .stc-req-comm-backdrop', function(e){
+    $(document).on('click', '.stc-req-comm-close, .stc-req-comm-backdrop', function(e){
       e.preventDefault();
+      e.stopPropagation();
       closeCommModal();
       refreshInbox();
+    });
+    $(document).on('keydown.stcReqComm', function(e){
+      if((e.key === 'Escape' || e.keyCode === 27) && $('#stcReqCommModal').hasClass('show')){
+        closeCommModal();
+        refreshInbox();
+      }
+    });
+    $(document).on('click', '#stcReqCommModal', function(e){
+      if(e.target === this){
+        closeCommModal();
+        refreshInbox();
+      }
     });
     $(document).on('change', '#stcReqCommImage', function(){
       var f = this.files && this.files[0] ? this.files[0].name : '';

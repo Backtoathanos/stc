@@ -15,34 +15,19 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
+    <link href="./assets/css/stc-modal-fix.css" rel="stylesheet">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <style>
-      /* Keep other fades visible, but do not make modal backdrops solid black. */
-      .fade:not(.show):not(.modal):not(.modal-backdrop) {
-        opacity: 1;
-      }
-      .modal-backdrop {
-        z-index: 1040;
-      }
-      .modal {
-        z-index: 1055;
-      }
-      .modal-backdrop.fade.in,
-      .modal-backdrop.fade.show,
-      .stc-req-backdrop {
-        opacity: 0.45 !important;
-        z-index: 1050 !important;
-      }
       #stc-create-req-modal,
-      .bd-requisition-modal-lg {
+      .bd-requisition-modal-lg,
+      #stc-sup-requisition-rece-modal,
+      #stc-sup-requisition-item-edit-modal,
+      .bd-log-modal-lg {
         z-index: 1060 !important;
+      }
+      #stc-create-req-modal {
         overflow-x: hidden;
         overflow-y: auto;
-      }
-      #stc-create-req-modal.fade,
-      #stc-create-req-modal.fade.in,
-      #stc-create-req-modal.fade.show {
-        opacity: 1 !important;
       }
       #stc-create-req-modal .modal-dialog {
         transform: none !important;
@@ -306,6 +291,7 @@
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="./assets/scripts/stc-modal-fix.js"></script>
 
     <script>
         $(document).ready(function(){
@@ -877,37 +863,13 @@
 
 <script>
 $(document).ready(function() {
-    function stcCloseCreateReq() {
-        $('#stc-create-req-modal').removeClass('in show').hide().attr('aria-hidden', 'true');
-        $('.stc-req-backdrop').remove();
-        if (!$('.modal.in:visible, .modal.show:visible').length) {
-            $('body').removeClass('modal-open');
-            $('.modal-backdrop').not('.stc-req-backdrop').each(function(){
-                if (!$('.modal.in:visible, .modal.show:visible').length) {
-                    $(this).remove();
-                }
-            });
-        }
-    }
-    function stcOpenCreateReq() {
-        $('.stc-req-backdrop').remove();
-        $('body').append('<div class="modal-backdrop fade in show stc-req-backdrop"></div>');
-        $('body').addClass('modal-open');
-        $('#stc-create-req-modal').addClass('in show').css({ display: 'block', opacity: 1 }).attr('aria-hidden', 'false');
-    }
     $(document).on('click', '.stc-open-create-req', function(e) {
         e.preventDefault();
-        e.stopImmediatePropagation();
-        stcOpenCreateReq();
+        $('#stc-create-req-modal').modal('show');
     });
-    $(document).on('click', '.stc-close-create-req, .stc-req-backdrop', function(e) {
+    $(document).on('click', '.stc-close-create-req', function(e) {
         e.preventDefault();
-        stcCloseCreateReq();
-    });
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Escape' && $('#stc-create-req-modal').is(':visible')) {
-            stcCloseCreateReq();
-        }
+        $('#stc-create-req-modal').modal('hide');
     });
 
     // Add new item card
