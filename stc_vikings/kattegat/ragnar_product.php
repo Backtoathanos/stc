@@ -734,6 +734,55 @@ class ragnarProduct extends tesseract{
 		return $odin;
 	}
 
+	/** Rack products + stock for Add Product Supports modal (lazy-loaded). */
+	public function get_rack_products($rack_id){
+		$rack_id = (int)$rack_id;
+		if($rack_id <= 0){
+			return array('success' => false, 'html' => 'Invalid rack.', 'products' => array());
+		}
+		$sql = "
+			SELECT
+				A.`stc_purchase_product_adhoc_id`,
+				A.`stc_purchase_product_adhoc_productid`,
+				A.`stc_purchase_product_adhoc_itemdesc`,
+				A.`stc_purchase_product_adhoc_qty`,
+				A.`stc_purchase_product_adhoc_unit`,
+				IFNULL((
+					SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`)
+					FROM `stc_cust_super_requisition_list_items_rec` R
+					WHERE R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
+				), 0) AS `delivered`,
+				IFNULL((
+					SELECT SUM(G.`qty`)
+					FROM `gld_challan` G
+					WHERE G.`product_id` = A.`stc_purchase_product_adhoc_productid`
+				), 0) AS `deliveredgld`
+			FROM `stc_purchase_product_adhoc` A
+			WHERE A.`stc_purchase_product_adhoc_rackid` = '".$rack_id."'
+			  AND A.`stc_purchase_product_adhoc_status` = 1
+			ORDER BY A.`stc_purchase_product_adhoc_itemdesc` ASC
+		";
+		$res = mysqli_query($this->stc_dbs, $sql);
+		$lines = array();
+		$products = array();
+		if($res){
+			while($row = mysqli_fetch_assoc($res)){
+				$stock = (float)$row['stc_purchase_product_adhoc_qty'] - ((float)$row['delivered'] + (float)$row['deliveredgld']);
+				$desc = (string)$row['stc_purchase_product_adhoc_itemdesc'];
+				$unit = (string)$row['stc_purchase_product_adhoc_unit'];
+				$lines[] = htmlspecialchars($desc, ENT_QUOTES, 'UTF-8').' - '.$stock.'/'.htmlspecialchars($unit, ENT_QUOTES, 'UTF-8');
+				$products[] = array(
+					'id' => (int)$row['stc_purchase_product_adhoc_id'],
+					'desc' => $desc,
+					'stock' => $stock,
+					'unit' => $unit,
+				);
+			}
+		}
+		$html = count($lines) ? implode('<br>', $lines) : 'No products in this rack.';
+		return array('success' => true, 'html' => $html, 'products' => $products);
+	}
+
 	// category insert tot table
 	public function cat_in($category_name){
 		$check_loki=mysqli_query($this->stc_dbs, "SELECT * FROM `stc_category` WHERE `stc_cat_name`='".strtoupper($category_name)."'");
@@ -1227,6 +1276,14 @@ if(isset($_POST['remove_rack'])){
 	$objloki=new ragnarProduct();
 	$objlokiout=$objloki->remove_rack($id);
 	echo json_encode($objlokiout);
+}
+
+// lazy-load products for one rack (Add Product Supports page)
+if(isset($_POST['get_rack_products'])){
+	$rack_id = isset($_POST['rack_id']) ? (int)$_POST['rack_id'] : 0;
+	$objloki = new ragnarProduct();
+	echo json_encode($objloki->get_rack_products($rack_id));
+	exit;
 }
 
 // category hit

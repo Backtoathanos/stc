@@ -193,76 +193,58 @@ include("kattegat/role_check.php");
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
-                                          <table class="table table-bordered">
+                                          <table class="table table-bordered" id="stc-rack-grid">
                                             <tbody>
-                                              <?php 
+                                              <?php
                                                 include_once("../MCU/db.php");
 
-                                                $query = mysqli_query($con, "SELECT stc_rack_id, stc_rack_name FROM stc_rack ORDER BY LEFT(stc_rack_name, 1) ASC, CAST(SUBSTRING(stc_rack_name, 2) AS UNSIGNED) ASC");
-                                                $racks = [];
-
-                                                // Fetch racks into an array
-                                                while ($row = mysqli_fetch_assoc($query)) {
+                                                $query = mysqli_query($con, "SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack`");
+                                                $racks = array();
+                                                if($query){
+                                                  while($row = mysqli_fetch_assoc($query)){
                                                     $racks[] = $row;
+                                                  }
                                                 }
-
-                                                // Define a custom natural sorting function
-                                                usort($racks, function ($a, $b) {
-                                                    return strnatcmp($a['stc_rack_name'], $b['stc_rack_name']);
+                                                usort($racks, function($a, $b){
+                                                  return strnatcmp($a['stc_rack_name'], $b['stc_rack_name']);
                                                 });
-                                                $columnCount = 20; // Number of columns per row
-                                                $counter = 0; // Initialize counter
 
-                                                $data = '<tr>'; // Start the first row
-                                                foreach ($racks as $row) {
-                                                  $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_itemdesc` ASC");
-                                                  $style="style='Background-color: #ff6565;'";
-                                                  $productsContainer='';
-                                                  $remove_rack='<a href="javascript:void(0)" class="remove-rack" id="'.$row['stc_rack_id'].'"><i class="fa fa-trash"></i></a>';
-                                                  if(mysqli_num_rows($quer_nested)>0){
-                                                    foreach($quer_nested as $quer_row){
-                                                      $delivered=0;
-                                                      $sql_qry=mysqli_query($con, "
-                                                        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
-                                                        FROM `stc_cust_super_requisition_list_items_rec` 
-                                                        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$quer_row['stc_purchase_product_adhoc_id']."'
-                                                      ");
-                                                      if(mysqli_num_rows($sql_qry)>0){
-                                                        foreach($sql_qry as $sql_row){
-                                                          $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
-                                                        }
-                                                      }
-                                                      $deliveredgld=0;
-                                                      $sql_qry=mysqli_query($con, "
-                                                        SELECT `qty` FROM `gld_challan` WHERE `product_id`='".$quer_row['stc_purchase_product_adhoc_productid']."'
-                                                      ");
-                                                      if(mysqli_num_rows($sql_qry)>0){
-                                                        foreach($sql_qry as $sql_row){
-                                                          $deliveredgld+=$sql_row['qty'];
-                                                        }
-                                                      }
-                                                      $stock=$quer_row['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
-                                                      $productsContainer.=$productsContainer!=""?"</br>".$quer_row['stc_purchase_product_adhoc_itemdesc'].' - '.$stock.'/'.$quer_row['stc_purchase_product_adhoc_unit']:$quer_row['stc_purchase_product_adhoc_itemdesc'].' - '.$stock.'/'.$quer_row['stc_purchase_product_adhoc_unit'];
-                                                    }
-                                                    $style='style="Background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
-                                                    $remove_rack='';
-                                                  }
-                                                  $data .= '<td class="text-center tdclick" '.$style.'><b>' . $row['stc_rack_name'] . ' '.$remove_rack.'</b><span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
-                                                  $counter++;
-
-                                                  // Start a new row after 10 columns
-                                                  if ($counter % $columnCount == 0) {
-                                                    $data .= '</tr><tr>'; // Close current row and start a new one
+                                                $occupied = array();
+                                                $occQ = mysqli_query($con, "
+                                                  SELECT DISTINCT `stc_purchase_product_adhoc_rackid` AS `rid`
+                                                  FROM `stc_purchase_product_adhoc`
+                                                  WHERE `stc_purchase_product_adhoc_status` = 1
+                                                ");
+                                                if($occQ){
+                                                  while($or = mysqli_fetch_assoc($occQ)){
+                                                    $occupied[(int)$or['rid']] = true;
                                                   }
                                                 }
 
-                                                // Close the last row if it's not a complete set of columns
-                                                if ($counter % $columnCount != 0) {
+                                                $columnCount = 20;
+                                                $counter = 0;
+                                                $data = '<tr>';
+                                                foreach($racks as $row){
+                                                  $rid = (int)$row['stc_rack_id'];
+                                                  $rname = htmlspecialchars($row['stc_rack_name'], ENT_QUOTES, 'UTF-8');
+                                                  $hasItems = isset($occupied[$rid]);
+                                                  if($hasItems){
+                                                    $style = 'style="background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
+                                                    $remove_rack = '';
+                                                  }else{
+                                                    $style = 'style="background-color:#ff6565;"';
+                                                    $remove_rack = '<a href="javascript:void(0)" class="remove-rack" id="'.$rid.'"><i class="fa fa-trash"></i></a>';
+                                                  }
+                                                  $data .= '<td class="text-center tdclick" data-rack-id="'.$rid.'" '.$style.'><b>'.$rname.' '.$remove_rack.'</b></td>';
+                                                  $counter++;
+                                                  if($counter % $columnCount == 0){
+                                                    $data .= '</tr><tr>';
+                                                  }
+                                                }
+                                                if($counter % $columnCount != 0){
                                                   $data .= '</tr>';
                                                 }
-
                                                 echo $data;
-
                                               ?>
                                             </tbody>
                                           </table>
@@ -307,48 +289,68 @@ include("kattegat/role_check.php");
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
-    <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script>
         $(document).ready(function(){
-          // Attach event handler
-          $('body').on('click', '.tdclick', function (e) {
-              e.preventDefault();
-              var rack_name=$(this).find('b').html();
-              // Retrieve the text from the .tdspanproducts element
-              var products_name = $(this).find('.tdspanproducts').html();
+          var rackProductCache = {};
 
-              // Update the .showproducts element's content
-              $('.showrack_name').html('<b>' + rack_name + '</b>');
-              $('.showproducts').html(products_name);
+          $('body').on('click', '.tdclick', function (e) {
+              if($(e.target).closest('.remove-rack').length){ return; }
+              e.preventDefault();
+              var $td = $(this);
+              var rackId = $td.data('rack-id');
+              var rack_name = $td.find('b').clone().children().remove().end().text().trim();
+              $('.showrack_name').html('<b>' + $('<div>').text(rack_name).html() + '</b>');
+
+              if(!$td.attr('data-toggle')){
+                $('.showproducts').html('No products in this rack.');
+                return;
+              }
+
+              if(rackProductCache[rackId]){
+                $('.showproducts').html(rackProductCache[rackId]);
+                return;
+              }
+
+              $('.showproducts').html('Loading...');
+              $.ajax({
+                url: "kattegat/ragnar_product.php",
+                method: "POST",
+                data: { get_rack_products: 1, rack_id: rackId },
+                dataType: "JSON",
+                success: function(res){
+                  var html = (res && res.html) ? res.html : 'Failed to load products.';
+                  rackProductCache[rackId] = html;
+                  $('.showproducts').html(html);
+                },
+                error: function(){
+                  $('.showproducts').html('Failed to load products.');
+                }
+              });
           });
 
           $('body').on('click', '.remove-rack', function (e) {
               e.preventDefault();
+              e.stopPropagation();
 
-              const id = $(this).attr('id'); // Get the rack ID
-              const rack = $(this); // Reference to the clicked button/link
+              const id = $(this).attr('id');
+              const rack = $(this);
 
-              // Confirm with the user before removing the rack
               if (!confirm("Are you sure you want to remove this rack?")) {
                   return;
               }
 
-              // Make the AJAX call
               $.ajax({
                   url: "kattegat/ragnar_product.php",
                   method: "POST",
                   data: { remove_rack: 1, id: id },
                   dataType: "JSON",
-                  success: function (response) {
-                    // Notify the user and remove the rack element
+                  success: function () {
                     alert('Rack removed successfully.');
                     rack.closest('td').remove();
                   }
               });
           });
 
-
-          // rack directions
           $('.stc-rack-form').on('submit', function(e){
             e.preventDefault();
             $.ajax({
@@ -362,12 +364,11 @@ include("kattegat/role_check.php");
                 $('#rackshow').html(argument);
                 $("#rackshow").show().delay(3000).fadeOut();
                 $('.stc-rack-form')[0].reset();
-                stc_product_reload();
+                setTimeout(function(){ location.reload(); }, 800);
               }
-            });   
+            });
           });
 
-          // category direction
           $('.stc-add-category-form').on('submit', function(e){
             e.preventDefault();
             $.ajax({
@@ -381,12 +382,10 @@ include("kattegat/role_check.php");
                 $('#carshow').html(argument);
                 $("#carshow").show().delay(3000).fadeOut();
                 $('.stc-add-category-form')[0].reset();
-                stc_product_reload();
               }
-            });   
+            });
           });
 
-          // sub category direction
           $('.stc-sub-category-form').on('submit', function(e){
             e.preventDefault();
             $.ajax({
@@ -400,12 +399,10 @@ include("kattegat/role_check.php");
                 $('#subcatshow').html(argument);
                 $("#subcatshow").show().delay(3000).fadeOut();
                 $('.stc-sub-category-form')[0].reset();
-                stc_product_reload();
               }
-            });   
-          }); 
+            });
+          });
 
-          // brand direction
           $('.stc-brand-form').on('submit', function(e){
             e.preventDefault();
             $.ajax({
@@ -419,10 +416,9 @@ include("kattegat/role_check.php");
                 $('#brandshow').html(argument);
                 $("#brandshow").show().delay(3000).fadeOut();
                 $('.stc-brand-form')[0].reset();
-                stc_product_reload();
               }
-            });   
-          }); 
+            });
+          });
         });
     </script>
 </body>
