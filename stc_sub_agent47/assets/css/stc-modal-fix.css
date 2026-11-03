@@ -1,7 +1,9 @@
 /**
- * Bootstrap 3 JS (.in) + theme CSS that expects Bootstrap 4 (.show)
- * Keep every modal visible above its backdrop.
+ * Directory-wide modal fix for stc_sub_agent47
+ * Theme CSS expects Bootstrap 4 (.show); some pages also load BS3 habits (.in).
+ * Never force opacity with !important — that causes close blink.
  */
+
 .fade:not(.show):not(.in):not(.modal):not(.modal-backdrop) {
   opacity: 1;
 }
@@ -14,41 +16,39 @@
   z-index: 1040;
 }
 
-.modal.fade.in,
+/* Open: visible. Closed: let Bootstrap fade — no !important */
 .modal.fade.show,
-.modal.in,
-.modal.show {
-  opacity: 1 !important;
+.modal.fade.in {
+  opacity: 1;
 }
 
-.modal.fade.in .modal-dialog,
+.modal.fade {
+  transition: opacity 0.15s linear;
+}
+
 .modal.fade.show .modal-dialog,
-.modal.in .modal-dialog,
-.modal.show .modal-dialog {
-  transform: none !important;
-  -webkit-transform: none !important;
-  pointer-events: auto !important;
+.modal.fade.in .modal-dialog {
+  transform: none;
+  -webkit-transform: none;
+  pointer-events: auto;
 }
 
-.modal-backdrop.fade.in,
+.modal-backdrop.fade {
+  transition: opacity 0.15s linear;
+}
+
 .modal-backdrop.fade.show,
-.modal-backdrop.in,
-.modal-backdrop.show {
-  opacity: 0.45 !important;
-  z-index: 1050 !important;
+.modal-backdrop.fade.in {
+  opacity: 0.45;
+  z-index: 1050;
 }
 
 .modal-content {
   background: #fff;
-  opacity: 1;
 }
 
-/* Chat / custom high-z modals own their backdrop — do not raise all backdrops */
+/* Chat uses its own backdrop layer */
 .stc-req-comm-backdrop {
   z-index: 20040 !important;
-  opacity: 0.45 !important;
-}
-
-body.stc-req-comm-open .stc-req-comm-backdrop {
-  z-index: 20040 !important;
+  opacity: 0.45;
 }

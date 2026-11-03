@@ -878,3 +878,59 @@ label.valid {
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* === stc-modal-fix (directory-wide) === */
+/**
+ * Directory-wide modal fix for stc_sub_agent47
+ * Theme CSS expects Bootstrap 4 (.show); some pages also load BS3 habits (.in).
+ * Never force opacity with !important — that causes close blink.
+ */
+
+.fade:not(.show):not(.in):not(.modal):not(.modal-backdrop) {
+  opacity: 1;
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+/* Open: visible. Closed: let Bootstrap fade — no !important */
+.modal.fade.show,
+.modal.fade.in {
+  opacity: 1;
+}
+
+.modal.fade {
+  transition: opacity 0.15s linear;
+}
+
+.modal.fade.show .modal-dialog,
+.modal.fade.in .modal-dialog {
+  transform: none;
+  -webkit-transform: none;
+  pointer-events: auto;
+}
+
+.modal-backdrop.fade {
+  transition: opacity 0.15s linear;
+}
+
+.modal-backdrop.fade.show,
+.modal-backdrop.fade.in {
+  opacity: 0.45;
+  z-index: 1050;
+}
+
+.modal-content {
+  background: #fff;
+}
+
+/* Chat uses its own backdrop layer */
+.stc-req-comm-backdrop {
+  z-index: 20040 !important;
+  opacity: 0.45;
+}

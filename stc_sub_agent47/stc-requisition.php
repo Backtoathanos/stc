@@ -38,7 +38,6 @@
       }
       #stc-create-req-modal .modal-content {
         background: #fff !important;
-        opacity: 1 !important;
         border: 0;
         border-radius: 10px;
         box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
