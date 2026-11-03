@@ -247,3 +247,27 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="stc-comm-modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#075e54;color:#fff;">
+        <div>
+          <h4 class="modal-title mb-0" id="stcCommModalTitle">Chat</h4>
+          <small id="stcCommModalMeta" style="opacity:.9;"></small>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;opacity:1;"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body p-0">
+        <input type="hidden" id="stcCommItemId" value="">
+        <div id="stcCommThread"></div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-danger stc-comm-del-thread-btn" id="stcCommDeleteThreadBtn" data-req-item-id="">
+          <i class="fas fa-trash"></i> Delete whole chat
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

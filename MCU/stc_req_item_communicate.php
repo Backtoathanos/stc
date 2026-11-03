@@ -150,10 +150,64 @@ if (!function_exists('stc_req_comm_mark_seen')) {
 }
 
 if (!function_exists('stc_req_comm_inbox')) {
-    function stc_req_comm_inbox($db, $actor){
+    function stc_req_comm_inbox($db, $actor, $opts = array()){
         stc_req_comm_ensure_table($db);
         $userType = mysqli_real_escape_string($db, (string)$actor['user_type']);
         $createdBy = (int)$actor['created_by'];
+        $isAdmin = (strcasecmp((string)$actor['user_type'], 'vikings') === 0);
+        $showAll = $isAdmin && !empty($opts['all']);
+        $limit = isset($opts['limit']) ? (int)$opts['limit'] : ($showAll ? 15 : 40);
+        $offset = isset($opts['offset']) ? (int)$opts['offset'] : 0;
+        if($limit < 1){ $limit = 15; }
+        if($limit > 50){ $limit = 50; }
+        if($offset < 0){ $offset = 0; }
+
+        $unreadWhere = "
+            WHERE C.`status`=1
+              AND (S.`id` IS NULL OR S.`last_seen_id` < C.`id`)
+              AND NOT (C.`user_type`='".$userType."' AND C.`created_by`='".$createdBy."')
+        ";
+        $unreadCnt = 0;
+        $uq = mysqli_query($db, "
+            SELECT COUNT(*) AS c
+            FROM `stc_req_item_communicate` C
+            INNER JOIN (
+                SELECT `req_item_id`, MAX(`id`) AS max_id
+                FROM `stc_req_item_communicate`
+                WHERE `status`=1
+                GROUP BY `req_item_id`
+            ) L ON L.`req_item_id`=C.`req_item_id` AND L.`max_id`=C.`id`
+            LEFT JOIN `stc_req_item_communicate_seen` S
+                ON S.`req_item_id`=C.`req_item_id`
+                AND S.`user_type`='".$userType."'
+                AND S.`created_by`='".$createdBy."'
+            ".$unreadWhere."
+        ");
+        if($uq && ($ur = mysqli_fetch_assoc($uq))){
+            $unreadCnt = (int)($ur['c'] ?? 0);
+        }
+
+        $listWhere = $showAll
+            ? "WHERE C.`status`=1"
+            : $unreadWhere;
+        $total = $showAll ? 0 : $unreadCnt;
+        if($showAll){
+            $tq = mysqli_query($db, "
+                SELECT COUNT(*) AS c
+                FROM `stc_req_item_communicate` C
+                INNER JOIN (
+                    SELECT `req_item_id`, MAX(`id`) AS max_id
+                    FROM `stc_req_item_communicate`
+                    WHERE `status`=1
+                    GROUP BY `req_item_id`
+                ) L ON L.`req_item_id`=C.`req_item_id` AND L.`max_id`=C.`id`
+                WHERE C.`status`=1
+            ");
+            if($tq && ($tr = mysqli_fetch_assoc($tq))){
+                $total = (int)($tr['c'] ?? 0);
+            }
+        }
+
         $out = array();
         $q = mysqli_query($db, "
             SELECT
@@ -164,7 +218,11 @@ if (!function_exists('stc_req_comm_inbox')) {
                 C.`image_url`,
                 C.`issue_type`,
                 C.`username`,
+                C.`user_type`,
+                C.`created_by`,
                 C.`created_date`,
+                S.`id` AS seen_id,
+                S.`last_seen_id`,
                 I.`stc_cust_super_requisition_list_items_title` AS item_title,
                 P.`stc_cust_project_title` AS project_title
             FROM `stc_req_item_communicate` C
@@ -184,14 +242,17 @@ if (!function_exists('stc_req_comm_inbox')) {
                 ON RL.`stc_cust_super_requisition_list_id`=C.`req_id`
             LEFT JOIN `stc_cust_project` P
                 ON P.`stc_cust_project_id`=RL.`stc_cust_super_requisition_list_project_id`
-            WHERE C.`status`=1
-              AND (S.`id` IS NULL OR S.`last_seen_id` < C.`id`)
-              AND NOT (C.`user_type`='".$userType."' AND C.`created_by`='".$createdBy."')
+            ".$listWhere."
             ORDER BY C.`id` DESC
-            LIMIT 40
+            LIMIT ".$limit." OFFSET ".$offset."
         ");
         if($q){
             while($row = mysqli_fetch_assoc($q)){
+                $mine = (strcasecmp((string)$row['user_type'], (string)$actor['user_type']) === 0)
+                    && ((int)$row['created_by'] === (int)$actor['created_by']);
+                $isNew = !$mine && (
+                    empty($row['seen_id']) || ((int)$row['last_seen_id'] < (int)$row['id'])
+                );
                 $out[] = array(
                     'id' => (int)$row['id'],
                     'req_item_id' => (int)$row['req_item_id'],
@@ -204,10 +265,20 @@ if (!function_exists('stc_req_comm_inbox')) {
                     'item_title' => (string)($row['item_title'] ?? ''),
                     'project_title' => (string)($row['project_title'] ?? ''),
                     'created_date' => date('d-m-Y h:i A', strtotime($row['created_date'])),
+                    'is_new' => $isNew ? 1 : 0,
                 );
             }
         }
-        return $out;
+        return array(
+            'mode' => $showAll ? 'all' : 'new',
+            'is_admin' => $isAdmin ? 1 : 0,
+            'unread_count' => $unreadCnt,
+            'total' => $total,
+            'limit' => $limit,
+            'offset' => $offset,
+            'has_more' => ($offset + count($out)) < $total ? 1 : 0,
+            'items' => $out,
+        );
     }
 }
 
@@ -527,8 +598,25 @@ if (!function_exists('stc_req_comm_handle_request')) {
         $action = isset($_POST['stc_req_comm_action']) ? strtolower(trim((string)$_POST['stc_req_comm_action'])) : '';
         $reqItemId = isset($_POST['req_item_id']) ? (int)$_POST['req_item_id'] : 0;
         if($action === 'inbox'){
-            $items = stc_req_comm_inbox($db, $actor);
-            echo json_encode(array('ok' => true, 'count' => count($items), 'items' => $items));
+            $isAdmin = (strcasecmp((string)$actor['user_type'], 'vikings') === 0);
+            $opts = array(
+                'all' => $isAdmin ? 1 : 0,
+                'limit' => isset($_POST['limit']) ? (int)$_POST['limit'] : ($isAdmin ? 15 : 40),
+                'offset' => isset($_POST['offset']) ? (int)$_POST['offset'] : 0,
+            );
+            $inbox = stc_req_comm_inbox($db, $actor, $opts);
+            echo json_encode(array(
+                'ok' => true,
+                'count' => (int)$inbox['unread_count'],
+                'unread_count' => (int)$inbox['unread_count'],
+                'total' => (int)$inbox['total'],
+                'has_more' => (int)$inbox['has_more'],
+                'mode' => (string)$inbox['mode'],
+                'is_admin' => (int)$inbox['is_admin'],
+                'limit' => (int)$inbox['limit'],
+                'offset' => (int)$inbox['offset'],
+                'items' => $inbox['items'],
+            ));
             exit;
         }
         if($action === 'list'){
@@ -639,19 +727,21 @@ if (!function_exists('stc_req_comm_render_ui')) {
     line-height:18px;text-align:center;
   }
   .stc-req-comm-inbox-panel{
-    position:fixed;width:400px;max-width:calc(100vw - 24px);max-height:420px;
+    position:fixed;width:420px;max-width:calc(100vw - 24px);max-height:520px;
     overflow:hidden;z-index:20070;background:#fff;border:1px solid #e5e7eb;
     border-radius:12px;box-shadow:0 16px 40px rgba(15,23,42,.18);
     white-space:normal;text-align:left;font-family:inherit;
+    display:flex;flex-direction:column;
   }
   .stc-req-comm-inbox-head{
-    padding:12px 14px;background:#075e54;color:#fff;font-weight:700;font-size:14px;
+    padding:12px 14px;background:#075e54;color:#fff;font-weight:700;font-size:14px;flex-shrink:0;
   }
-  .stc-req-comm-inbox-list{max-height:370px;overflow-y:auto;}
+  .stc-req-comm-inbox-list{max-height:400px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   .stc-req-comm-inbox-item{
     display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
     border-bottom:1px solid #f1f5f9;color:#1f2937;text-decoration:none;background:#fff;
   }
+  .stc-req-comm-inbox-item.is-new{background:#fff8f0;}
   .stc-req-comm-inbox-item:last-child{border-bottom:0;}
   .stc-req-comm-inbox-item:hover{background:#f0fdf8;color:#1f2937;text-decoration:none;}
   .stc-req-comm-inbox-ico{
@@ -660,6 +750,11 @@ if (!function_exists('stc_req_comm_render_ui')) {
   }
   .stc-req-comm-inbox-body{min-width:0;flex:1;}
   .stc-req-comm-inbox-title{font-size:13px;font-weight:700;line-height:1.35;word-break:break-word;}
+  .stc-req-comm-inbox-title .stc-req-comm-new-badge{
+    display:inline-block;vertical-align:middle;margin-left:6px;
+    background:#e74c3c;color:#fff;border-radius:3px;padding:1px 6px;
+    font-size:10px;font-weight:700;letter-spacing:.3px;line-height:1.4;
+  }
   .stc-req-comm-inbox-meta,.stc-req-comm-inbox-msg,.stc-req-comm-inbox-foot{
     display:block;font-size:12px;color:#667781;margin-top:3px;word-break:break-word;
   }
@@ -669,6 +764,12 @@ if (!function_exists('stc_req_comm_render_ui')) {
     padding:1px 6px;font-size:10px;font-weight:700;margin-right:6px;
   }
   .stc-req-comm-inbox-empty{padding:28px 16px;text-align:center;color:#7b8794;font-size:13px;}
+  .stc-req-comm-inbox-more{
+    display:block;width:100%;border:0;border-top:1px solid #eef2f7;background:#f8fafc;
+    color:#075e54;font-weight:700;font-size:13px;padding:12px 14px;cursor:pointer;flex-shrink:0;
+  }
+  .stc-req-comm-inbox-more:hover{background:#eef8f5;}
+  .stc-req-comm-inbox-more[disabled]{opacity:.6;cursor:wait;}
   .stc-req-comm-inbox-btn.stc-req-comm-has-new{border-color:#f5c6cb;background:#fff5f5;}
   .stc-req-comm-inbox-btn.stc-req-comm-has-new i{color:#e74c3c;}
 </style>
@@ -706,55 +807,99 @@ if (!function_exists('stc_req_comm_render_ui')) {
       $('#stcReqCommThread').html('<div class="stc-req-comm-empty">Could not load messages.</div>');
     });
   }
-  function renderInbox(items){
+  var inboxState = { items: [], offset: 0, limit: 15, hasMore: 0, mode: 'new', unread: 0, loading: false };
+  function inboxItemHtml(it){
+    var preview = it.message ? it.message : (it.image_url ? 'Photo attached' : 'New message');
+    var tag = it.issue_label ? '<span class="stc-req-comm-inbox-tag">'+esc(it.issue_label)+'</span>' : '';
+    var isNew = parseInt(it.is_new, 10) === 1;
+    var newBadge = isNew ? ' <span class="stc-req-comm-new-badge">NEW</span>' : '';
+    return '<a href="#" class="stc-req-comm-inbox-item stc-req-comm-open'+(isNew ? ' is-new' : '')+'"'
+      + ' data-req-item-id="'+esc(it.req_item_id)+'"'
+      + ' data-req-id="'+esc(it.req_id)+'"'
+      + ' data-item-title="'+esc(it.item_title || '')+'">'
+      + '<div class="stc-req-comm-inbox-ico"><i class="fa fa-comments"></i></div>'
+      + '<div class="stc-req-comm-inbox-body">'
+      + '<div class="stc-req-comm-inbox-title">'+esc(it.item_title || ('Item #'+it.req_item_id))+newBadge+'</div>'
+      + '<div class="stc-req-comm-inbox-meta">Req# '+esc(it.req_id)+' · '+esc(it.project_title || '-')+'</div>'
+      + '<div class="stc-req-comm-inbox-msg">'+esc(preview)+'</div>'
+      + '<div class="stc-req-comm-inbox-foot">'+tag+esc(it.username)+' · '+esc(it.created_date)+'</div>'
+      + '</div></a>';
+  }
+  function syncUnreadMarks(items){
+    var $ = jq();
+    $('.stc-req-comm-open').removeClass('has-unread');
+    (items || []).forEach(function(it){
+      if(parseInt(it.is_new, 10) === 1){
+        $('.stc-req-comm-open[data-req-item-id="'+it.req_item_id+'"]').addClass('has-unread');
+      }
+    });
+  }
+  function paintInboxPanel(keepScroll){
+    var $ = jq();
+    var $panel = $('#stcReqCommInboxPanel');
+    if(!$panel.length) return;
+    var $list = $panel.find('.stc-req-comm-inbox-list');
+    var scrollTop = keepScroll && $list.length ? $list.scrollTop() : 0;
+    var items = inboxState.items || [];
+    var head = inboxState.mode === 'all' ? 'All requisition messages' : 'New requisition messages';
+    var html = '<div class="stc-req-comm-inbox-head">'+head+'</div><div class="stc-req-comm-inbox-list">';
+    if(!items.length){
+      html += '<div class="stc-req-comm-inbox-empty">'+(inboxState.mode === 'all' ? 'No requisition messages yet.' : 'No new requisition messages.')+'</div>';
+    }else{
+      items.forEach(function(it){ html += inboxItemHtml(it); });
+    }
+    html += '</div>';
+    if(inboxState.mode === 'all' && parseInt(inboxState.hasMore, 10) === 1){
+      html += '<button type="button" class="stc-req-comm-inbox-more" id="stcReqCommInboxMore">Show more</button>';
+    }
+    $panel.html(html);
+    if(keepScroll){
+      $panel.find('.stc-req-comm-inbox-list').scrollTop(scrollTop);
+    }
+    syncUnreadMarks(items);
+  }
+  function renderInbox(res, append){
     var $ = jq();
     var $badge = $('#stcReqCommInboxBadge');
     var $btn = $('#stcReqCommInboxBtn');
-    var $panel = $('#stcReqCommInboxPanel');
     if(!$badge.length) return;
-    var count = items && items.length ? items.length : 0;
-    if(count > 0){
-      $badge.text(count > 99 ? '99+' : count).show();
+    var items = (res && res.items) ? res.items : [];
+    var unread = parseInt((res && (res.unread_count != null ? res.unread_count : res.count)) || 0, 10) || 0;
+    inboxState.mode = (res && res.mode) ? res.mode : 'new';
+    inboxState.limit = parseInt((res && res.limit) || inboxState.limit, 10) || 15;
+    inboxState.hasMore = parseInt((res && res.has_more) || 0, 10) || 0;
+    inboxState.unread = unread;
+    if(append){
+      inboxState.items = (inboxState.items || []).concat(items);
+      inboxState.offset = inboxState.items.length;
+    }else{
+      inboxState.items = items;
+      inboxState.offset = items.length;
+    }
+    if(unread > 0){
+      $badge.text(unread > 99 ? '99+' : unread).show();
       $btn.addClass('stc-req-comm-has-new');
     }else{
       $badge.hide();
       $btn.removeClass('stc-req-comm-has-new');
     }
-    var html = '<div class="stc-req-comm-inbox-head">New requisition messages</div><div class="stc-req-comm-inbox-list">';
-    if(!count){
-      html += '<div class="stc-req-comm-inbox-empty">No new requisition messages.</div>';
-    }else{
-      items.forEach(function(it){
-        var preview = it.message ? it.message : (it.image_url ? 'Photo attached' : 'New message');
-        var tag = it.issue_label ? '<span class="stc-req-comm-inbox-tag">'+esc(it.issue_label)+'</span>' : '';
-        html += '<a href="#" class="stc-req-comm-inbox-item stc-req-comm-open"'
-          + ' data-req-item-id="'+esc(it.req_item_id)+'"'
-          + ' data-req-id="'+esc(it.req_id)+'"'
-          + ' data-item-title="'+esc(it.item_title || '')+'">'
-          + '<div class="stc-req-comm-inbox-ico"><i class="fa fa-comments"></i></div>'
-          + '<div class="stc-req-comm-inbox-body">'
-          + '<div class="stc-req-comm-inbox-title">'+esc(it.item_title || ('Item #'+it.req_item_id))+'</div>'
-          + '<div class="stc-req-comm-inbox-meta">Req# '+esc(it.req_id)+' · '+esc(it.project_title || '-')+'</div>'
-          + '<div class="stc-req-comm-inbox-msg">'+esc(preview)+'</div>'
-          + '<div class="stc-req-comm-inbox-foot">'+tag+esc(it.username)+' · '+esc(it.created_date)+'</div>'
-          + '</div></a>';
-      });
-    }
-    html += '</div>';
-    $panel.html(html);
-    $('.stc-req-comm-open').removeClass('has-unread');
-    if(count){
-      items.forEach(function(it){
-        $('.stc-req-comm-open[data-req-item-id="'+it.req_item_id+'"]').addClass('has-unread');
-      });
-    }
+    paintInboxPanel(!!append);
   }
-  function refreshInbox(){
+  function refreshInbox(append){
     var $ = jq();
-    if(!$('#stcReqCommInbox').length) return;
-    $.post(apiUrl, { stc_req_comm_action:'inbox' }, function(res){
-      if(res && res.ok){ renderInbox(res.items || []); }
-    }, 'json');
+    if(!$('#stcReqCommInbox').length || inboxState.loading) return;
+    var offset = append ? (inboxState.offset || 0) : 0;
+    var limit = inboxState.limit || 15;
+    inboxState.loading = true;
+    if(append){ $('#stcReqCommInboxMore').prop('disabled', true).text('Loading...'); }
+    $.post(apiUrl, { stc_req_comm_action:'inbox', limit: limit, offset: offset }, function(res){
+      inboxState.loading = false;
+      if(res && res.ok){ renderInbox(res, !!append); }
+      else if(append){ $('#stcReqCommInboxMore').prop('disabled', false).text('Show more'); }
+    }, 'json').fail(function(){
+      inboxState.loading = false;
+      if(append){ $('#stcReqCommInboxMore').prop('disabled', false).text('Show more'); }
+    });
   }
   function openCommModal(){
     var $ = jq();
@@ -801,7 +946,7 @@ if (!function_exists('stc_req_comm_render_ui')) {
       if(!$btn.length || !$panel.length) return;
       $panel.appendTo('body');
       var r = $btn[0].getBoundingClientRect();
-      var width = Math.min(400, window.innerWidth - 24);
+      var width = Math.min(420, window.innerWidth - 24);
       var left = Math.min(window.innerWidth - width - 12, Math.max(12, r.right - width));
       $panel.css({
         position: 'fixed',
@@ -809,7 +954,7 @@ if (!function_exists('stc_req_comm_render_ui')) {
         left: left + 'px',
         right: 'auto',
         width: width + 'px',
-        display: 'block'
+        display: 'flex'
       });
     }
     $(document).on('click', '#stcReqCommInboxBtn', function(e){
@@ -819,8 +964,14 @@ if (!function_exists('stc_req_comm_render_ui')) {
       if($panel.is(':visible')){
         $panel.hide();
       }else{
+        refreshInbox(false);
         placeInboxPanel();
       }
+    });
+    $(document).on('click', '#stcReqCommInboxMore', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      refreshInbox(true);
     });
     $(document).on('click', function(e){
       if(!$(e.target).closest('#stcReqCommInbox, #stcReqCommInboxPanel').length){

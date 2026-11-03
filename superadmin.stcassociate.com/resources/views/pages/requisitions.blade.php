@@ -6,12 +6,33 @@
   <title>STC Associates | {{!empty($page_title) ? $page_title : ''}}</title>
   @include('layouts.head')
   <style>
-    #example1 thead, #req-items thead, #req-itemsdis thead, #req-combiner thead, #req-combinerreq thead, #req-itemlog thead, #req-recsup thead{
+    #example1 thead, #req-items thead, #req-itemsdis thead, #req-combiner thead, #req-combinerreq thead, #req-itemlog thead, #req-recsup thead, #req-comm thead{
         background: white;
         position: sticky;
         top: 0;
     }
     .nav-tabs .nav-link { white-space: nowrap; }
+    .stc-comm-filters .form-group { margin-bottom: 10px; }
+    .stc-comm-filters label { font-weight: 600; font-size: 12px; margin-bottom: 2px; }
+    #stcCommThread{
+      height: 420px; overflow-y: auto; padding: 14px 12px; background: #ece5dd;
+    }
+    .stc-comm-row{display:flex;margin-bottom:10px;}
+    .stc-comm-bubble{
+      max-width:82%;padding:8px 10px;border-radius:8px;background:#fff;
+      box-shadow:0 1px 1px rgba(0,0,0,.08);word-break:break-word;position:relative;
+    }
+    .stc-comm-meta{font-size:11px;color:#667781;margin-bottom:3px;}
+    .stc-comm-tag{
+      display:inline-block;background:#f39c12;color:#fff;border-radius:3px;
+      padding:1px 6px;font-size:10px;margin-bottom:4px;
+    }
+    .stc-comm-bubble img{max-width:220px;max-height:220px;display:block;margin-top:6px;border-radius:6px;}
+    .stc-comm-del{
+      position:absolute;top:6px;right:6px;border:0;background:transparent;color:#c0392b;
+      font-size:12px;padding:2px 4px;cursor:pointer;
+    }
+    .stc-comm-empty{text-align:center;color:#667781;padding:40px 10px;}
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -71,6 +92,9 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" id="recsup-tab" data-toggle="pill" href="#recsup" role="tab">Received</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="comm-tab" data-toggle="pill" href="#comm" role="tab">Chat</a>
               </li>
             </ul>
             <div class="tab-content" id="custom-content-below-tabContent">
@@ -239,6 +263,74 @@
                               <th class="text-center">Date</th>
                               <th class="text-center">Req Item ID</th>
                               <th class="text-center">Quantity</th>
+                              <th class="text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane" id="comm" role="tabpanel">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="row stc-comm-filters">
+                          <div class="col-md-3">
+                            <div class="form-group">
+                              <label>Site name</label>
+                              <input type="text" class="form-control form-control-sm" id="comm-filter-site" placeholder="Site / project">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-group">
+                              <label>Req / Item ID</label>
+                              <input type="text" class="form-control form-control-sm" id="comm-filter-req" placeholder="Req or item id">
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="form-group">
+                              <label>Item name</label>
+                              <input type="text" class="form-control form-control-sm" id="comm-filter-item" placeholder="Item description">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-group">
+                              <label>User</label>
+                              <input type="text" class="form-control form-control-sm" id="comm-filter-user" placeholder="Username">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-group">
+                              <label>Issue</label>
+                              <select class="form-control form-control-sm" id="comm-filter-issue">
+                                <option value="all">All</option>
+                                <option value="wrong_material">Wrong Material</option>
+                                <option value="fault_material">Fault Material</option>
+                                <option value="general">Message</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                          <button type="button" class="btn btn-primary btn-sm" id="comm-filter-btn"><i class="fas fa-search"></i> Filter</button>
+                          <button type="button" class="btn btn-secondary btn-sm" id="comm-filter-reset">Reset</button>
+                        </div>
+                        <table id="req-comm" class="table table-bordered table-striped">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Site</th>
+                              <th class="text-center">Req#</th>
+                              <th class="text-center">Item</th>
+                              <th class="text-center">Last message</th>
+                              <th class="text-center">By</th>
+                              <th class="text-center">Issue</th>
+                              <th class="text-center">Msgs</th>
+                              <th class="text-center">Date</th>
                               <th class="text-center">Action</th>
                             </tr>
                           </thead>
@@ -467,6 +559,164 @@
       { data: 'stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty' },
       { data: 'actionData' }
     ], 4);
+
+    if ($.fn.DataTable.isDataTable('#req-comm')) {
+      $('#req-comm').DataTable().destroy();
+    }
+    var commTable = $('#req-comm').DataTable({
+      processing: true,
+      serverSide: true,
+      responsive: true,
+      lengthChange: true,
+      autoWidth: false,
+      order: [[7, 'desc']],
+      ajax: {
+        url: "{{ url('/branch/stc/requisitions/commlist') }}",
+        data: function(d){
+          d.site = $('#comm-filter-site').val() || '';
+          d.item = $('#comm-filter-item').val() || '';
+          d.req_id = $('#comm-filter-req').val() || '';
+          d.user = $('#comm-filter-user').val() || '';
+          d.issue_type = $('#comm-filter-issue').val() || 'all';
+        }
+      },
+      columns: [
+        { data: 'site_name' },
+        { data: 'req_id', className: 'text-center' },
+        { data: 'item_title' },
+        { data: 'message' },
+        { data: 'username' },
+        { data: 'issue_label', className: 'text-center' },
+        { data: 'msg_count', className: 'text-center' },
+        { data: 'created_date', className: 'text-center' },
+        { data: 'actionData' }
+      ],
+      columnDefs: [
+        { targets: 8, orderable: false, className: 'text-center text-nowrap' }
+      ],
+      dom: 'Bfrtip',
+      buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    });
+    commTable.buttons().container().appendTo('#req-comm_wrapper .col-md-6:eq(0)');
+
+    $('#comm-filter-btn').on('click', function(){ reloadDt('#req-comm'); });
+    $('#comm-filter-reset').on('click', function(){
+      $('#comm-filter-site, #comm-filter-item, #comm-filter-req, #comm-filter-user').val('');
+      $('#comm-filter-issue').val('all');
+      reloadDt('#req-comm');
+    });
+    $('#comm-filter-site, #comm-filter-item, #comm-filter-req, #comm-filter-user').on('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); reloadDt('#req-comm'); }
+    });
+
+    function escHtml(s){
+      return $('<div>').text(s == null ? '' : String(s)).html();
+    }
+    function renderCommThread(messages){
+      if(!messages || !messages.length){
+        return '<div class="stc-comm-empty">No messages in this chat.</div>';
+      }
+      var html = '';
+      messages.forEach(function(m){
+        var tag = m.issue_label ? '<div class="stc-comm-tag">'+escHtml(m.issue_label)+'</div>' : '';
+        var text = m.message ? '<div>'+escHtml(m.message).replace(/\n/g,'<br>')+'</div>' : '';
+        var img = m.image_url ? '<a href="'+escHtml(m.image_url)+'" target="_blank"><img src="'+escHtml(m.image_url)+'" alt="photo"></a>' : '';
+        html += '<div class="stc-comm-row" data-msg-id="'+escHtml(m.id)+'">'
+          + '<div class="stc-comm-bubble">'
+          + '<button type="button" class="stc-comm-del" title="Remove message" data-id="'+escHtml(m.id)+'"><i class="fas fa-trash"></i></button>'
+          + '<div class="stc-comm-meta"><b>'+escHtml(m.username)+'</b> · '+escHtml(m.user_type)+' · '+escHtml(m.created_date)+'</div>'
+          + tag + text + img
+          + '</div></div>';
+      });
+      return html;
+    }
+    function openCommModal(reqItemId, fallbackTitle, fallbackSite, fallbackReqId){
+      $('#stcCommItemId').val(reqItemId);
+      $('#stcCommDeleteThreadBtn').attr('data-req-item-id', reqItemId);
+      $('#stcCommThread').html('<div class="stc-comm-empty">Loading...</div>');
+      $('#stcCommModalMeta').text('Loading…');
+      $('#stc-comm-modal').modal('show');
+      $.ajax({
+        type: 'GET',
+        url: "{{ url('/branch/stc/requisitions/commthread') }}",
+        data: { req_item_id: reqItemId },
+        success: function(res){
+          if(!(res && res.success && res.data)){
+            $('#stcCommThread').html('<div class="stc-comm-empty">'+(res && res.message ? escHtml(res.message) : 'Failed to load chat.')+'</div>');
+            return;
+          }
+          var d = res.data;
+          var title = d.item_title || fallbackTitle || ('Item #'+reqItemId);
+          var site = d.site_name || fallbackSite || '—';
+          var reqId = d.req_id || fallbackReqId || 0;
+          $('#stcCommModalTitle').text(title);
+          $('#stcCommModalMeta').text('Site: '+site+' · Req# '+reqId+' · Item ID '+reqItemId);
+          $('#stcCommThread').html(renderCommThread(d.messages || []));
+          var el = document.getElementById('stcCommThread');
+          if(el){ el.scrollTop = el.scrollHeight; }
+        },
+        error: function(){
+          $('#stcCommThread').html('<div class="stc-comm-empty">Failed to load chat.</div>');
+        }
+      });
+    }
+    function deleteCommThread(reqItemId, fromModal){
+      if(!reqItemId || !confirm('Delete this whole chat? All messages will be removed.')) return;
+      $.ajax({
+        type: 'POST',
+        url: "{{ url('/branch/stc/requisitions/commdeletethread') }}",
+        data: { req_item_id: reqItemId, _token: "{{ csrf_token() }}" },
+        success: function(res){
+          if(res && res.success){
+            if(fromModal){ $('#stc-comm-modal').modal('hide'); }
+            reloadDt('#req-comm');
+            swalSuccess('success', res.message || 'Whole chat deleted.');
+          }else{
+            swalSuccess('error', (res && res.message) ? res.message : 'Delete failed');
+          }
+        },
+        error: function(){ swalSuccess('error', 'Delete failed'); }
+      });
+    }
+    $('body').on('click', '.stc-comm-open-btn', function(){
+      openCommModal(
+        $(this).data('req-item-id'),
+        $(this).data('item-title'),
+        $(this).data('site-name'),
+        $(this).data('req-id')
+      );
+    });
+    $('body').on('click', '.stc-comm-del-thread-btn', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var reqItemId = $(this).data('req-item-id') || $('#stcCommItemId').val();
+      deleteCommThread(reqItemId, $(this).attr('id') === 'stcCommDeleteThreadBtn' || $(this).closest('#stc-comm-modal').length > 0);
+    });
+    $('body').on('click', '.stc-comm-del', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var id = $(this).data('id');
+      var $row = $(this).closest('.stc-comm-row');
+      if(!id || !confirm('Remove this message?')) return;
+      $.ajax({
+        type: 'POST',
+        url: "{{ url('/branch/stc/requisitions/commdelete') }}",
+        data: { id: id, _token: "{{ csrf_token() }}" },
+        success: function(res){
+          if(res && res.success){
+            $row.slideUp(150, function(){ $(this).remove(); });
+            if(!$('#stcCommThread .stc-comm-row').length){
+              $('#stcCommThread').html('<div class="stc-comm-empty">No messages in this chat.</div>');
+            }
+            reloadDt('#req-comm');
+            swalSuccess('success', res.message || 'Message removed.');
+          }else{
+            swalSuccess('error', (res && res.message) ? res.message : 'Remove failed');
+          }
+        },
+        error: function(){ swalSuccess('error', 'Remove failed'); }
+      });
+    });
 
     bindEdit('.edit-req-btn', "{{ url('/branch/stc/requisitions/get') }}", function(r){
       $('#edit-req-id').val(r.stc_cust_super_requisition_list_id);

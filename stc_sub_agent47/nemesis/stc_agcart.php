@@ -1482,18 +1482,53 @@ class witcher_supervisor extends tesseract{
 		");
 	}
 
+	private function stc_refresh_adhoc_status($adhoc_id){
+		$adhoc_id = (int)$adhoc_id;
+		if($adhoc_id <= 0){
+			return;
+		}
+		$sq = mysqli_query($this->stc_dbs, "
+			SELECT
+				A.`stc_purchase_product_adhoc_qty` AS adhoc_qty,
+				COALESCE(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`), 0) AS used_qty
+			FROM `stc_purchase_product_adhoc` A
+			LEFT JOIN `stc_cust_super_requisition_list_items_rec` R
+				ON R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
+			WHERE A.`stc_purchase_product_adhoc_id`='".$adhoc_id."'
+			GROUP BY A.`stc_purchase_product_adhoc_id`, A.`stc_purchase_product_adhoc_qty`
+		");
+		if(!$sq || !($row = mysqli_fetch_assoc($sq))){
+			return;
+		}
+		$status = ((float)$row['adhoc_qty'] > 0 && (float)$row['used_qty'] >= (float)$row['adhoc_qty']) ? '2' : '1';
+		mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc`
+			SET `stc_purchase_product_adhoc_status`='".$status."'
+			WHERE `stc_purchase_product_adhoc_id`='".$adhoc_id."'
+		");
+	}
+
 	public function stc_return_item($req_id){
 		$odin='';
+		$e_req = mysqli_real_escape_string($this->stc_dbs, $req_id);
 		$query=mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_super_requisition_list_items_rec_id` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`= '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			SELECT `stc_cust_super_requisition_list_items_rec_id`,
+				`stc_cust_super_requisition_list_items_rec_list_poaid`
+			FROM `stc_cust_super_requisition_list_items_rec`
+			WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`= '".$e_req."'
 		");
 		if(mysqli_num_rows($query)>0){
+			$adhoc_ids = [];
 			while($row=mysqli_fetch_assoc($query)){
-				mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."' AND `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_items_rec_id'])."'");
+				$poaid = (int)($row['stc_cust_super_requisition_list_items_rec_list_poaid'] ?? 0);
+				if($poaid > 0){
+					$adhoc_ids[$poaid] = $poaid;
+				}
+				mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$e_req."' AND `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_items_rec_id'])."'");
 				
 			}
-			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='8' WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
-			mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_rec_items_fr_supervisor` WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
+			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='8' WHERE `stc_cust_super_requisition_list_id`='".$e_req."'");
+			mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_rec_items_fr_supervisor` WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$e_req."'");
 			
 			$title="Returned";
 			$message="Returned by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A');
@@ -1505,7 +1540,7 @@ class witcher_supervisor extends tesseract{
 					`status`, 
 					`created_by`
 				) VALUES (
-					'".mysqli_real_escape_string($this->stc_dbs, $req_id)."',
+					'".$e_req."',
 					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
 					'1',
@@ -1513,6 +1548,9 @@ class witcher_supervisor extends tesseract{
 				)
 			");
 			$this->stc_tooldetails_track_on_requisition_return($req_id);
+			foreach($adhoc_ids as $adhoc_id){
+				$this->stc_refresh_adhoc_status($adhoc_id);
+			}
 			$odin='success';
 		}
 		return $odin;

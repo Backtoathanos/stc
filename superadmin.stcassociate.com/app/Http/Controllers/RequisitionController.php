@@ -10,6 +10,8 @@ use App\RequisitionCombiner;
 use App\RequisitionCombinerReq;
 use App\RequisitionItemLog;
 use App\RequisitionReceived;
+use App\ReqItemCommunicate;
+use Illuminate\Support\Facades\DB;
 
 class RequisitionController extends Controller
 {
@@ -496,6 +498,216 @@ class RequisitionController extends Controller
         return $delete
             ? $this->jsonResult(true, 'Record deleted succesfully!')
             : $this->jsonResult(false, 'Record deleted failed!');
+    }
+
+    private function issueLabel($type){
+        if($type === 'wrong_material') return 'Wrong Material';
+        if($type === 'fault_material') return 'Fault Material';
+        return 'Message';
+    }
+
+    function commlist(Request $request){
+        $p = $this->dtParams($request);
+        $site = trim((string)$request->get('site', ''));
+        $item = trim((string)$request->get('item', ''));
+        $reqId = trim((string)$request->get('req_id', ''));
+        $user = trim((string)$request->get('user', ''));
+        $issue = trim((string)$request->get('issue_type', ''));
+
+        $base = DB::table('stc_req_item_communicate as C')
+            ->join(DB::raw('(
+                SELECT req_item_id, MAX(id) AS max_id, COUNT(*) AS msg_count
+                FROM stc_req_item_communicate
+                WHERE status = 1
+                GROUP BY req_item_id
+            ) as L'), function($j){
+                $j->on('L.req_item_id', '=', 'C.req_item_id')->on('L.max_id', '=', 'C.id');
+            })
+            ->leftJoin('stc_cust_super_requisition_list_items as I', 'I.stc_cust_super_requisition_list_id', '=', 'C.req_item_id')
+            ->leftJoin('stc_cust_super_requisition_list as RL', 'RL.stc_cust_super_requisition_list_id', '=', 'C.req_id')
+            ->leftJoin('stc_cust_project as P', 'P.stc_cust_project_id', '=', 'RL.stc_cust_super_requisition_list_project_id')
+            ->where('C.status', 1);
+
+        $applyFilters = function($q) use ($site, $item, $reqId, $user, $issue, $p){
+            if($site !== ''){
+                $q->where('P.stc_cust_project_title', 'like', '%'.$site.'%');
+            }
+            if($item !== ''){
+                $q->where('I.stc_cust_super_requisition_list_items_title', 'like', '%'.$item.'%');
+            }
+            if($reqId !== ''){
+                $q->where(function($w) use ($reqId){
+                    $w->where('C.req_id', 'like', '%'.$reqId.'%')
+                      ->orWhere('C.req_item_id', 'like', '%'.$reqId.'%');
+                });
+            }
+            if($user !== ''){
+                $q->where('C.username', 'like', '%'.$user.'%');
+            }
+            if($issue !== '' && $issue !== 'all'){
+                $q->where('C.issue_type', $issue);
+            }
+            if($p['searchValue'] !== ''){
+                $sv = $p['searchValue'];
+                $q->where(function($w) use ($sv){
+                    $w->where('P.stc_cust_project_title', 'like', '%'.$sv.'%')
+                      ->orWhere('I.stc_cust_super_requisition_list_items_title', 'like', '%'.$sv.'%')
+                      ->orWhere('C.message', 'like', '%'.$sv.'%')
+                      ->orWhere('C.username', 'like', '%'.$sv.'%')
+                      ->orWhere('C.req_id', 'like', '%'.$sv.'%')
+                      ->orWhere('C.req_item_id', 'like', '%'.$sv.'%');
+                });
+            }
+            return $q;
+        };
+
+        $totalRecords = (clone $base)->count();
+        $filteredQ = $applyFilters(clone $base);
+        $totalFiltered = (clone $filteredQ)->count();
+
+        $sortMap = [
+            'req_item_id' => 'C.req_item_id',
+            'req_id' => 'C.req_id',
+            'site_name' => 'P.stc_cust_project_title',
+            'item_title' => 'I.stc_cust_super_requisition_list_items_title',
+            'username' => 'C.username',
+            'issue_type' => 'C.issue_type',
+            'msg_count' => 'L.msg_count',
+            'created_date' => 'C.created_date',
+            'id' => 'C.id',
+        ];
+        $sortCol = $sortMap[$p['columnName']] ?? 'C.id';
+        $sortDir = strtolower($p['columnSortOrder']) === 'asc' ? 'asc' : 'desc';
+
+        $rows = $filteredQ
+            ->select(
+                'C.id',
+                'C.req_item_id',
+                'C.req_id',
+                'C.message',
+                'C.image_url',
+                'C.issue_type',
+                'C.username',
+                'C.user_type',
+                'C.created_date',
+                'L.msg_count',
+                'I.stc_cust_super_requisition_list_items_title as item_title',
+                'P.stc_cust_project_title as site_name'
+            )
+            ->orderBy($sortCol, $sortDir)
+            ->skip((int)$p['start'])
+            ->take((int)$p['rowperpage'])
+            ->get();
+
+        $data = [];
+        foreach($rows as $r){
+            $preview = trim((string)$r->message);
+            if($preview === '' && !empty($r->image_url)){
+                $preview = 'Photo attached';
+            }
+            if(mb_strlen($preview) > 80){
+                $preview = mb_substr($preview, 0, 80).'…';
+            }
+            $data[] = [
+                'id' => (int)$r->id,
+                'req_item_id' => (int)$r->req_item_id,
+                'req_id' => (int)$r->req_id,
+                'site_name' => (string)($r->site_name ?? '—'),
+                'item_title' => (string)($r->item_title ?? '—'),
+                'username' => (string)$r->username,
+                'user_type' => (string)$r->user_type,
+                'issue_type' => (string)$r->issue_type,
+                'issue_label' => $this->issueLabel($r->issue_type),
+                'message' => $preview,
+                'msg_count' => (int)$r->msg_count,
+                'created_date' => $r->created_date ? date('d-m-Y h:i A', strtotime($r->created_date)) : '',
+                'actionData' => '<button type="button" class="btn btn-info btn-sm stc-comm-open-btn" data-req-item-id="'.(int)$r->req_item_id.'" data-req-id="'.(int)$r->req_id.'" data-item-title="'.e((string)($r->item_title ?? '')).'" data-site-name="'.e((string)($r->site_name ?? '')).'" title="Open chat"><i class="fas fa-comments"></i> Open</button> '
+                    .'<button type="button" class="btn btn-danger btn-sm stc-comm-del-thread-btn" data-req-item-id="'.(int)$r->req_item_id.'" title="Delete whole chat"><i class="fas fa-trash"></i> Delete</button>',
+            ];
+        }
+
+        return $this->dtResponse($p['draw'], $totalRecords, $totalFiltered, $data);
+    }
+
+    function commthread(Request $request){
+        $reqItemId = (int)$request->get('req_item_id', 0);
+        if($reqItemId <= 0){
+            return $this->jsonResult(false, 'Invalid item.');
+        }
+
+        $meta = DB::table('stc_cust_super_requisition_list_items as I')
+            ->leftJoin('stc_cust_super_requisition_list as RL', 'RL.stc_cust_super_requisition_list_id', '=', 'I.stc_cust_super_requisition_list_items_req_id')
+            ->leftJoin('stc_cust_project as P', 'P.stc_cust_project_id', '=', 'RL.stc_cust_super_requisition_list_project_id')
+            ->where('I.stc_cust_super_requisition_list_id', $reqItemId)
+            ->select(
+                'I.stc_cust_super_requisition_list_id as req_item_id',
+                'I.stc_cust_super_requisition_list_items_req_id as req_id',
+                'I.stc_cust_super_requisition_list_items_title as item_title',
+                'P.stc_cust_project_title as site_name'
+            )
+            ->first();
+
+        $messages = ReqItemCommunicate::where('req_item_id', $reqItemId)
+            ->where('status', 1)
+            ->orderBy('id', 'asc')
+            ->get()
+            ->map(function($m){
+                return [
+                    'id' => (int)$m->id,
+                    'req_item_id' => (int)$m->req_item_id,
+                    'req_id' => (int)$m->req_id,
+                    'message' => (string)$m->message,
+                    'image_url' => (string)$m->image_url,
+                    'issue_type' => (string)$m->issue_type,
+                    'issue_label' => $this->issueLabel($m->issue_type),
+                    'username' => (string)$m->username,
+                    'user_type' => (string)$m->user_type,
+                    'created_date' => $m->created_date ? date('d-m-Y h:i A', strtotime($m->created_date)) : '',
+                ];
+            })
+            ->values();
+
+        return $this->jsonResult(true, 'ok', [
+            'req_item_id' => $reqItemId,
+            'req_id' => $meta ? (int)$meta->req_id : 0,
+            'item_title' => $meta ? (string)$meta->item_title : '',
+            'site_name' => $meta ? (string)$meta->site_name : '',
+            'messages' => $messages,
+        ]);
+    }
+
+    function commdelete(Request $request){
+        $id = (int)$request->get('id', 0);
+        if($id <= 0){
+            return $this->jsonResult(false, 'Invalid message.');
+        }
+        $row = ReqItemCommunicate::where('id', $id)->where('status', 1)->first();
+        if(!$row){
+            return $this->jsonResult(false, 'Message not found.');
+        }
+        $row->status = 0;
+        $row->save();
+        return $this->jsonResult(true, 'Message removed.', [
+            'id' => $id,
+            'req_item_id' => (int)$row->req_item_id,
+        ]);
+    }
+
+    function commdeletethread(Request $request){
+        $reqItemId = (int)$request->get('req_item_id', 0);
+        if($reqItemId <= 0){
+            return $this->jsonResult(false, 'Invalid chat.');
+        }
+        $updated = ReqItemCommunicate::where('req_item_id', $reqItemId)
+            ->where('status', 1)
+            ->update(['status' => 0]);
+        if($updated < 1){
+            return $this->jsonResult(false, 'Chat not found or already deleted.');
+        }
+        return $this->jsonResult(true, 'Whole chat deleted.', [
+            'req_item_id' => $reqItemId,
+            'deleted' => (int)$updated,
+        ]);
     }
 
     public function operate(Request $request, $id = null){

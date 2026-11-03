@@ -277,6 +277,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/requisitions/recsupget', [RequisitionController::class, 'recsupget']);
     Route::post('/branch/stc/requisitions/recsupupdate', [RequisitionController::class, 'recsupupdate']);
     Route::get('/branch/stc/requisitions/recsupdelete', [RequisitionController::class, 'recsupdelete']);
+    Route::get('/branch/stc/requisitions/commlist', [RequisitionController::class, 'commlist']);
+    Route::get('/branch/stc/requisitions/commthread', [RequisitionController::class, 'commthread']);
+    Route::post('/branch/stc/requisitions/commdelete', [RequisitionController::class, 'commdelete']);
+    Route::post('/branch/stc/requisitions/commdeletethread', [RequisitionController::class, 'commdeletethread']);
     
     // for stc std
     Route::get('/branch/stc/std', [STDController::class, 'show']);    

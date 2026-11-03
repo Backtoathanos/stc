@@ -2094,6 +2094,50 @@ class sceptor extends tesseract{
 		}
 	}
 
+	private function stc_refresh_adhoc_status($adhoc_id){
+		$adhoc_id = (int)$adhoc_id;
+		if($adhoc_id <= 0){
+			return;
+		}
+		$sq = mysqli_query($this->stc_dbs, "
+			SELECT
+				A.`stc_purchase_product_adhoc_qty` AS adhoc_qty,
+				COALESCE(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`), 0) AS used_qty
+			FROM `stc_purchase_product_adhoc` A
+			LEFT JOIN `stc_cust_super_requisition_list_items_rec` R
+				ON R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
+			WHERE A.`stc_purchase_product_adhoc_id`='".$adhoc_id."'
+			GROUP BY A.`stc_purchase_product_adhoc_id`, A.`stc_purchase_product_adhoc_qty`
+		");
+		if(!$sq || !($row = mysqli_fetch_assoc($sq))){
+			return;
+		}
+		$status = ((float)$row['adhoc_qty'] > 0 && (float)$row['used_qty'] >= (float)$row['adhoc_qty']) ? '2' : '1';
+		mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc`
+			SET `stc_purchase_product_adhoc_status`='".$status."'
+			WHERE `stc_purchase_product_adhoc_id`='".$adhoc_id."'
+		");
+	}
+
+	private function stc_refresh_adhoc_status_for_product($product_id){
+		$product_id = (int)$product_id;
+		if($product_id <= 0){
+			return;
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT `stc_purchase_product_adhoc_id`
+			FROM `stc_purchase_product_adhoc`
+			WHERE `stc_purchase_product_adhoc_productid`='".$product_id."'
+		");
+		if(!$q){
+			return;
+		}
+		while($r = mysqli_fetch_assoc($q)){
+			$this->stc_refresh_adhoc_status((int)$r['stc_purchase_product_adhoc_id']);
+		}
+	}
+
 	// Accept a returned requisition item (set flag + description log) — hides from Return List
 	public function stc_accept_return_item($item_id, $description = ''){
 		$this->stc_ensure_return_accepted_column();
@@ -2108,7 +2152,8 @@ class sceptor extends tesseract{
 
 		$chk = mysqli_query($this->stc_dbs, "
 			SELECT `stc_cust_super_requisition_list_items_status`,
-				`stc_cust_super_requisition_list_items_return_accepted`
+				`stc_cust_super_requisition_list_items_return_accepted`,
+				`stc_cust_super_requisition_list_items_product_id`
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
 			LIMIT 1
@@ -2151,6 +2196,8 @@ class sceptor extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
 			)
 		");
+
+		$this->stc_refresh_adhoc_status_for_product((int)($row['stc_cust_super_requisition_list_items_product_id'] ?? 0));
 
 		return ['success' => true, 'message' => 'Return accepted successfully.'];
 	}
