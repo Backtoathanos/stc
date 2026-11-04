@@ -30,8 +30,9 @@ function stc_rent_bill_line($qty, $sale_rate, $returnable, $rent_percent, $item_
 	$qty = (float)$qty;
 	$sale_rate = round((float)$sale_rate, 2);
 	$monthly = stc_rent_monthly($purchase_rate, $rent_percent);
-	$is_tools = stripos((string)$item_type, 'tool') !== false;
-	if((int)$returnable === 1 && $monthly > 0 && $is_tools){
+	// Product Returnable + rent % is the source of truth (not requisition item_type).
+	// Scaffolding/Cup lock lines are often typed Consumable but still billed as rent.
+	if((int)$returnable === 1 && $monthly > 0){
 		$start = strtotime(substr((string)$rec_date, 0, 10));
 		$from = strtotime(substr((string)$date_from, 0, 10));
 		$to = strtotime(substr((string)$date_to, 0, 10));

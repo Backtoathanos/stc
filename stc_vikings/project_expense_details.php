@@ -36,8 +36,8 @@ if(isset($_GET['pro_id'])){
             $qty = (float)$qty;
             $sale_rate = round((float)$sale_rate, 2);
             $monthly = stc_rent_monthly($purchase_rate, $rent_percent);
-            $is_tools = stripos((string)$item_type, 'tool') !== false;
-            if ((int)$returnable === 1 && $monthly > 0 && $is_tools) {
+            // Product Returnable + rent % is the source of truth (not requisition item_type).
+            if ((int)$returnable === 1 && $monthly > 0) {
                 $start = strtotime(substr((string)$rec_date, 0, 10));
                 $from = strtotime(substr((string)$date_from, 0, 10));
                 $to = strtotime(substr((string)$date_to, 0, 10));
