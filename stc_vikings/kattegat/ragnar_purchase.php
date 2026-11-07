@@ -3529,18 +3529,21 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 	public function stc_poadhoc_customerledger($dateFrom, $dateTo, $siteName) {
 		$this->stc_ensure_product_rent_columns();
-		$filter = '';
 		$dateFrom=date('Y-m-d', strtotime($dateFrom));
 		$dateTo=date('Y-m-d', strtotime($dateTo));
+		$siteName = (int)$siteName;
 		$query = "
 			SELECT D.stc_cust_project_id, D.stc_cust_project_title,
+				A.stc_cust_super_requisition_list_items_rec_id AS rec_id,
 				A.stc_cust_super_requisition_list_items_rec_recqty as qty,
 				A.stc_cust_super_requisition_list_items_rec_date as rec_date,
 				E.stc_purchase_product_adhoc_rate as rate,
 				IFNULL(E.stc_purchase_product_adhoc_prate, 0) AS purchase_rate,
 				IFNULL(P.stc_product_returnable, 0) AS returnable,
 				IFNULL(P.stc_product_rent_percent, 0) AS rent_percent,
-				B.stc_cust_super_requisition_items_type AS item_type
+				B.stc_cust_super_requisition_items_type AS item_type,
+				IFNULL(RC.stc_requisition_combiner_id, 0) AS combiner_id,
+				IFNULL(RC.stc_requisition_combiner_refrence, '') AS combiner_name
 			FROM `stc_cust_super_requisition_list_items_rec` A 
 			INNER JOIN stc_cust_super_requisition_list_items B
 			ON A.stc_cust_super_requisition_list_items_rec_list_item_id=B.stc_cust_super_requisition_list_id
@@ -3551,7 +3554,12 @@ class ragnarPurchaseAdhoc extends tesseract{
 			INNER JOIN stc_purchase_product_adhoc E
 			ON A.stc_cust_super_requisition_list_items_rec_list_poaid=E.stc_purchase_product_adhoc_id
 			LEFT JOIN stc_product P ON P.stc_product_id = E.stc_purchase_product_adhoc_productid
-			WHERE stc_cust_project_cust_id=$siteName AND DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' 
+			LEFT JOIN stc_requisition_combiner_req CR
+			ON CR.stc_requisition_combiner_req_requisition_id = C.stc_cust_super_requisition_list_id
+			LEFT JOIN stc_requisition_combiner RC
+			ON RC.stc_requisition_combiner_id = CR.stc_requisition_combiner_req_comb_id
+			WHERE D.stc_cust_project_cust_id='".$siteName."'
+			  AND DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$dateFrom."' AND '".$dateTo."'
 			ORDER BY D.stc_cust_project_title
 		";
 		$result = mysqli_query($this->stc_dbs, $query);
@@ -3564,10 +3572,21 @@ class ragnarPurchaseAdhoc extends tesseract{
 						'stc_cust_project_id' => $projectId,
 						'stc_cust_project_title' => $row['stc_cust_project_title'],
 						'total' => 0,
+						'combiner_map' => array(),
+						'billed_rec' => array(),
 					);
 				}
-				$bill = stc_rent_bill_line($row['qty'], $row['rate'], $row['returnable'], $row['rent_percent'], $row['item_type'], $row['rec_date'], $dateFrom, $dateTo, $row['purchase_rate']);
-				$projects[$projectId]['total'] += $bill['total'];
+				$recId = (int)$row['rec_id'];
+				if ($recId > 0 && empty($projects[$projectId]['billed_rec'][$recId])) {
+					$bill = stc_rent_bill_line($row['qty'], $row['rate'], $row['returnable'], $row['rent_percent'], $row['item_type'], $row['rec_date'], $dateFrom, $dateTo, $row['purchase_rate']);
+					$projects[$projectId]['total'] += $bill['total'];
+					$projects[$projectId]['billed_rec'][$recId] = 1;
+				}
+				$cid = (int)$row['combiner_id'];
+				$cname = trim((string)$row['combiner_name']);
+				if ($cid > 0 && $cname !== '') {
+					$projects[$projectId]['combiner_map'][$cid] = $cname;
+				}
 			}
 		}
 		$odin = array();
@@ -3578,6 +3597,17 @@ class ragnarPurchaseAdhoc extends tesseract{
 			if ($row['total'] == 0) {
 				continue;
 			}
+			// One combiner name only (no req id) — unique by reference name
+			$uniqueNames = array();
+			foreach ($row['combiner_map'] as $cname) {
+				$cname = trim((string)$cname);
+				if ($cname !== '') {
+					$uniqueNames[$cname] = $cname;
+				}
+			}
+			$uniqueNames = array_values($uniqueNames);
+			$row['combiner_name'] = count($uniqueNames) ? $uniqueNames[0] : '—';
+			unset($row['combiner_map'], $row['billed_rec']);
 			$row['ltotal'] = $row['total'];
 			$row['total'] = number_format($row['total'], 2);
 			$odin[] = $row;

@@ -1,11 +1,15 @@
 <?php 
-if(isset($_GET['pro_id'])){
-    $num = $_GET['pro_id'];
-    $str_length = 5;
+$combinerNameParam = isset($_GET['combiner_name']) ? trim((string)$_GET['combiner_name']) : '';
+$hasProId = isset($_GET['pro_id']) && $_GET['pro_id'] !== '';
+$combinerOnlyMode = (!$hasProId && $combinerNameParam !== '');
+
+if($hasProId || $combinerOnlyMode){
     $dateFrom=date('Y-m-d', strtotime($_GET['dateFrom']));
     $dateTo=date('Y-m-d', strtotime($_GET['dateTo']));
-    // hardcoded left padding if number < $str_length
-    $str = substr("0000{$num}", -$str_length);
+    $str_length = 5;
+    $num = $hasProId ? $_GET['pro_id'] : 0;
+    $str = $hasProId ? substr("0000{$num}", -$str_length) : 'COMB';
+    $custIdFilter = isset($_GET['cust_id']) ? (int)$_GET['cust_id'] : 0;
 
     include "../MCU/db.php";
     if (!function_exists('stc_rent_monthly')) {
@@ -57,21 +61,47 @@ if(isset($_GET['pro_id'])){
             mysqli_query($con, "ALTER TABLE `stc_product` ADD `".$col."` ".$def);
         }
     }
-    $checkpurchaseorder=mysqli_query($con, "
-      SELECT * FROM `stc_cust_project`
-      WHERE `stc_cust_project_id`='".mysqli_real_escape_string($con, $_GET['pro_id'])."'
-    ");
-    
-    if(!$checkpurchaseorder || mysqli_num_rows($checkpurchaseorder) == 0) {
-        echo "<div style='text-align: center; padding: 50px; color: #dc3545;'>";
-        echo "<h2>Project Not Found</h2>";
-        echo "<p>The requested project does not exist or you don't have permission to view it.</p>";
-        echo "<a href='javascript:history.back()' class='btn btn-primary'>Go Back</a>";
-        echo "</div>";
-        exit;
+
+    $get_stc_purchase_product = array(
+        'stc_cust_project_title' => $combinerNameParam !== '' ? $combinerNameParam : '',
+        'stc_cust_project_responsive_person' => ''
+    );
+
+    if ($hasProId) {
+        $checkpurchaseorder=mysqli_query($con, "
+          SELECT * FROM `stc_cust_project`
+          WHERE `stc_cust_project_id`='".mysqli_real_escape_string($con, $_GET['pro_id'])."'
+        ");
+        
+        if(!$checkpurchaseorder || mysqli_num_rows($checkpurchaseorder) == 0) {
+            echo "<div style='text-align: center; padding: 50px; color: #dc3545;'>";
+            echo "<h2>Project Not Found</h2>";
+            echo "<p>The requested project does not exist or you don't have permission to view it.</p>";
+            echo "<a href='javascript:history.back()' class='btn btn-primary'>Go Back</a>";
+            echo "</div>";
+            exit;
+        }
+        
+        $get_stc_purchase_product=mysqli_fetch_assoc($checkpurchaseorder);
+    } else {
+        // Combiner-wide view: confirm combiner reference exists
+        $chkComb = mysqli_query($con, "
+          SELECT stc_requisition_combiner_id
+          FROM stc_requisition_combiner
+          WHERE stc_requisition_combiner_refrence='".mysqli_real_escape_string($con, $combinerNameParam)."'
+          LIMIT 1
+        ");
+        if(!$chkComb || mysqli_num_rows($chkComb) == 0) {
+            echo "<div style='text-align: center; padding: 50px; color: #dc3545;'>";
+            echo "<h2>Req Combiner Not Found</h2>";
+            echo "<p>No combiner found for: ".htmlspecialchars($combinerNameParam, ENT_QUOTES, 'UTF-8')."</p>";
+            echo "<a href='javascript:history.back()' class='btn btn-primary'>Go Back</a>";
+            echo "</div>";
+            exit;
+        }
+        $get_stc_purchase_product['stc_cust_project_title'] = $combinerNameParam;
+        $get_stc_purchase_product['stc_cust_project_responsive_person'] = 'All Sites';
     }
-    
-    $get_stc_purchase_product=mysqli_fetch_assoc($checkpurchaseorder);
     $get_purchase_product_merchant_name=$get_stc_purchase_product['stc_cust_project_title'];
 ?>
 <!DOCTYPE html>
@@ -81,9 +111,7 @@ if(isset($_GET['pro_id'])){
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Project Expense Details - STC-
-        <?php echo $str;?>
-    </title>
+    <title><?php echo $combinerOnlyMode ? 'Req Combiner Expense - '.htmlspecialchars($combinerNameParam, ENT_QUOTES, 'UTF-8') : 'Project Expense Details - STC-'.$str; ?></title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700" />
     <!-- https://fonts.google.com/specimen/Roboto -->
     <link rel="stylesheet" href="css/fontawesome.min.css" />
@@ -350,11 +378,17 @@ if(isset($_GET['pro_id'])){
                                 </p>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
-                                <h2 align="center">Project Expense Summary</h2>
+                                <h2 align="center"><?php echo $combinerOnlyMode ? 'Req Combiner Expense Summary' : 'Project Expense Summary'; ?></h2>
                                 <div style="text-align: center;">
+                                    <?php if ($combinerOnlyMode) { ?>
+                                    <h4 align="center">Req Combiner:
+                                        <?php echo htmlspecialchars($combinerNameParam, ENT_QUOTES, 'UTF-8'); ?>
+                                    </h4>
+                                    <?php } else { ?>
                                     <h4 align="center">Project ID: STC/P/
                                         <?php echo $str; ?>
                                     </h4>
+                                    <?php } ?>
                                     <h4 align="center">Date:
                                         <?php echo date('d-m-Y'); ?>
                                     </h4>
@@ -368,9 +402,21 @@ if(isset($_GET['pro_id'])){
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
                                 <div style="font-size: 18px; margin-bottom: 20px;" class="">
-                                    <p><strong>Project:</strong>
-                                        <?php echo $get_stc_purchase_product['stc_cust_project_title']; ?>
+                                    <?php if ($combinerOnlyMode) { ?>
+                                    <p><strong>Req Combiner:</strong>
+                                        <?php echo htmlspecialchars($combinerNameParam, ENT_QUOTES, 'UTF-8'); ?>
                                     </p>
+                                    <p><strong>Scope:</strong> All sites under this combiner</p>
+                                    <?php } else { ?>
+                                    <p><strong>Project:</strong>
+                                        <?php echo htmlspecialchars($get_stc_purchase_product['stc_cust_project_title'], ENT_QUOTES, 'UTF-8'); ?>
+                                    </p>
+                                    <?php
+                                    if ($combinerNameParam !== '') {
+                                        echo '<p><strong>Req Combiner:</strong> '.htmlspecialchars($combinerNameParam, ENT_QUOTES, 'UTF-8').'</p>';
+                                    }
+                                    ?>
+                                    <?php } ?>
                                 </div>
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
@@ -410,32 +456,59 @@ if(isset($_GET['pro_id'])){
                                                 <thead>
                                                     <tr style="background-color: #3989c6; color: white;">
                                                         <th
-                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 8%;">
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 6%;">
                                                             SL
                                                             No</th>
+                                                        <?php if ($combinerOnlyMode) { ?>
                                                         <th
-                                                            style="padding: 10px; text-align: left; border: 1px solid #ddd; width: 50%;">
+                                                            style="padding: 10px; text-align: left; border: 1px solid #ddd; width: 22%;">
+                                                            Site Name</th>
+                                                        <?php } ?>
+                                                        <th
+                                                            style="padding: 10px; text-align: left; border: 1px solid #ddd; width: <?php echo $combinerOnlyMode ? '35%' : '50%'; ?>;">
                                                             Item Name</th>
                                                         <th
-                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 12%;">
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 10%;">
                                                             Unit</th>
                                                         <th
-                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 12%;">
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 10%;">
                                                             Qty</th>
                                                         <th
-                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
+                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 12%;">
                                                             Rate</th>
                                                         <th
-                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
+                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 12%;">
                                                             Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                 <?php
                                                     // Get requisitions with proper joins and rate calculation
+                                                    $combinerName = $combinerNameParam;
+                                                    $combinerJoin = '';
+                                                    $combinerWhere = '';
+                                                    if ($combinerName !== '') {
+                                                        $combinerJoin = "
+                                                        INNER JOIN stc_requisition_combiner_req CR
+                                                          ON CR.stc_requisition_combiner_req_requisition_id = C.stc_cust_super_requisition_list_id
+                                                        INNER JOIN stc_requisition_combiner RC
+                                                          ON RC.stc_requisition_combiner_id = CR.stc_requisition_combiner_req_comb_id
+                                                        ";
+                                                        $combinerWhere = " AND RC.stc_requisition_combiner_refrence = '".mysqli_real_escape_string($con, $combinerName)."' ";
+                                                    }
+                                                    $projectWhere = '';
+                                                    $custWhere = '';
+                                                    if ($combinerOnlyMode) {
+                                                        if ($custIdFilter > 0) {
+                                                            $custWhere = " AND D.stc_cust_project_cust_id = '".mysqli_real_escape_string($con, (string)$custIdFilter)."' ";
+                                                        }
+                                                    } else {
+                                                        $projectWhere = " AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' ";
+                                                    }
                                                     $query="
                                                         SELECT 
                                                         D.stc_cust_project_id,
+                                                        D.stc_cust_project_title as site_name,
                                                         B.stc_cust_super_requisition_list_items_title as item_name,
                                                         B.stc_cust_super_requisition_list_items_unit as unit,
                                                         A.stc_cust_super_requisition_list_items_rec_recqty as qty,
@@ -455,8 +528,11 @@ if(isset($_GET['pro_id'])){
                                                         INNER JOIN stc_purchase_product_adhoc E
                                                         ON A.stc_cust_super_requisition_list_items_rec_list_poaid = E.stc_purchase_product_adhoc_id
                                                         LEFT JOIN stc_product P ON P.stc_product_id = E.stc_purchase_product_adhoc_productid
+                                                        ".$combinerJoin."
                                                         WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$dateFrom."' AND '".$dateTo."'
-                                                        AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' AND (E.stc_purchase_product_adhoc_rate > 0 OR (IFNULL(P.stc_product_returnable,0)=1 AND IFNULL(P.stc_product_rent_percent,0)>0))
+                                                        ".$projectWhere.$custWhere."
+                                                        AND (E.stc_purchase_product_adhoc_rate > 0 OR (IFNULL(P.stc_product_returnable,0)=1 AND IFNULL(P.stc_product_rent_percent,0)>0))
+                                                        ".$combinerWhere."
                                                         ORDER BY D.stc_cust_project_title, B.stc_cust_super_requisition_list_items_title ASC
                                                     ";
                                                     // echo $query;
@@ -501,11 +577,18 @@ if(isset($_GET['pro_id'])){
                                                             $total = $req_row['total'];
                                                             $row_break_class = (($sl > 1) && (($sl - 1) % $rows_per_page === 0)) ? ' page-break' : '';
                                                 ?>
+                                                <?php $colCount = $combinerOnlyMode ? 7 : 6; $labelSpan = $colCount - 1; ?>
                                                 <tr class="table-row<?php echo $row_break_class; ?>">
                                                     <td
                                                         style="padding: 12px; text-align: center; border: 1px solid #ddd; background-color: #f8f9fa;">
                                                         <?php echo $sl; ?>
                                                     </td>
+                                                    <?php if ($combinerOnlyMode) { ?>
+                                                    <td
+                                                        style="padding: 12px; text-align: left; border: 1px solid #ddd;">
+                                                        <?php echo htmlspecialchars(isset($req_row['site_name']) ? $req_row['site_name'] : ''); ?>
+                                                    </td>
+                                                    <?php } ?>
                                                     <td
                                                         style="padding: 12px; text-align: left; border: 1px solid #ddd;">
                                                         <?php echo htmlspecialchars($req_row['item_name']); ?>
@@ -534,7 +617,7 @@ if(isset($_GET['pro_id'])){
                                                                 $page_no = (int) ($sl / $rows_per_page);
                                                 ?>
                                                 <tr>
-                                                    <td colspan="6"
+                                                    <td colspan="<?php echo $colCount; ?>"
                                                         style="padding: 8px 0; text-align: right; border: none; font-size: 12px; color: #333;">
                                                         Page <?php echo $page_no; ?> of <?php echo $total_pages; ?>
                                                     </td>
@@ -545,7 +628,7 @@ if(isset($_GET['pro_id'])){
                                                 ?>
                                                 <tr
                                                     style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #3989c6;">
-                                                    <td colspan="5"
+                                                    <td colspan="<?php echo $labelSpan; ?>"
                                                         style="padding: 15px; text-align: right; border: 1px solid #ddd; font-size: 16px;">
                                                         Grand Total:</td>
                                                     <td
@@ -556,9 +639,10 @@ if(isset($_GET['pro_id'])){
                                                 </tr>
                                                 <?php
                                                     } else {
+                                                        $colCount = $combinerOnlyMode ? 7 : 6;
                                                 ?>
                                                 <tr>
-                                                    <td colspan="6"
+                                                    <td colspan="<?php echo $colCount; ?>"
                                                         style="padding: 40px; text-align: center; border: 1px solid #ddd; color: #666; background-color: #f8f9fa;">
                                                         <i class="fas fa-inbox"
                                                             style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
@@ -574,9 +658,10 @@ if(isset($_GET['pro_id'])){
                                                     }
 
                                                     $last_page_no = ($total_rows > 0) ? $total_pages : 1;
+                                                    $colCount = $combinerOnlyMode ? 7 : 6;
                                                 ?>
                                                 <tr>
-                                                    <td colspan="6"
+                                                    <td colspan="<?php echo $colCount; ?>"
                                                         style="padding: 8px 0; text-align: right; border: none; font-size: 12px; color: #333;">
                                                         Page <?php echo $last_page_no; ?> of <?php echo $total_pages; ?>
                                                     </td>

@@ -650,6 +650,19 @@ include("kattegat/role_check.php");
           color: #aaa;
           margin-left: 2px;
       }
+      .stc-summary-view-table thead th.stc-summary-sortable {
+          cursor: pointer;
+          user-select: none;
+          white-space: nowrap;
+      }
+      .stc-summary-view-table thead th.stc-summary-sortable:hover {
+          background: #eef5ff;
+      }
+      .stc-summary-view-table thead th .stc-summary-sort-icon {
+          font-size: 11px;
+          color: #aaa;
+          margin-left: 4px;
+      }
       /* Fullscreen overlays must escape header/sidebar stacking; attached to body via JS */
       .stc-poa-view-panel.stc-poa-view-fullscreen-active,
       .stc-poa-create-panel.stc-poa-create-fullscreen-active {
@@ -3447,7 +3460,9 @@ include("kattegat/role_check.php");
             }
           }
 
-          function stcPoaExportTableExcel(tableSelector, filenamePrefix) {
+          function stcPoaExportTableExcel(tableSelector, filenamePrefix, options) {
+            var opts = options || {};
+            var keepLinks = !!opts.keepLinks;
             var $src = $(tableSelector);
             if (!$src.length || !$.fn.table2excel) return;
             var $clone = $src.clone();
@@ -3459,7 +3474,19 @@ include("kattegat/role_check.php");
             $clone.find('button, a, .itemname-autocomplete-list, .dropdown-options, img').each(function() {
               var $el = $(this);
               if ($el.is('a') && $.trim($el.text()) !== '') {
-                $el.replaceWith($('<span/>').text($.trim($el.text())));
+                if (keepLinks) {
+                  var href = $el.attr('href') || '';
+                  if (href && href.indexOf('javascript:') !== 0 && href !== '#') {
+                    try {
+                      $el.attr('href', new URL(href, window.location.href).href);
+                    } catch (err) {}
+                    $el.removeAttr('target');
+                  } else {
+                    $el.replaceWith($('<span/>').text($.trim($el.text())));
+                  }
+                } else {
+                  $el.replaceWith($('<span/>').text($.trim($el.text())));
+                }
               } else if (!$el.is('a')) {
                 $el.remove();
               }
@@ -3473,7 +3500,8 @@ include("kattegat/role_check.php");
             $('body').append($wrap);
             $clone.table2excel({
               filename: filenamePrefix + '-' + new Date().toISOString().slice(0, 10) + '.xls',
-              name: 'POA'
+              name: 'POA',
+              exclude_links: !keepLinks
             });
             $wrap.remove();
           }
@@ -4357,6 +4385,7 @@ include("kattegat/role_check.php");
             var dateFrom = $('.stc-poa-filterdatefrom').val();
             var dateTo = $('.stc-poa-filterdateto').val();
             var siteName = $('.stc-poa-filtersitename').val();
+            $('.stc-detailed-ledger-excel').hide();
 
             // Make AJAX request
             $.ajax({
@@ -4408,16 +4437,29 @@ include("kattegat/role_check.php");
                       <td>${Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>`;
                     $('.stc-call-view-poadhocledger-row').append(outrow);
+                    $('.stc-detailed-ledger-excel').show();
                 } else {
                   $('.stc-call-view-poadhocledger-row').html('<tr><td colspan="10">No data found</td></tr>');
+                  $('.stc-detailed-ledger-excel').hide();
                 }
               },
               error: function (xhr, status, error) {
                 // console.error('Error fetching data:', error, xhr.responseText);
                 $('.stc-call-view-poadhocledger-row').html('<tr><td colspan="10">Error loading data</td></tr>');
+                $('.stc-detailed-ledger-excel').hide();
               }
             });
 
+          });
+
+          $(document).on('click', '.stc-detailed-ledger-excel', function(e){
+            e.preventDefault();
+            stcPoaExportTableExcel('.stc-purchase-view-table', 'customer-ledger-detailed');
+          });
+          $(document).on('click', '.stc-summary-ledger-excel', function(e){
+            e.preventDefault();
+            // Keep Site Name hyperlinks (same project_expense_details URL as on page)
+            stcPoaExportTableExcel('.stc-summary-view-table', 'customer-ledger-summary', { keepLinks: true });
           });
           
           $('.stc-summary-filter-find').on('click', function () {
@@ -4425,6 +4467,7 @@ include("kattegat/role_check.php");
             var dateFrom = $('.stc-summary-filterdatefrom').val();
             var dateTo = $('.stc-summary-filterdateto').val();
             var siteName = $('.stc-summary-filtersitename').val();
+            $('.stc-summary-ledger-excel').hide();
 
             // Make AJAX request
             $.ajax({
@@ -4444,35 +4487,95 @@ include("kattegat/role_check.php");
                 if (response && response.length > 0) {
                   var total=0;
                   $.each(response, function (index, item) {
-                    // Format date for better readability
-                    let formattedDate = new Date(item.stc_cust_super_requisition_list_date).toLocaleDateString('en-GB');
-
-                    var row = `<tr>
+                    var cname = (item.combiner_name && item.combiner_name !== '—') ? String(item.combiner_name) : '';
+                    var combinerHtml = cname
+                      ? '<a href="project_expense_details.php?dateFrom='+encodeURIComponent(dateFrom)+'&dateTo='+encodeURIComponent(dateTo)+'&combiner_name='+encodeURIComponent(cname)+'&cust_id='+encodeURIComponent(siteName)+'" target="_blank">'+cname.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</a>'
+                      : '—';
+                    var siteHtml = '<a href="project_expense_details.php?pro_id='+item.stc_cust_project_id+'&dateFrom='+encodeURIComponent(dateFrom)+'&dateTo='+encodeURIComponent(dateTo)+'" target="_blank">'+(item.stc_cust_project_title || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</a>';
+                    var row = `<tr class="stc-summary-data-row">
                       <td class="text-center">${index + 1}</td>
-                      <td><a href="project_expense_details.php?pro_id=${item.stc_cust_project_id}&dateFrom=${dateFrom}&dateTo=${dateTo}" target="_blank">${item.stc_cust_project_title}</a></td>
-                      <td class="text-right">${item.total}</td>
+                      <td>${combinerHtml}</td>
+                      <td>${siteHtml}</td>
+                      <td class="text-right" data-sort-value="${parseFloat(item.ltotal) || 0}">${item.total}</td>
                     </tr>
                     `;
                     total+=parseFloat(item.ltotal);
                     $('.stc-call-view-summaryledger-row').append(row);
                   });
                   var outrow = `
-                    <tr>
-                      <td colspan="2" class="text-right"> Total : </td>
+                    <tr class="stc-summary-total-row">
+                      <td colspan="3" class="text-right"> Total : </td>
                       <td class="text-right">${Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>`;
                     $('.stc-call-view-summaryledger-row').append(outrow);
+                    $('.stc-summary-view-table thead th.stc-summary-sortable').removeData('sort-dir').find('.stc-summary-sort-icon').html('&#8645;').css('color', '#aaa');
+                    $('.stc-summary-ledger-excel').show();
                 } else {
-                  $('.stc-call-view-summaryledger-row').html('<tr><td colspan="10">No data found</td></tr>');
+                  $('.stc-call-view-summaryledger-row').html('<tr><td colspan="4">No data found</td></tr>');
+                  $('.stc-summary-ledger-excel').hide();
                 }
               },
               error: function (xhr, status, error) {
                 // console.error('Error fetching data:', error, xhr.responseText);
-                $('.stc-call-view-summaryledger-row').html('<tr><td colspan="10">Error loading data</td></tr>');
+                $('.stc-call-view-summaryledger-row').html('<tr><td colspan="4">Error loading data</td></tr>');
+                $('.stc-summary-ledger-excel').hide();
               }
             });
 
           });
+
+          $(document).on('click', '.stc-summary-view-table thead th.stc-summary-sortable', function () {
+            var $th = $(this);
+            var $table = $th.closest('table');
+            var $tbody = $table.find('tbody.stc-call-view-summaryledger-row');
+            var $dataRows = $tbody.find('tr.stc-summary-data-row');
+            if (!$dataRows.length) return;
+
+            var col = parseInt($th.attr('data-sort-col'), 10);
+            var type = $th.attr('data-sort-type') || 'text';
+            var dir = $th.data('sort-dir') === 'asc' ? 'desc' : 'asc';
+
+            $table.find('thead th.stc-summary-sortable').each(function () {
+              if (this !== $th[0]) {
+                $(this).removeData('sort-dir').find('.stc-summary-sort-icon').html('&#8645;').css('color', '#aaa');
+              }
+            });
+            $th.data('sort-dir', dir);
+            $th.find('.stc-summary-sort-icon').html(dir === 'asc' ? '&#8593;' : '&#8595;').css('color', '#333');
+
+            var rows = $dataRows.get();
+            rows.sort(function (a, b) {
+              var $a = $(a).children().eq(col);
+              var $b = $(b).children().eq(col);
+              var av, bv;
+              if (type === 'num') {
+                av = parseFloat($a.attr('data-sort-value'));
+                if (isNaN(av)) {
+                  av = parseFloat(String($a.text()).replace(/,/g, '')) || 0;
+                }
+                bv = parseFloat($b.attr('data-sort-value'));
+                if (isNaN(bv)) {
+                  bv = parseFloat(String($b.text()).replace(/,/g, '')) || 0;
+                }
+                return dir === 'asc' ? av - bv : bv - av;
+              }
+              av = $.trim($a.text()).toLowerCase();
+              bv = $.trim($b.text()).toLowerCase();
+              if (av < bv) return dir === 'asc' ? -1 : 1;
+              if (av > bv) return dir === 'asc' ? 1 : -1;
+              return 0;
+            });
+
+            var $total = $tbody.find('tr.stc-summary-total-row').detach();
+            $.each(rows, function (i, row) {
+              $(row).children().eq(0).text(i + 1);
+              $tbody.append(row);
+            });
+            if ($total.length) {
+              $tbody.append($total);
+            }
+          });
+
           $('body').delegate('.showledgertr', 'click', function(e){
             var id=$(this).attr('id');
             $('.ledgeritemshow-'+id).toggle();
@@ -6699,6 +6802,7 @@ include("kattegat/role_check.php");
                                                 </td>
                                                 <td>
                                                     <a class="btn btn-success stc-adhocpofilter-find" href="javascript:void(0)">Find</a>
+                                                    <button type="button" class="btn btn-outline-success stc-detailed-ledger-excel ml-1" title="Export to Excel" aria-label="Export to Excel" style="display:none;"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -6764,6 +6868,7 @@ include("kattegat/role_check.php");
                                                 </td>
                                                 <td>
                                                     <a class="btn btn-success stc-summary-filter-find" href="javascript:void(0)">Find</a>
+                                                    <button type="button" class="btn btn-outline-success stc-summary-ledger-excel ml-1" title="Export to Excel" aria-label="Export to Excel" style="display:none;"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -6775,13 +6880,14 @@ include("kattegat/role_check.php");
                                     <table class="table table-hover table-bordered stc-summary-view-table">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">Sl No.</th>
-                                                <th class="text-center">Site Name</th>
-                                                <th class="text-center">Total Amount</th>
+                                                <th class="text-center stc-summary-sortable" data-sort-col="0" data-sort-type="num">Sl No. <span class="stc-summary-sort-icon">&#8645;</span></th>
+                                                <th class="text-center stc-summary-sortable" data-sort-col="1" data-sort-type="text">Req Combiner <span class="stc-summary-sort-icon">&#8645;</span></th>
+                                                <th class="text-center stc-summary-sortable" data-sort-col="2" data-sort-type="text">Site Name <span class="stc-summary-sort-icon">&#8645;</span></th>
+                                                <th class="text-center stc-summary-sortable" data-sort-col="3" data-sort-type="num">Total Amount <span class="stc-summary-sort-icon">&#8645;</span></th>
                                             </tr>
                                         </thead>
                                         <tbody class="stc-call-view-summaryledger-row">
-                                            <tr><td colspan="3">Search</td></tr>
+                                            <tr><td colspan="4">Search</td></tr>
                                         </tbody>
                                     </table>
                                 </div>
