@@ -130,14 +130,14 @@
       }
       .stc-req-dates-row {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex-wrap: nowrap;
+        align-items: flex-end;
+        gap: 8px;
       }
       .stc-req-dates-row .stc-req-dates-col {
-        width: 100%;
-      }
-      .stc-req-dates-row .stc-req-dates-col:not(:last-child) {
-        margin-bottom: 8px;
+        flex: 1 1 0;
+        min-width: 0;
       }
       .stc-req-dates-row .stc-req-lbl-sub {
         display: block;
@@ -226,7 +226,7 @@
                                                 ?>
                                                 <div class="stc-req-filter-toolbar">
                                                     <div class="row">
-                                                        <div class="col-md-4 col-sm-12 col-xs-12 stc-req-field">
+                                                        <div class="col-md-3 col-sm-12 col-xs-12 stc-req-field">
                                                             <span class="stc-req-lbl">Date range</span>
                                                             <div class="stc-req-dates-row">
                                                                 <div class="stc-req-dates-col">
@@ -239,13 +239,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-3 col-sm-6 col-xs-12 stc-req-field">
+                                                        <div class="col-md-3 col-sm-12 col-xs-12 stc-req-field">
+                                                            <label class="stc-req-lbl" for="stc-sup-req-item-search">Item search</label>
+                                                            <input type="text" class="form-control" id="stc-sup-req-item-search" placeholder="Material / item name…" autocomplete="off">
+                                                        </div>
+                                                        <div class="col-md-2 col-sm-6 col-xs-12 stc-req-field">
                                                             <label class="stc-req-lbl" for="stc-sup-req-project-filter">Project</label>
                                                             <select class="form-control" id="stc-sup-req-project-filter" title="Filter by project">
                                                                 <option value="">Loading…</option>
                                                             </select>
                                                         </div>
-                                                        <div class="col-md-3 col-sm-6 col-xs-12 stc-req-field">
+                                                        <div class="col-md-2 col-sm-6 col-xs-12 stc-req-field">
                                                             <label class="stc-req-lbl" for="stc-sup-req-status-filter">Status</label>
                                                             <select class="form-control" id="stc-sup-req-status-filter" title="Line-item status">
                                                                 <option value="">All</option>
@@ -344,6 +348,7 @@
                 e.preventDefault();
                 $('#stc-sup-req-beg-date').val('<?php echo $effectiveDate; ?>');
                 $('#stc-sup-req-end-date').val('<?php echo $newDate; ?>');
+                $('#stc-sup-req-item-search').val('');
                 $('#stc-sup-req-status-filter').val('');
                 loadReqProjectFilter();
             });
@@ -355,6 +360,7 @@
                 var supreqtodate=$('#stc-sup-req-end-date').val();
                 var supreq_project_id=$('#stc-sup-req-project-filter').val();
                 var supreq_status=$('#stc-sup-req-status-filter').val();
+                var supreq_item=$.trim($('#stc-sup-req-item-search').val() || '');
                 $.ajax({
                     url     : "nemesis/stc_agcart.php",
                     method  : "POST",
@@ -364,11 +370,12 @@
                             supreqtodate:supreqtodate,
                             supreq_project_id:supreq_project_id,
                             supreq_status:supreq_status,
+                            supreq_item:supreq_item,
                             supreq_page:reqPage,
                             supreq_per_page:25
                     },
                     success : function(reequisitionresult){
-                        $('.stc-requisition-search-result').html('<div class="mb-2"><input type="text" class="form-control stc-requisition-search" placeholder="Quick search in results…"></div>'+reequisitionresult);
+                        $('.stc-requisition-search-result').html(reequisitionresult);
                     }
                 });
             }
@@ -376,6 +383,13 @@
             $('body').delegate('.stc-sup-req-search', 'click', function(e){
                 e.preventDefault();
                 loadRequisitionSearchResults(1);
+            });
+
+            $('#stc-sup-req-item-search').on('keydown', function(e){
+                if(e.which === 13){
+                    e.preventDefault();
+                    loadRequisitionSearchResults(1);
+                }
             });
 
             $('body').delegate('.stc-req-page-btn', 'click', function(e){
@@ -386,20 +400,6 @@
                 if(isNaN(p) || p < 1){ return; }
                 loadRequisitionSearchResults(p);
             });
-
-            $('body').delegate('.stc-requisition-search', 'keyup', function(e){
-                var searchText = $(this).val().toLowerCase(); // Convert to lowercase for case-insensitive comparison
-                filterTable(searchText);
-            });
-
-            // Function to filter the table based on the input text
-            function filterTable(searchText) {
-                $('.stc-requisition-search-result > table > tbody tr').each(function () {
-                    var rowText = $(this).text().toLowerCase();
-                    // Toggle the visibility of the row based on whether it contains the search text
-                    $(this).toggle(rowText.includes(searchText));
-                });
-            }
 
             // call listed items from requisition
             $('body').delegate('.ag-show-requisition-items-hit', 'click', function(e){

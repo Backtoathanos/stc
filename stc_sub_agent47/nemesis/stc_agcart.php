@@ -368,7 +368,7 @@ class witcher_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
-	public function stc_search_requisitions($supreqfromdate, $supreqtodate, $project_id='', $status_filter='', $page=1, $per_page=25){ 
+	public function stc_search_requisitions($supreqfromdate, $supreqtodate, $project_id='', $status_filter='', $page=1, $per_page=25, $item_search=''){ 
 		$chk=mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_cust_super_requisition_list` LIKE 'stc_cust_super_requisition_list_order_number'");
 		if($chk && mysqli_num_rows($chk)==0){
 			mysqli_query($this->stc_dbs, "
@@ -388,6 +388,12 @@ class witcher_supervisor extends tesseract{
 				$status_sql=" AND I.`stc_cust_super_requisition_list_items_status`='".$sf."' ";
 			}
 		}
+		$item_sql='';
+		$item_search=trim((string)$item_search);
+		if($item_search!==''){
+			$item_esc=mysqli_real_escape_string($this->stc_dbs, $item_search);
+			$item_sql=" AND I.`stc_cust_super_requisition_list_items_title` LIKE '%".$item_esc."%' ";
+		}
 		$super_esc=mysqli_real_escape_string($this->stc_dbs, (string)$_SESSION['stc_agent_sub_id']);
 		$from_where="
 			FROM `stc_cust_super_requisition_list_items` I
@@ -399,7 +405,7 @@ class witcher_supervisor extends tesseract{
 				DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
 				AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
 			) AND `stc_cust_super_requisition_list_super_id`='".$super_esc."'
-			".$project_sql.$status_sql."
+			".$project_sql.$status_sql.$item_sql."
 		";
 		$cnt_res=mysqli_query($this->stc_dbs, "SELECT COUNT(*) AS cnt ".$from_where);
 		$cnt_row=$cnt_res ? mysqli_fetch_assoc($cnt_res) : array('cnt'=>0);
@@ -1894,10 +1900,11 @@ if(isset($_POST['call_searched_requisition'])){
 	$supreqtodate=date("Y-m-d", strtotime($_POST['supreqtodate']));
 	$supreq_project_id=isset($_POST['supreq_project_id']) ? $_POST['supreq_project_id'] : '';
 	$supreq_status=isset($_POST['supreq_status']) ? $_POST['supreq_status'] : '';
+	$supreq_item=isset($_POST['supreq_item']) ? trim((string)$_POST['supreq_item']) : '';
 	$supreq_page=isset($_POST['supreq_page']) ? (int)$_POST['supreq_page'] : 1;
 	$supreq_per_page=isset($_POST['supreq_per_page']) ? (int)$_POST['supreq_per_page'] : 25;
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page);
+	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page, $supreq_item);
 	echo $opobjsearchreq;
 }
 
